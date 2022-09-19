@@ -84,6 +84,7 @@ load_SSM_summary <- function(year, scenario = "Exist1") {
                             Chla_max = col_double(), 
                             Chla_min = col_double())) %>% 
     mutate(Year = year, .before = GridCell) %>% 
+    mutate(Scenario = scenario, .before = Year) %>% 
     relocate(GridCell, .before = Layer)
 }
 
