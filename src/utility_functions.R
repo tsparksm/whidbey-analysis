@@ -88,15 +88,28 @@ load_ssm_summary <- function(year, scenario = "Exist1") {
     relocate(GridCell, .before = Layer)
 }
 
+# Load in locator info: names, coordinates, SSM grid cells
+load_locator_info <- function() {
+  read_csv(here("data", "whidbey_locators.csv"), 
+           col_types = cols(Number = col_skip(), 
+                            Name = col_character(), 
+                            Locator = col_character(), 
+                            Lat = col_double(), 
+                            Lon = col_double(), 
+                            SiteType = col_skip(), 
+                            Area = col_skip(), 
+                            GridCell = col_integer()))
+}
+
 # Load SSM summaries, combine into single tibble
 # Assumes that all columns in SSM summaries are the same
 combine_ssm_summary <- function(years, scenarios) {
   temp <- list()
   for (i in 1:length(years)) {
     if (length(scenarios) == 1) {
-      temp[[i]] <- load_SSM_summary(years[i], scenarios)
+      temp[[i]] <- load_ssm_summary(years[i], scenarios)
     } else if (length(scenarios) == length(years)) {
-      temp[[i]] <- load_SSM_summary(years[i], scenarios[i])
+      temp[[i]] <- load_ssm_summary(years[i], scenarios[i])
     } else 
       stop("scenarios vector is not length 1 or length(years)")
   }
