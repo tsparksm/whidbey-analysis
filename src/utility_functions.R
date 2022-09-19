@@ -5,7 +5,7 @@ library(here)
 # Load in Whidbey Basin CTD data
 # Data must be downloaded from internal CTD website
 # Ensure ALL parameters are included
-load_CTD_data <- function() {
+load_ctd_data <- function() {
   fpath <- here("data", "raw", "whidbey_CTD.txt")
   import_CTD(fpath)
 }
@@ -59,7 +59,7 @@ load_buoy_data <- function() {
 # Load in summarized SSM output
 # Output generated using external script (make_SSM_summary.R)
 # Assumes scenario is Exist1 (normal model year) unless otherwise specified
-load_SSM_summary <- function(year, scenario = "Exist1") {
+load_ssm_summary <- function(year, scenario = "Exist1") {
   fpath <- here("data", "ssm", 
                 paste("SSM", year, scenario, "summary.csv", 
                       sep = "_"))
@@ -86,6 +86,26 @@ load_SSM_summary <- function(year, scenario = "Exist1") {
     mutate(Year = year, .before = GridCell) %>% 
     mutate(Scenario = scenario, .before = Year) %>% 
     relocate(GridCell, .before = Layer)
+}
+
+# Load SSM summaries, combine into single tibble
+# Assumes that all columns in SSM summaries are the same
+combine_ssm_summary <- function(years, scenarios) {
+  temp <- list()
+  for (i in 1:length(years)) {
+    if (length(scenarios) == 1) {
+      temp[[i]] <- load_SSM_summary(years[i], scenarios)
+    } else if (length(scenarios) == length(years)) {
+      temp[[i]] <- load_SSM_summary(years[i], scenarios[i])
+    } else 
+      stop("scenarios vector is not length 1 or length(years)")
+  }
+  
+  output <- temp[[1]]
+  for (j in 2:length(years)) {
+    output <- add_row(output, temp[[j]])
+  }
+  return(output)
 }
 
 # Re-download Whidbey Basin discrete/bottle data
