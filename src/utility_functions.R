@@ -89,9 +89,9 @@ load_ssm_summary <- function(year, scenario = "Exist1") {
     relocate(GridCell, .before = Layer)
 }
 
-# Load in locator info: names, coordinates, SSM grid cells
-load_locator_info <- function() {
-  read_csv(here("data", "whidbey_locators.csv"), 
+# Load in KC locator info: names, coordinates, SSM grid cells
+load_locator_kc <- function() {
+  read_csv(here("data", "whidbey_locators_kc.csv"), 
            col_types = cols(Number = col_skip(), 
                             Name = col_character(), 
                             Locator = col_character(), 
@@ -100,6 +100,26 @@ load_locator_info <- function() {
                             SiteType = col_skip(), 
                             Area = col_skip(), 
                             GridCell = col_integer()))
+}
+
+# Load in all Whidbey locator info: names, coordinates, agency, etc.
+load_locator_all <- function(jitter = T) {
+  read_csv(here("data", paste0("whidbey_stations_all", 
+                               if_else(jitter, "_jitter.csv", ".csv"))), 
+           col_types = cols(Name = col_character(), 
+                            Agency = col_character(), 
+                            Data_Type = col_character(), 
+                            Frequency = col_character(), 
+                            First_Year = col_integer(), 
+                            Last_Year = col_integer(), 
+                            Lat = col_double(), 
+                            Lon = col_double(), 
+                            DO = col_skip(), 
+                            NO3 = col_skip(), 
+                            PO4 = col_skip(), 
+                            Chla = col_skip(), 
+                            Si = col_skip(), 
+                            Notes = col_character()))
 }
 
 # Load SSM summaries, combine into single tibble

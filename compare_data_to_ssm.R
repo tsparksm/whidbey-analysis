@@ -6,7 +6,7 @@ years <- c(2006, 2008, 2014)
 scenarios <- "Exist1"  # 1 scenario, or length(years) scenarios
 
 #### Load data and information ####
-locator_info <- load_locator_info() %>% 
+locator_info <- load_locator_kc() %>% 
   select(Locator, GridCell)
 data_ctd <- load_ctd_data() %>% 
   mutate(Type = "CTD", 
@@ -43,7 +43,7 @@ data_combined_ctd <- full_join(data_ctd, data_ssm_avg)
 # Combine SSM and discrete output ####
 # TO DO
 
-#### Make figure - CTD vs SSM ####
+#### Figure - CTD vs SSM ####
 for (station in unique(locator_info$Locator)) {
   for (month in 2:8) {
     ggplot(data = data_combined_ctd %>% 
