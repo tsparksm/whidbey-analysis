@@ -96,15 +96,15 @@ for (station in unique(data_discrete$Locator)) {
                   Locator == station), 
          aes(x = CollectDate, 
              y = Value, 
-             color = grepl("MDL", QfrCode))) + 
+             shape = grepl("MDL", QfrCode))) + 
     theme_bw() + 
     geom_point() + 
-    scale_color_manual(values = c("black", "orange")) + 
+    scale_shape_manual(values = c(16, 1)) + 
     facet_wrap(~ DepthBin, ncol = 1) + 
     labs(x = "", 
          y = "Phosphate (mg/L)", 
          title = station, 
-         color = "<MDL")
+         shape = "<MDL")
   ggsave(filename = here("figs", "bottle", "po4", 
                          paste0(station, "_PO4.png")), 
          height = 5, width = 5)
@@ -118,15 +118,15 @@ for (station in unique(data_discrete$Locator)) {
                   Locator == station), 
          aes(x = CollectDate, 
              y = Value, 
-             color = grepl("MDL", QfrCode))) + 
+             shape = grepl("MDL", QfrCode))) + 
     theme_bw() + 
     geom_point() + 
-    scale_color_manual(values = c("black", "orange")) + 
+    scale_shape_manual(values = c(16, 1)) + 
     facet_wrap(~ DepthBin, ncol = 1) + 
     labs(x = "", 
          y = "Ammonia (mg/L)", 
          title = station, 
-         color = "<MDL")
+         shape = "<MDL")
   ggsave(filename = here("figs", "bottle", "nh3", 
                          paste0(station, "_NH3.png")), 
          height = 5, width = 5)
