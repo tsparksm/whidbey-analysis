@@ -140,15 +140,15 @@ ggplot(data = data_discrete %>%
                 QualityId %in% good_quals_discrete), 
        aes(x = CollectDate, 
            y = Value, 
-           color = grepl("MDL", QfrCode))) + 
+           shape = grepl("MDL", QfrCode))) + 
   theme_bw() + 
   geom_point() + 
-  scale_color_manual(values = c("black", "orange")) + 
+  scale_shape_manual(values = c(16, 1)) + 
   facet_grid(rows = vars(DepthBin), 
              cols = vars(Locator)) + 
   labs(x = "", 
        y = "Ammonia (mg/L)", 
-       color = "<MDL")
+       shape = "<MDL")
 ggsave(filename = here("figs", "bottle", "nh3", 
                        "comparison_NH3.png"), 
        height = 4, width = 6.5)
