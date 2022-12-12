@@ -21,7 +21,7 @@ for (station in unique(data_ctd$Locator)) {
     scale_x_reverse(expand = c(0, 0)) + 
     facet_wrap(~ Month) + 
     labs(x = "Depth (m)", 
-         y = "Nitrate (mg/L)", 
+         y = "Nitrate + nitrite N(mg/L)", 
          title = station)
   ggsave(filename = here("figs", "ctd-profiles", "no23", 
                          paste0(station, "_NO23.png")), 
