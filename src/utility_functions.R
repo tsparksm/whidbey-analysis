@@ -91,7 +91,7 @@ load_ssm_summary <- function(year, scenario = "Exist1") {
 
 # Load in KC locator info: names, coordinates, SSM grid cells
 load_locator_kc <- function() {
-  read_csv(here("data", "whidbey_locators_kc.csv"), 
+  read_csv(here("data", "whidbey_stations_kc.csv"), 
            col_types = cols(Number = col_skip(), 
                             Name = col_character(), 
                             Locator = col_character(), 
