@@ -74,15 +74,15 @@ for (station in unique(data_discrete$Locator)) {
                   Locator == station), 
          aes(x = CollectDate, 
              y = Value, 
-             color = grepl("MDL", QfrCode))) + 
+             shape = grepl("MDL", QfrCode))) + 
     theme_bw() + 
     geom_point() + 
-    scale_color_manual(values = c("black", "orange")) + 
+    scale_shape_manual(values = c(16, 1)) + 
     facet_wrap(~ DepthBin, ncol = 1) + 
     labs(x = "", 
          y = "Nitrate (mg/L)", 
          title = station, 
-         color = "<MDL")
+         shape = "<MDL")
   ggsave(filename = here("figs", "bottle", "no23", 
                          paste0(station, "_NO23.png")), 
          height = 5, width = 5)
