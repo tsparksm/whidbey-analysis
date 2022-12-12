@@ -47,6 +47,25 @@ for (station in unique(data_ctd$Locator)) {
          height = 5, width = 5)
 }
 
+#### Figure - chl CTD profiles by station, month ####
+for (station in unique(data_ctd$Locator)) {
+  ggplot(data = data_ctd %>% 
+           filter(Locator == station, 
+                  Chlorophyll_Qual %in% good_quals_ctd, 
+                  Depth <= 50)) + 
+    theme_bw() + 
+    geom_line(aes(x = Depth, y = Chlorophyll, group = Date)) + 
+    coord_flip() + 
+    scale_x_reverse(expand = c(0, 0)) + 
+    facet_wrap(~ Month) + 
+    labs(x = "Depth (m)", 
+         y = "Chlorophyll a (mg/L)", 
+         title = station)
+  ggsave(filename = here("figs", "ctd-profiles", "chl", 
+                         paste0(station, "_chl.png")), 
+         height = 5, width = 5)
+}
+
 #### Figure - nitrate bottle by station, depth, time ####
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
