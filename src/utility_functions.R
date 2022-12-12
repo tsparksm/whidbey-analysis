@@ -162,3 +162,18 @@ download_whidbey_discrete <- function() {
                                  "TSS"), 
                     fname = fpath)
 }
+
+# Calculate depth bin based on total profile depth and bin width
+depth_bin <- function(depth, width) {
+  end <- ceiling(max(depth) / width) * width
+  break_points <- seq(from = 0, to = end, by = width)
+  bins <- cut(depth, breaks = break_points)
+  return(bins)
+}
+
+# Using output from depth_bin(), calculate midpoint of bin
+get_bin_depth <- function(bin) {
+  depths <- parse_number(unlist(strsplit(as.character(bin), ",")))
+  depth <- mean(depths)
+  return(depth)
+}
