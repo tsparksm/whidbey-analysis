@@ -177,3 +177,12 @@ get_bin_depth <- function(bin) {
   depth <- mean(depths)
   return(depth)
 }
+
+# Load CTD composite - Central Basin monitoring
+load_composite <- function(bin_size, monthly = TRUE) {
+  folder <- "//kc.kingcounty.lcl/dnrp/WLRD/STS/Share/Marine Group/CTD_data_repository/Data composites/"
+  import_CTD_composite(paste0(folder, "data_CTD_", 
+                              bin_size, "m_bins_", 
+                              if_else(monthly, "monthly", "all"), 
+                              ".csv"))
+}
