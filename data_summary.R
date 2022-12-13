@@ -132,6 +132,27 @@ for (station in unique(data_discrete$Locator)) {
          height = 5, width = 5)
 }
 
+#### Figure - chl CTD profiles by station, year ####
+yoi <- 2022
+for (station in unique(data_ctd$Locator)) {
+  ggplot(data = data_ctd %>% 
+           filter(Locator == station, 
+                  Chlorophyll_Qual %in% good_quals_ctd, 
+                  Depth <= 50, 
+                  year(Date) == yoi)) + 
+    theme_bw() + 
+    geom_line(aes(x = Depth, y = Chlorophyll)) + 
+    coord_flip() + 
+    scale_x_reverse(expand = c(0, 0)) + 
+    facet_wrap(~ Date) + 
+    labs(x = "Depth (m)", 
+         y = "Chlorophyll a (mg/L)", 
+         title = station)
+  ggsave(filename = here("figs", "ctd-profiles", "chl", 
+                         paste0(station, "_", yoi, "_chl.png")), 
+         height = 5, width = 5)
+}
+
 #### Figure - ammonia bottle two station comparison ####
 stations <- c("PENNCOVEWEST", "PSUSANBUOY")
 ggplot(data = data_discrete %>% 
