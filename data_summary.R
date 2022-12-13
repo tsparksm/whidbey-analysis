@@ -153,23 +153,3 @@ for (station in unique(data_ctd$Locator)) {
          height = 5, width = 5)
 }
 
-#### Figure - ammonia bottle two station comparison ####
-stations <- c("PENNCOVEWEST", "PSUSANBUOY")
-ggplot(data = data_discrete %>% 
-         filter(ParmId == 13, 
-                Locator %in% stations, 
-                QualityId %in% good_quals_discrete), 
-       aes(x = CollectDate, 
-           y = Value, 
-           shape = grepl("MDL", QfrCode))) + 
-  theme_bw() + 
-  geom_point() + 
-  scale_shape_manual(values = c(16, 1)) + 
-  facet_grid(rows = vars(DepthBin), 
-             cols = vars(Locator)) + 
-  labs(x = "", 
-       y = "Ammonia (mg/L)", 
-       shape = "<MDL")
-ggsave(filename = here("figs", "bottle", "nh3", 
-                       "comparison_NH3.png"), 
-       height = 4, width = 6.5)
