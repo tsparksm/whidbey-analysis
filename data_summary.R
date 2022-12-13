@@ -153,3 +153,23 @@ for (station in unique(data_ctd$Locator)) {
          height = 5, width = 5)
 }
 
+#### Figure - surface density CTD profiles by station, year ####
+yoi <- 2022
+for (station in unique(data_ctd$Locator)) {
+  ggplot(data = data_ctd %>% 
+           filter(Locator == station, 
+                  SigmaTheta_Qual %in% good_quals_ctd, 
+                  Depth <= 50, 
+                  year(Date) == yoi)) + 
+    theme_bw() + 
+    geom_line(aes(x = Depth, y = SigmaTheta)) + 
+    coord_flip() + 
+    scale_x_reverse(expand = c(0, 0)) + 
+    facet_wrap(~ Date) + 
+    labs(x = "Depth (m)", 
+         y = expression(sigma [theta]~(kg/m^3)), 
+         title = station)
+  ggsave(filename = here("figs", "ctd-profiles", "density", 
+                         paste0(station, "_", yoi, "_surface_sigmat.png")), 
+         height = 5, width = 5)
+}
