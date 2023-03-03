@@ -10,8 +10,7 @@ good_quals_discrete <- 0:2
 #### Figure - nitrate CTD profiles by station, month ####
 for (station in unique(data_ctd$Locator)) {
   ggplot(data = data_ctd %>% 
-           filter(Locator == station, 
-                  NO23_Qual %in% good_quals_ctd), 
+           filter(Locator == station), 
          aes(x = Depth, y = NO23, group = Date)) + 
     theme_bw() + 
     geom_line() + 
@@ -29,8 +28,7 @@ for (station in unique(data_ctd$Locator)) {
 #### Figure - DO CTD profiles by station, month ####
 for (station in unique(data_ctd$Locator)) {
   ggplot(data = data_ctd %>% 
-           filter(Locator == station, 
-                  DO_Qual %in% good_quals_ctd)) + 
+           filter(Locator == station)) + 
     theme_bw() + 
     geom_line(aes(x = Depth, y = DO, group = Date)) + 
     geom_hline(yintercept = 6, color = "orange") + 
@@ -49,7 +47,6 @@ for (station in unique(data_ctd$Locator)) {
 for (station in unique(data_ctd$Locator)) {
   ggplot(data = data_ctd %>% 
            filter(Locator == station, 
-                  Chlorophyll_Qual %in% good_quals_ctd, 
                   Depth <= 50)) + 
     theme_bw() + 
     geom_line(aes(x = Depth, y = Chlorophyll, group = Date)) + 
@@ -164,7 +161,6 @@ yoi <- 2022
 for (station in unique(data_ctd$Locator)) {
   ggplot(data = data_ctd %>% 
            filter(Locator == station, 
-                  Chlorophyll_Qual %in% good_quals_ctd, 
                   Depth <= 50, 
                   year(Date) == yoi)) + 
     theme_bw() + 
@@ -185,7 +181,6 @@ yoi <- 2022
 for (station in unique(data_ctd$Locator)) {
   ggplot(data = data_ctd %>% 
            filter(Locator == station, 
-                  SigmaTheta_Qual %in% good_quals_ctd, 
                   Depth <= 50, 
                   year(Date) == yoi)) + 
     theme_bw() + 
