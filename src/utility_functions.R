@@ -207,3 +207,36 @@ load_composite <- function(bin_size,
                               if_else(monthly, "monthly", "all"), 
                               ".csv"))
 }
+
+# Load stratification - Central Basin or Whidbey
+# For Whidbey, set location = "Whidbey"
+# For Central Basin, set location = "" or "Central"
+load_strat <- function(location = "Whidbey") {
+  if (location == "Whidbey") location <- "Whidbey_"
+  if (location == "Central") location <- ""
+  folder <- "//kc.kingcounty.lcl/dnrp/WLRD/STS/Share/Marine Group/CTD_data_repository/Data composites/"
+  fname <- paste0(folder, "data_", location, "strat_all.csv")
+  read_csv(fname, 
+           col_types = cols(Locator = col_character(), 
+                            Date = col_date(), 
+                            Stratified = col_logical(), 
+                            Max_dpdz = col_double(), 
+                            Depth_pycno = col_double(), 
+                            Max_buoyfreq = col_double(), 
+                            Pycno_dpdS = col_double(), 
+                            Pycno_dpdT = col_double(), 
+                            Mean_density = col_double(), 
+                            PE_anomaly = col_double(), 
+                            DeltaT = col_double(), 
+                            DeltaS = col_double(), 
+                            DeltaP = col_double(), 
+                            DeltaT_50 = col_double(), 
+                            DeltaS_50 = col_double(), 
+                            DeltaP_50 = col_double(), 
+                            Max_depth = col_double(), 
+                            Flag = col_character(), 
+                            BinPycno = col_character(), 
+                            BinStrength = col_character(), 
+                            Month = col_integer(), 
+                            Year = col_integer()))
+}
