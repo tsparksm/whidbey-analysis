@@ -1,11 +1,13 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
 
-data_whidbey <- load_ctd_data() %>% 
-  mutate(Month = month(Date), 
-         Year = year(Date))
+data_whidbey <- load_composite(bin_size = 0.5, 
+                               monthly = FALSE, 
+                               location = "Whidbey")
 data_central <- load_composite(bin_size = 0.5, 
-                               monthly = FALSE)
+                               monthly = FALSE, 
+                               location = "Central")
+
 
 good_quals_ctd <- c(NA, "TA")
 
