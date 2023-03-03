@@ -8,6 +8,7 @@ data_central <- load_composite(bin_size = 0.5,
                                monthly = FALSE, 
                                location = "Central")
 
+bottle_data <- load_whidbey_discrete()
 
 good_quals_ctd <- c(NA, "TA")
 
@@ -39,3 +40,4 @@ ggplot(data = bottle_data %>%
   scale_shape_manual(values = c(1, 16))
 ggsave(here("figs", "bottle", 
             paste0("N_P_shallow_", yoi, ".png")), 
+       dpi = 600, height = 5, width = 8)
