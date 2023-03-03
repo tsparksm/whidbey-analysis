@@ -17,8 +17,8 @@ load_ctd_data <- function() {
 load_discrete_data <- function() {
   fpath <- here("data", "raw", "whidbey_discrete.csv")
   output <- import_discrete(fpath) %>% 
-    mutate(Value = case_when(QfrCode == "<MDL" ~ Mdl, 
-                             TRUE ~ Value),
+    mutate(Detect = !is.na(Value), 
+           Value = ifelse(Detect, Value, Mdl), 
            DepthBin = case_when(Depth < 2 ~ "surface", 
                                 Depth < 7 ~ "2-6 m", 
                                 Depth < 11 ~ "7-10 m", 
