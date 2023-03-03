@@ -20,12 +20,9 @@ sigmat_contour_alpha <- 0.1  # if you want contour lines, use 0.1; else use 0
 # How wide do you want your depth bins (0.5, 1, 2, 5 probably best)
 bin_width <- 0.5
 
-# Load and bin data
-data_ctd <- load_ctd_data() %>% 
-  mutate(Year = year(Date), 
-         YearDay = yday(Date), 
-         Bin = depth_bin(Depth, bin_width), 
-         BinDepth = sapply(Bin, get_bin_depth))
+# Load composite data
+data_ctd <- load_composite(bin_width, 
+                           monthly = FALSE)
 
 # How narrowly spaced do you want the color bins in each of these plots?
 # Original values are in comments following semi-colon
