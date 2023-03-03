@@ -2,7 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 
 data_ctd <- load_composite(0.5, monthly = FALSE)
-data_discrete <- load_discrete_data()
+data_discrete <- load_whidbey_discrete()
 
 good_quals_ctd <- c(NA, "TA")
 good_quals_discrete <- 0:2
