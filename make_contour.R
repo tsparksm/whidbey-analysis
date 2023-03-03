@@ -22,7 +22,8 @@ bin_width <- 0.5
 
 # Load composite data
 data_ctd <- load_composite(bin_width, 
-                           monthly = FALSE)
+                           monthly = FALSE) %>% 
+  mutate(YearDay = yday(Date))
 
 # How narrowly spaced do you want the color bins in each of these plots?
 # Original values are in comments following semi-colon
