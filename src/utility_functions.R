@@ -191,10 +191,18 @@ get_bin_depth <- function(bin) {
   return(depth)
 }
 
-# Load CTD composite - Central Basin monitoring
-load_composite <- function(bin_size, monthly = TRUE) {
+# Load CTD composite - Central Basin or Whidbey monitoring
+# For Whidbey, set location = "Whidbey" (only 0.5 and 1 m bins right now)
+# For Central Basin, set location = "" or "Central"
+load_composite <- function(bin_size, 
+                           location = "Whidbey", 
+                           monthly = TRUE) {
+  if (location == "Whidbey") location <- "Whidbey_"
+  if (location == "Central") location <- ""
   folder <- "//kc.kingcounty.lcl/dnrp/WLRD/STS/Share/Marine Group/CTD_data_repository/Data composites/"
-  import_CTD_composite(paste0(folder, "data_CTD_", 
+  import_CTD_composite(paste0(folder, "data_", 
+                              location, 
+                              "CTD_", 
                               bin_size, "m_bins_", 
                               if_else(monthly, "monthly", "all"), 
                               ".csv"))
