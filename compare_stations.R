@@ -14,13 +14,28 @@ good_quals_ctd <- c(NA, "TA")
 #### Combine data from Whidbey and Central Basins ####
 data_combine <- full_join(data_whidbey, data_central)
 
-#### Figure - compare 2 stations over a year, N and P ####
-stations <- c("SARATOGACH", "NSEX01")
+#### Figure - compare shallow stations over a year, N and P ####
+stations <- c("PENNCOVEWEST", "PENNCOVEENT", "PSUSANBUOY")
 yoi <- 2022
 
-ggplot(data = data_combine %>% 
+ggplot(data = bottle_data %>% 
          filter(Locator %in% stations, 
-                Year == yoi, 
+                year(CollectDate) == yoi, 
                 ParmId %in% c(14, 15)), 
-       aes(x = Date, 
-           y = )
+       aes(x = CollectDate, 
+           y = Value, 
+           color = Depth, 
+           shape = Detect)) + 
+  theme_bw() + 
+  geom_point() + 
+  facet_grid(cols = vars(Locator), 
+             rows = vars(ParmDisplayName), 
+             scales = "free_y") + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
+  labs(x = "", y = "Concentration (mg/L)") + 
+  scale_color_gradient(trans = "log",
+                       breaks = c(25, 10, 5, 1)) +
+  scale_shape_manual(values = c(1, 16))
+ggsave(here("figs", "bottle", 
+            paste0("N_P_shallow_", yoi, ".png")), 
