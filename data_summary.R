@@ -1,9 +1,7 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
 
-data_ctd <- load_ctd_data() %>% 
-  mutate(Month = factor(month.name[month(Date)], 
-                        levels = month.name))
+data_ctd <- load_composite(0.5, monthly = FALSE)
 data_discrete <- load_discrete_data()
 
 good_quals_ctd <- c(NA, "TA")
@@ -88,6 +86,35 @@ for (station in unique(data_discrete$Locator)) {
          height = 5, width = 5)
 }
 
+#### Figure - N and P bottle for a single deep station, year ####
+yoi <- 2022
+stations <- c("SARATOGACH")
+for (station in stations) {
+  ggplot(data = bottle_data %>% 
+           filter(Locator == station, 
+                  year(CollectDate) == yoi, 
+                  ParmId %in% c(14, 15)), 
+         aes(x = CollectDate, 
+             y = Value, 
+             color = Depth, 
+             shape = Detect)) + 
+    theme_bw() + 
+    geom_point() + 
+    facet_grid(rows = vars(ParmDisplayName), 
+               scales = "free_y") + 
+    scale_x_datetime(date_breaks = "1 month", 
+                     date_labels = "%b") + 
+    labs(x = "", y = "Concentration (mg/L)", 
+         title = paste(station, yoi)) + 
+    scale_color_gradient(trans = "log",
+                         breaks = c(150, 50, 25, 10, 5, 1)) +
+    scale_shape_manual(values = c(1, 16))
+  ggsave(here("figs", "bottle", 
+              paste0("N_P_", station, "_", yoi, ".png")), 
+         dpi = 600, height = 4, width = 6)
+  
+}
+
 #### Figure - phosphate bottle by station, depth, time ####
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
@@ -146,7 +173,7 @@ for (station in unique(data_ctd$Locator)) {
     scale_x_reverse(expand = c(0, 0)) + 
     facet_wrap(~ Date) + 
     labs(x = "Depth (m)", 
-         y = "Chlorophyll a (mg/L)", 
+         y = expression(Chlorophyll~(mu*g/L)), 
          title = station)
   ggsave(filename = here("figs", "ctd-profiles", "chl", 
                          paste0(station, "_", yoi, "_chl.png")), 
@@ -173,3 +200,4 @@ for (station in unique(data_ctd$Locator)) {
                          paste0(station, "_", yoi, "_surface_sigmat.png")), 
          height = 5, width = 5)
 }
+
