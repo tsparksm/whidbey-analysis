@@ -3,12 +3,25 @@ library(tidyverse)
 library(here)
 library(lubridate)
 
-# Load in Whidbey Basin CTD data
-# Data must be downloaded from internal CTD website
-# Ensure ALL parameters are included
-load_ctd_data <- function() {
-  fpath <- here("data", "raw", "whidbey_CTD.txt")
-  import_CTD(fpath)
+# Load CTD data - single or multiple sites
+# Outputs a single tibble containing one or more sites
+# sites = vector of 1+ locator codes, e.g. c("JSUR01", "LTED04")
+# type = "qcd" (default) or "raw"
+load_CTD <- function(sites, type = "qcd") {
+  folder <- "//kc.kingcounty.lcl/dnrp/WLRD/STS/Share/Marine Group/CTD_data_repository/"
+  for (locator in sites) {
+    subfolder <- paste0(folder, locator)
+    fpath <- list.files(path = subfolder, 
+                        pattern = paste0(type, ".csv"), 
+                        full.names = T)
+    temp <- import_CTD(fpath)
+    if (locator == sites[1]) {
+      output <- temp
+    } else {
+      output <- add_row(output, temp)
+    }
+  }
+  return(output)
 }
 
 # Load in Whidbey Basin discrete/bottle data
