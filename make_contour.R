@@ -171,19 +171,22 @@ for (station in stations) {
     extra_data_before <- data_to_plot %>% 
       filter(Year == yoi - 1, 
              YearDay == max(YearDay)) %>% 
-      mutate(YearDay = YearDay - 365)
+      mutate(YearDay = YearDay - 365, 
+             Year = yoi)
     data_to_plot <- add_row(data_to_plot, extra_data_before)
     
     extra_data_after <- data_to_plot %>% 
       filter(Year == yoi + 1, 
              BinDepth <= max_depth, 
              YearDay == min(YearDay)) %>% 
-      mutate(YearDay = YearDay + 365)
+      mutate(YearDay = YearDay + 365, 
+             Year = yoi)
     data_to_plot <- add_row(data_to_plot, extra_data_after)
   }
   
-  ggplot(data = data_to_plot %>% 
-           filter(Year %in% years[1]:years[2])) + 
+  data_to_plot <- filter(data_to_plot, Year %in% years[1]:years[2])
+  
+  ggplot(data = data_to_plot) + 
     theme_classic() + 
     facet_wrap(~ Year, 
                ncol = 1) + 
@@ -216,7 +219,7 @@ for (station in stations) {
                                   yday(paste(yoi, "-11-01", sep = "")), 
                                   yday(paste(yoi, "-12-01", sep = ""))), 
                        labels = month.abb) + 
-    geom_vline(xintercept = unique(data_to_plot$YearDay), 
+    geom_vline(aes(xintercept = YearDay), 
                alpha = 0.2) + 
     labs(x = "", 
          y = "Depth (m)", 
