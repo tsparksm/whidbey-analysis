@@ -27,7 +27,7 @@ load_CTD <- function(sites, type = "qcd") {
 # Load in Whidbey Basin discrete/bottle data
 # Data must be downloaded using kcmarine download_discrete()
 # Adds depth bins that are relevant for Whidbey Basin sites
-load_discrete_data <- function() {
+load_whidbey_discrete <- function() {
   fpath <- here("data", "raw", "whidbey_discrete.csv")
   output <- import_discrete(fpath) %>% 
     mutate(Detect = !is.na(Value), 
