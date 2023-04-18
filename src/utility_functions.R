@@ -240,3 +240,102 @@ load_strat <- function(location = "Whidbey") {
                             Month = col_integer(), 
                             Year = col_integer()))
 }
+
+round_any = function(x, accuracy, f=round){f(x/ accuracy) * accuracy}
+
+craftbrewer_pal <- function (type = "seq", palette = 1, direction = 1) 
+{
+  pal <- scales:::pal_name(palette, type)
+  force(direction)
+  function(n) {
+    n_max_palette <- RColorBrewer:::maxcolors[names(RColorBrewer:::maxcolors) == palette]
+    
+    if (n < 3) {
+      pal <- suppressWarnings(RColorBrewer::brewer.pal(n, pal))
+    } else if (n > n_max_palette){
+      rlang::warn(paste(n, "colours used, but", palette, "has only",
+                        n_max_palette, "- New palette created based on all colors of", 
+                        palette))
+      n_palette <- RColorBrewer::brewer.pal(n_max_palette, palette)
+      colfunc <- grDevices::colorRampPalette(n_palette)
+      pal <- colfunc(n)
+    }
+    else {
+      pal <- RColorBrewer::brewer.pal(n, pal)
+    }
+    pal <- pal[seq_len(n)]
+    if (direction == -1) {
+      pal <- rev(pal)
+    }
+    pal
+  }
+}
+
+scale_fill_craftfermenter <- function(..., type = "seq", 
+                                      palette = 1, 
+                                      direction = -1, 
+                                      na.value = "grey50", 
+                                      guide = "coloursteps", 
+                                      aesthetics = "fill") {
+  type <- match.arg(type, c("seq", "div", "qual"))
+  if (type == "qual") {
+    warn("Using a discrete colour palette in a binned scale.\n  Consider using type = \"seq\" or type = \"div\" instead")
+  }
+  binned_scale(aesthetics, "fermenter", ggplot2:::binned_pal(craftbrewer_pal(type, palette, direction)), na.value = na.value, guide = guide, ...)
+}
+
+# Load climate data from NOAA
+# Daily summaries downloaded here: https://www.ncei.noaa.gov/cdo-web/search
+# Click on Everett for best Whidbey options
+load_climate <- function() {
+  fname <- here("data", "raw", "everett_climate_data.csv")
+  read_csv(fname, 
+           col_types = cols(STATION = col_character(), 
+                            NAME = col_character(), 
+                            LATITUDE = col_double(), 
+                            LONGITUDE = col_double(), 
+                            ELEVATION = col_double(), 
+                            DATE = col_date(), 
+                            AWND = col_double(), 
+                            AWND_ATTRIBUTES = col_character(), 
+                            DAPR = col_integer(), 
+                            DAPR_ATTRIBUTES = col_character(), 
+                            MDPR = col_double(), 
+                            MDPR_ATTRIBUTES = col_character(), 
+                            PGTM = col_integer(), 
+                            PGTM_ATTRIBUTES = col_character(), 
+                            PRCP = col_double(), 
+                            PRCP_ATTRIBUTES = col_character(), 
+                            SNOW = col_double(), 
+                            SNOW_ATTRIBUTES = col_character(), 
+                            SNWD = col_double(), 
+                            SNWD_ATTRIBUTES = col_character(), 
+                            TAVG = col_double(), 
+                            TAVG_ATTRIBUTES = col_character(), 
+                            TMAX = col_integer(), 
+                            TMAX_ATTRIBUTES = col_character(), 
+                            TMIN = col_integer(), 
+                            TMIN_ATTRIBUTES = col_character(), 
+                            TOBS = col_integer(), 
+                            TOBS_ATTRIBUTES = col_character(), 
+                            WDF2 = col_integer(), 
+                            WDF2_ATTRIBUTES = col_character(), 
+                            WDF5 = col_integer(), 
+                            WDF5_ATTRIBUTES = col_character(), 
+                            WESD = col_double(), 
+                            WESD_ATTRIBUTES = col_character(), 
+                            WESF = col_double(), 
+                            WESF_ATTRIBUTES = col_character(), 
+                            WDF2 = col_double(), 
+                            WDF2_ATTRIBUTES = col_character(), 
+                            WDF5 = col_double(), 
+                            WDF5_ATTRIBUTES = col_character(), 
+                            WT01 = col_skip(), 
+                            WT01_ATTRIBUTES = col_skip(), 
+                            WT02 = col_skip(), 
+                            WT02_ATTRIBUTES = col_skip(), 
+                            WT03 = col_skip(), 
+                            WT03_ATTRIBUTES = col_skip(), 
+                            WT08 = col_skip(), 
+                            WT08_ATTRIBUTES = col_skip()))
+}
