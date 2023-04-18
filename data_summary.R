@@ -196,3 +196,93 @@ for (station in unique(data_ctd$Locator)) {
          height = 5, width = 5)
 }
 
+
+#### Figure - integrated chl by station, year ####
+yoi <- 2022
+
+totalchl <- data_ctd %>% 
+  filter(Depth >= 1, 
+         Depth <= 50, 
+         Year == yoi, 
+         Locator != "PENNCOVEPNN001") %>% 
+  group_by(Locator, Date) %>% 
+  summarize(Int_chl = trapz(Depth, Chlorophyll))
+
+ggplot(data = totalchl, 
+       aes(x = Date, 
+           y = Int_chl)) + 
+  theme_bw() + 
+  geom_point() + 
+  facet_wrap(~ Locator) + 
+  labs(x = "", 
+       y = "1-50 m integrated chl (mg/L*m)", 
+       title = yoi)
+
+ggsave(here("figs", paste0(yoi, "_50m_int_chl.png")), 
+       dpi = 600, height = 4, width = 6)
+
+#### Figure - integrated chl by year - deep stations ####
+yoi <- 2022
+stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
+              "PSUSANKP", "PSUSANENT", "Poss DO-2")
+
+totalchl <- data_ctd %>% 
+  filter(Depth >= 1, 
+         Depth <= 50, 
+         Year == yoi, 
+         Locator %in% stations) %>% 
+  group_by(Locator, Date) %>% 
+  summarize(Int_chl = pracma::trapz(Depth, Chlorophyll))
+
+ggplot(data = totalchl, 
+       aes(x = Date, 
+           y = Int_chl, 
+           color = Locator)) + 
+  theme_bw() + 
+  geom_point() + 
+  geom_line() + 
+  labs(x = "", 
+       y = "Chlorophyll fluorescence (mg/L*m)", 
+       color = "", 
+       title = paste(yoi, "1-50 m integrated chlorophyll")) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_x_date(date_breaks = "1 month", 
+               date_labels = "%b")
+
+ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep.png")), 
+       dpi = 600, height = 4, width = 6)
+
+
+#### Figure - minimum DO by year ####
+yoi <- 2022
+
+data_to_plot <- data_ctd %>% 
+  filter(Year == yoi, 
+         Locator != "PENNCOVEPNN001") %>% 
+  group_by(Locator, Date) %>% 
+  summarize(MinDO = min(DO))
+
+ggplot(data = data_to_plot, 
+       aes(x = Date, 
+           y = MinDO)) + 
+  theme_bw() + 
+  geom_point() + 
+  facet_wrap(~ Locator, 
+             ncol = 5) + 
+  labs(x = "", 
+       y = "Minimum DO (mg/L)", 
+       color = "", 
+       title = yoi) + 
+  scale_x_date(date_breaks = "2 month", 
+               date_labels = "%b") + 
+  scale_y_continuous(breaks = seq(0, 12, by = 2)) + 
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.4)) + 
+  geom_hline(aes(yintercept = 6, color = "WA WQS"), 
+             linetype = "dashed") + 
+  geom_hline(aes(yintercept = 2, color = "Hypoxia"), 
+                 linetype = "dashed") + 
+  scale_color_manual(values = c("red", "black"))
+
+ggsave(here("figs", paste0(yoi, "_min_DO.png")), 
+       dpi = 600, height = 6, width = 11)
