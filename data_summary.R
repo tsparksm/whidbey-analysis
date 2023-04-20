@@ -1,7 +1,10 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
 
-data_ctd <- load_composite(0.5, monthly = FALSE)
+data_ctd <- load_composite(0.5, monthly = FALSE) %>% 
+  mutate(Basin = "Whidbey")
+data_central <- load_composite(0.5, location = "Central", monthly = FALSE) %>% 
+  mutate(Basin = "Central")
 data_discrete <- load_whidbey_discrete()
 
 good_quals_ctd <- c(NA, "TA")
@@ -221,7 +224,7 @@ ggplot(data = totalchl,
 ggsave(here("figs", paste0(yoi, "_50m_int_chl.png")), 
        dpi = 600, height = 4, width = 6)
 
-#### Figure - integrated chl by year - deep stations ####
+#### Figure - integrated chl by year - deep stations basin comparison ####
 yoi <- 2022
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2")
@@ -252,6 +255,38 @@ ggplot(data = totalchl,
 ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep.png")), 
        dpi = 600, height = 4, width = 6)
 
+
+yoi <- 2022
+stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
+              "PSUSANKP", "PSUSANENT", "Poss DO-2", 
+              "KSBP01", "JSUR01", "NSEX01", "LSEP01", "LSNT01")
+
+totalchl <- data_ctd %>% 
+  full_join(data_central) %>% 
+  filter(Depth >= 1, 
+         Depth <= 50, 
+         Year == yoi, 
+         Locator %in% stations) %>% 
+  group_by(Basin, Locator, Date) %>% 
+  summarize(Int_chl = pracma::trapz(Depth, Chlorophyll))
+
+ggplot(data = totalchl, 
+       aes(x = Date, 
+           y = Int_chl, 
+           color = Basin)) + 
+  theme_bw() + 
+  geom_point() + 
+  geom_smooth(se = FALSE) + 
+  labs(x = "", 
+       y = "Chlorophyll fluorescence (mg/L*m)", 
+       color = "", 
+       title = paste(yoi, "1-50 m integrated chlorophyll")) + 
+  scale_color_brewer(palette = "Paired") + 
+  scale_x_date(date_breaks = "1 month", 
+               date_labels = "%b")
+
+ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep_CvsW.png")), 
+       dpi = 600, height = 4, width = 6)
 
 #### Figure - minimum DO by year ####
 yoi <- 2022
