@@ -115,6 +115,47 @@ for (station in stations) {
   
 }
 
+#### Figure - N:P by station, depth, time ####
+data_to_plot <- data_discrete %>% 
+  filter(ParmId %in% 13:15, 
+         QualityId %in% good_quals_discrete) %>% 
+  mutate(ND = is.na(Value), 
+         Value = ifelse(ND, Mdl, Value), 
+         Name = case_when(ParmId == 13 ~ "NH3", 
+                          ParmId == 14 ~ "NNN", 
+                          TRUE ~ "P")) %>% 
+  select(CollectDate, Locator, SampleId, DepthBin, Value, Name, Depth, ND) %>% 
+  group_by(CollectDate, Locator, DepthBin, Depth, ND, Name) %>% 
+  summarize(Value = mean(Value)) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = Name, 
+              values_from = Value) %>% 
+  mutate(N = (NNN + NH3)/14.09, 
+         P = P/30.97, 
+         NtoP = N/P) %>% 
+  group_by(CollectDate, Locator, DepthBin) %>% 
+  summarize(NtoP = mean(NtoP), 
+            N = mean(N), 
+            P = mean(P)) %>% 
+  ungroup()
+
+for (station in unique(data_discrete$Locator)) {
+  ggplot(data = data_to_plot %>% filter(Locator == station), 
+         aes(x = CollectDate, 
+             y = NtoP, 
+             color = N)) + 
+    theme_bw() + 
+    geom_point() + 
+    facet_wrap(~ DepthBin, ncol = 1) + 
+    labs(x = "", 
+         y = "N:P", 
+         title = station, 
+         color = "DIN (mg/L)")
+  ggsave(filename = here("figs", "bottle", "NtoP", 
+                         paste0(station, "_NtoP.png")), 
+         height = 5, width = 5)
+}
+
 #### Figure - phosphate bottle by station, depth, time ####
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
