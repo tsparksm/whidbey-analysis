@@ -94,18 +94,18 @@ mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
 mylabels[1] <- paste0("<", lims[1])
 mylabels[length(mylabels)] <- paste0(">", lims[2])
 
+data_to_plot <- data_remix %>% 
+  filter(Locator %in% stations, 
+         !is.na(SigmaTheta), 
+         BinDepth <= MinMaxDepth) %>% 
+  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
+                                SigmaTheta > lims[2] ~ lims[2], 
+                                TRUE ~ SigmaTheta))
+
 if (all_stations_fig) {
-  data_to_plot <- data_remix %>% 
-    filter(Locator %in% stations, 
-           !is.na(SigmaTheta), 
-           BinDepth <= MinMaxDepth) %>% 
-    group_by(Locator, Year, YearDay, BinDepth) %>% 
-    summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
-    ungroup() %>% 
-    mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
-                                  SigmaTheta > lims[2] ~ lims[2], 
-                                  TRUE ~ SigmaTheta))
-  
   ggplot(data = data_to_plot %>% 
            filter(Year %in% years[1]:years[2])) + 
     theme_classic() + 
@@ -156,16 +156,8 @@ if (all_stations_fig) {
          dpi = 600)
 } else {
   for (station in stations) {
-    data_to_plot <- data_remix %>% 
-      filter(Locator == station, 
-             !is.na(SigmaTheta), 
-             BinDepth <= MinMaxDepth) %>% 
-      group_by(Year, YearDay, BinDepth) %>% 
-      summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
-      ungroup() %>% 
-      mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
-                                    SigmaTheta > lims[2] ~ lims[2], 
-                                    TRUE ~ SigmaTheta))
+    data_to_plot <- data_to_plot %>% 
+      filter(Locator == station)
     
     ggplot(data = data_to_plot %>% 
              filter(Year %in% years[1]:years[2])) + 
@@ -226,17 +218,18 @@ mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
 mylabels[1] <- paste0("<", lims[1])
 mylabels[length(mylabels)] <- paste0(">", lims[2])
 
+data_to_plot <- data_remix %>% 
+  filter(Locator %in% stations, 
+         !is.na(SigmaTheta), 
+         BinDepth <= max_depth) %>% 
+  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
+                                SigmaTheta > lims[2] ~ lims[2], 
+                                TRUE ~ SigmaTheta))
+
 if (all_stations_fig) {
-  data_to_plot <- data_remix %>% 
-    filter(Locator %in% stations, 
-           !is.na(SigmaTheta), 
-           BinDepth <= max_depth) %>% 
-    group_by(Locator, Year, YearDay, BinDepth) %>% 
-    summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
-    ungroup() %>% 
-    mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
-                                  SigmaTheta > lims[2] ~ lims[2], 
-                                  TRUE ~ SigmaTheta))
   ggplot(data = data_to_plot %>% 
            filter(Year %in% years[1]:years[2])) + 
     theme_classic() + 
@@ -287,16 +280,8 @@ if (all_stations_fig) {
          dpi = 600)
 } else {
   for (station in stations) {
-    data_to_plot <- data_remix %>% 
-      filter(Locator == station, 
-             !is.na(SigmaTheta), 
-             BinDepth <= max_depth) %>% 
-      group_by(Year, YearDay, BinDepth) %>% 
-      summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
-      ungroup() %>% 
-      mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
-                                    SigmaTheta > lims[2] ~ lims[2], 
-                                    TRUE ~ SigmaTheta))
+    data_to_plot <- data_to_plot %>% 
+      filter(Locator == station)
     
     ggplot(data = data_to_plot %>% 
              filter(Year %in% years[1]:years[2])) + 
