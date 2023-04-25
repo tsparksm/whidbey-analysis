@@ -45,14 +45,13 @@ acc_T_anom <- 0.05  # temperature anomaly; 0.05
 acc_T <- 0.2  # temperature; 0.2
 acc_sigmaT <- 0.2  # sigma-theta density; 0.2
 
-#### Add max_depth for each station ####
+#### Calculate max_depth for each station ####
 max_depth <- data_ctd %>% 
   filter(Year <= years[2], 
          Year >= years[1]) %>% 
   group_by(Locator, Year, YearDay) %>% 
   summarize(MaxDepth = max(BinDepth, na.rm = TRUE)) %>% 
   summarize(MinMaxDepth = min(MaxDepth))
-data_ctd <- left_join(data_ctd, max_depth)
 
 #### Sigma-t contour plot ####
 for (station in stations) {
