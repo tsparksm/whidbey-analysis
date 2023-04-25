@@ -3,16 +3,26 @@ source(here::here("src", "utility_functions.R"))
 library(metR)
 library(cmocean)
 
-good_quals_ctd <- c(NA, "TA")
-
-# What stations to plot? One figure per station
+# What stations to plot?
 stations <- c("PENNCOVECW", "PENNCOVEENT", "PENNCOVEWEST", 
               "Poss DO-2", "PSUSANBUOY", "PSUSANENT", 
               "PSUSANKP", "SARATOGACH", "SARATOGAOP", "SARATOGARP")
-# What years to plot? c(min_year, max_year), shared axes b/w years
-# One figure with multiple panels
+
+# All stations on one figure? TRUE or FALSE
+all_stations_fig <- TRUE
+
+# If all_stations_fig == FALSE, same limits? TRUE or FALSE
+all_stations_lims <- TRUE
+
+# What years to plot? c(min_year, max_year)
 years <- c(2022, 2022)
 n <- length(unique(years))
+
+# All years on one figure? TRUE or FALSE
+all_years_fig <- TRUE
+
+# If all_years_fig == FALSE, same limits? TRUE or FALSE
+all_years_lims <- TRUE
 
 # Do you want contour lines on your sigma-theta plots?
 sigmat_contour_alpha <- 0.1  # if you want contour lines, use 0.1; else use 0
