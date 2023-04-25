@@ -334,56 +334,28 @@ if (all_stations_fig) {
 }
 
 #### DO contour plot ####
-for (station in stations) {
-  max_depth <- data_ctd %>% 
-    filter(Year <= years[2], 
-           Year >= years[1], 
-           Locator == station) %>% 
-    group_by(Year, YearDay) %>% 
-    summarize(MaxDepth = max(BinDepth, na.rm = TRUE)) %>% 
-    summarize(Value = min(MaxDepth)) %>% 
-    pull(Value)
-  
-  data_to_plot <- data_ctd %>% 
-    filter(Locator == station, 
-           !is.na(DO), 
-           BinDepth <= max_depth) %>% 
-    group_by(Year, YearDay, BinDepth) %>% 
-    summarize(DO = mean(DO, na.rm = TRUE)) %>% 
-    ungroup()
-  
-  # Add extra data before and after (assuming multiple years of data)
-  for (yoi in years[1]:years[2]) {
-    extra_data_before <- data_to_plot %>% 
-      filter(Year == yoi - 1, 
-             YearDay == max(YearDay)) %>% 
-      mutate(YearDay = YearDay - 365, 
-             Year = yoi)
-    data_to_plot <- add_row(data_to_plot, extra_data_before)
-    
-    extra_data_after <- data_to_plot %>% 
-      filter(Year == yoi + 1, 
-             BinDepth <= max_depth, 
-             YearDay == min(YearDay)) %>% 
-      mutate(YearDay = YearDay + 365, 
-             Year = yoi)
-    data_to_plot <- add_row(data_to_plot, extra_data_after)
-  }
-  
-  data_to_plot <- filter(data_to_plot, Year %in% years[1]:years[2])
-  
-  min_lim <- round_any(min(data_to_plot$DO, na.rm = T),
-                       accuracy = acc_DO, f = floor)
-  max_lim <- round_any(max(data_to_plot$DO, na.rm = T),
-                       accuracy = acc_DO, f = ceiling)
-  mybreaks <- seq(min_lim, max_lim, by = acc_DO)
-  mylabels <- mybreaks
-  mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-  
+data_to_plot <- data_remix %>% 
+  filter(Locator %in% stations, 
+         !is.na(DO), 
+         BinDepth <= MinMaxDepth) %>% 
+  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  summarize(DO = mean(DO, na.rm = TRUE)) %>% 
+  ungroup()
+
+min_lim <- round_any(min(data_to_plot$DO, na.rm = T),
+                     accuracy = acc_DO, f = floor)
+max_lim <- round_any(max(data_to_plot$DO, na.rm = T),
+                     accuracy = acc_DO, f = ceiling)
+mybreaks <- seq(min_lim, max_lim, by = acc_DO)
+mylabels <- mybreaks
+mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+
+if (all_stations_fig) {
   ggplot(data = data_to_plot) + 
     theme_classic() + 
-    facet_wrap(~ Year, 
-               ncol = 1) + 
+    facet_wrap(~ Locator, 
+               ncol = 1, 
+               scales = "free_y") + 
     metR::geom_contour_fill(aes(x = YearDay, 
                                 y = BinDepth, 
                                 z = DO), 
@@ -421,67 +393,93 @@ for (station in stations) {
     labs(x = "", 
          y = "Depth (m)", 
          fill = "mg/L", 
-         title = paste(station, "DO"))
+         title = "DO")
   ggsave(here("figs", "contour", "DO", 
-              paste0(station, "_DO_", 
+              paste0(paste(stations, collapse = "_"), 
+                     "_DO_", 
                      years[1], "_", years[2], 
                      ".png")), 
-         height = 2*n, 
+         height = 2*length(stations), 
          width = 8, 
          dpi = 600)
+} else {
+  for (station in stations) {
+    ggplot(data = data_to_plot %>% filter(Locator == station)) + 
+      theme_classic() + 
+      facet_wrap(~ Year, 
+                 ncol = 1) + 
+      metR::geom_contour_fill(aes(x = YearDay, 
+                                  y = BinDepth, 
+                                  z = DO), 
+                              na.fill = TRUE, 
+                              breaks = mybreaks) + 
+      metR::geom_contour2(aes(x = YearDay, y = BinDepth, z = DO), 
+                          na.fill = T, breaks = 6) + 
+      metR::geom_contour2(aes(x = YearDay, y = BinDepth, z = DO), 
+                          na.fill = T, breaks = 2, color = "red") +  
+      scale_fill_craftfermenter(
+        breaks = mybreaks, 
+        palette = "PuBu", 
+        direction = -1, 
+        limits = c(min_lim, max_lim), 
+        labels = mylabels, 
+        guide = guide_colorbar(show.limits = T, ticks = F)) + 
+      scale_y_reverse(expand = c(0, 0)) + 
+      coord_cartesian(xlim = c(0, 366)) + 
+      scale_x_continuous(expand = c(0, 0), 
+                         breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                    yday(paste(yoi, "-02-01", sep = "")), 
+                                    yday(paste(yoi, "-03-01", sep = "")), 
+                                    yday(paste(yoi, "-04-01", sep = "")), 
+                                    yday(paste(yoi, "-05-01", sep = "")), 
+                                    yday(paste(yoi, "-06-01", sep = "")), 
+                                    yday(paste(yoi, "-07-01", sep = "")), 
+                                    yday(paste(yoi, "-08-01", sep = "")), 
+                                    yday(paste(yoi, "-09-01", sep = "")), 
+                                    yday(paste(yoi, "-10-01", sep = "")), 
+                                    yday(paste(yoi, "-11-01", sep = "")), 
+                                    yday(paste(yoi, "-12-01", sep = ""))), 
+                         labels = month.abb) + 
+      geom_vline(aes(xintercept = YearDay), 
+                 alpha = 0.2) + 
+      labs(x = "", 
+           y = "Depth (m)", 
+           fill = "mg/L", 
+           title = paste(station, "DO"))
+    ggsave(here("figs", "contour", "DO", station, 
+                paste0(station, 
+                       "_DO_", 
+                       years[1], "_", years[2], 
+                       ".png")), 
+           height = 2*n, 
+           width = 8, 
+           dpi = 600) 
+  }
 }
 
 #### Temperature contour plot ####
-for (station in stations) {
-  max_depth <- data_ctd %>% 
-    filter(Year <= years[2], 
-           Year >= years[1], 
-           Locator == station) %>% 
-    group_by(Year, YearDay) %>% 
-    summarize(MaxDepth = max(BinDepth, na.rm = TRUE)) %>% 
-    summarize(Value = min(MaxDepth)) %>% 
-    pull(Value)
-  
-  data_to_plot <- data_ctd %>% 
-    filter(Locator == station, 
-           !is.na(Temperature), 
-           BinDepth <= max_depth) %>% 
-    group_by(Year, YearDay, BinDepth) %>% 
-    summarize(Temperature = mean(Temperature, na.rm = TRUE)) %>% 
-    ungroup()
-  
-  # Add extra data before and after (assuming multiple years of data)
-  for (yoi in years[1]:years[2]) {
-    extra_data_before <- data_to_plot %>% 
-      filter(Year == yoi - 1, 
-             YearDay == max(YearDay)) %>% 
-      mutate(YearDay = YearDay - 365, 
-             Year = yoi)
-    data_to_plot <- add_row(data_to_plot, extra_data_before)
-    
-    extra_data_after <- data_to_plot %>% 
-      filter(Year == yoi + 1, 
-             BinDepth <= max_depth, 
-             YearDay == min(YearDay)) %>% 
-      mutate(YearDay = YearDay + 365, 
-             Year = yoi)
-    data_to_plot <- add_row(data_to_plot, extra_data_after)
-  }
-  
-  data_to_plot <- filter(data_to_plot, Year %in% years[1]:years[2])
-  
-  min_lim <- round_any(min(data_to_plot$Temperature, na.rm = T),
-                       accuracy = acc_T, f = floor)
-  max_lim <- round_any(max(data_to_plot$Temperature, na.rm = T),
-                       accuracy = acc_T, f = ceiling)
-  mybreaks <- seq(min_lim, max_lim, by = acc_T)
-  mylabels <- mybreaks
-  mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-  
+data_to_plot <- data_remix %>% 
+  filter(Locator %in% stations, 
+         !is.na(Temperature), 
+         BinDepth <= MinMaxDepth) %>% 
+  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  summarize(Temperature = mean(Temperature, na.rm = TRUE)) %>% 
+  ungroup()
+
+min_lim <- round_any(min(data_to_plot$Temperature, na.rm = T),
+                     accuracy = acc_T, f = floor)
+max_lim <- round_any(max(data_to_plot$Temperature, na.rm = T),
+                     accuracy = acc_T, f = ceiling)
+mybreaks <- seq(min_lim, max_lim, by = acc_T)
+mylabels <- mybreaks
+mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+
+if (all_stations_fig) {
   ggplot(data = data_to_plot) + 
     theme_classic() + 
-    facet_wrap(~ Year, 
-               ncol = 1) + 
+    facet_wrap(~ Locator, 
+               ncol = 1, 
+               scales = "free_y") + 
     metR::geom_contour_fill(aes(x = YearDay, 
                                 y = BinDepth, 
                                 z = Temperature), 
@@ -513,15 +511,63 @@ for (station in stations) {
     labs(x = "", 
          y = "Depth (m)", 
          fill = expression( degree*C), 
-         title = paste(station, "temperature"))
+         title = ("Temperature"))
   ggsave(here("figs", "contour", "T", 
-              paste0(station, "_T_", 
+              paste0(paste(stations, collapse = "_"), 
+                     "_T_", 
                      years[1], "_", years[2], 
                      ".png")), 
-         height = 2*n, 
+         height = 2*length(stations), 
          width = 8, 
          dpi = 600)
+} else {
+  for (station in stations) {
+    ggplot(data = data_to_plot %>% filter(Locator == station)) + 
+      theme_classic() + 
+      facet_wrap(~ Year, 
+                 ncol = 1) + 
+      metR::geom_contour_fill(aes(x = YearDay, 
+                                  y = BinDepth, 
+                                  z = Temperature), 
+                              na.fill = TRUE, 
+                              breaks = mybreaks) + 
+      scale_fill_cmocean(name = "thermal", 
+                         breaks = mybreaks, 
+                         limits = c(min_lim, max_lim), 
+                         labels = mylabels, 
+                         guide = guide_colorbar(show.limits = T, ticks = F)) + 
+      scale_y_reverse(expand = c(0, 0)) + 
+      coord_cartesian(xlim = c(0, 366)) + 
+      scale_x_continuous(expand = c(0, 0), 
+                         breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                    yday(paste(yoi, "-02-01", sep = "")), 
+                                    yday(paste(yoi, "-03-01", sep = "")), 
+                                    yday(paste(yoi, "-04-01", sep = "")), 
+                                    yday(paste(yoi, "-05-01", sep = "")), 
+                                    yday(paste(yoi, "-06-01", sep = "")), 
+                                    yday(paste(yoi, "-07-01", sep = "")), 
+                                    yday(paste(yoi, "-08-01", sep = "")), 
+                                    yday(paste(yoi, "-09-01", sep = "")), 
+                                    yday(paste(yoi, "-10-01", sep = "")), 
+                                    yday(paste(yoi, "-11-01", sep = "")), 
+                                    yday(paste(yoi, "-12-01", sep = ""))), 
+                         labels = month.abb) + 
+      geom_vline(aes(xintercept = YearDay), 
+                 alpha = 0.2) + 
+      labs(x = "", 
+           y = "Depth (m)", 
+           fill = expression( degree*C), 
+           title = paste(station, "temperature"))
+    ggsave(here("figs", "contour", "T", station, 
+                paste0(station, "_T_", 
+                       years[1], "_", years[2], 
+                       ".png")), 
+           height = 2*n, 
+           width = 8, 
+           dpi = 600)
+  }
 }
+  
 #### Salinity contour plot - surface ####
 max_depth <- 50
 for (station in stations) {
