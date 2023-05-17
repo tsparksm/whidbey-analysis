@@ -70,6 +70,42 @@ load_buoy_data <- function() {
                             EventFlags = col_double()))
 }
 
+# Load in Port Susan EXO data (ST)
+load_buoy_data_ST <- function() {
+  fpath <- here("data", "raw", "prelim_PT_SUSAN_BUOY_DATA_MASTER.csv")
+  read_csv(fpath, 
+           col_types = cols(Timestamp = col_datetime(format = "%m/%d/%Y %H:%M"), 
+                            Date = col_date(format = "%m/%d/%Y"), 
+                            Time = col_time(), 
+                            TimeSec = col_integer(), 
+                            SiteName = col_character(), 
+                            Chlorophyll_RFU = col_number(), 
+                            Chlorophyll_ugL = col_number(), 
+                            Cond_uScm = col_number(), 
+                            Depth_m = col_number(), 
+                            nLF_Cond_uScm = col_number(), 
+                            ODO_percent_sat = col_number(), 
+                            ODO_percent_local = col_number(), 
+                            ODO_mgL = col_number(), 
+                            Pressure_psi_a = col_number(), 
+                            Salinity_psu = col_number(), 
+                            SpCond = col_number(), 
+                            TAL_PE_RFU = col_number(), 
+                            TAL_PE_ugL = col_number(), 
+                            TDS_mgL = col_number(), 
+                            Turbidity_FNU = col_number(), 
+                            TSS_mgL = col_number(), 
+                            Wiper_Position_V = col_number(), 
+                            pH = col_number(), 
+                            pH_mV = col_number(), 
+                            Temperature_degC = col_number(), 
+                            Vertical_Pos_m = col_number(), 
+                            Battery_V = col_number(), 
+                            Cable_Pwr_V = col_number(), 
+                            Probe_SN = col_character(), 
+                            Comments = col_character()))
+}
+
 # Load in summarized SSM output
 # Output generated using external script (make_SSM_summary.R)
 # Assumes scenario is Exist1 (normal model year) unless otherwise specified
