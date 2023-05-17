@@ -103,7 +103,20 @@ load_buoy_data_ST <- function() {
                             Battery_V = col_number(), 
                             Cable_Pwr_V = col_number(), 
                             Probe_SN = col_character(), 
-                            Comments = col_character()))
+                            Comments = col_character())) %>% 
+    rename(Temperature = Temperature_degC, 
+           Oxygen = ODO_mgL, 
+           Chlorophyll = Chlorophyll_ugL, 
+           OxygenSat = ODO_percent_sat, 
+           Salinity = Salinity_psu) %>% 
+    mutate(DateTime = as.POSIXct(paste(Date, Time), 
+                                 format = "%Y-%m-%d %H:%M:%S")) %>% 
+    select(DateTime, 
+           Temperature, 
+           Oxygen, 
+           Chlorophyll, 
+           OxygenSat, 
+           Salinity)
 }
 
 # Load in summarized SSM output
