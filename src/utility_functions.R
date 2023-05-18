@@ -52,7 +52,7 @@ load_buoy_data <- function() {
   fpath <- here("data", "raw", "Port_Susan_buoy_HCEP.csv")
   read_csv(fpath, 
            col_types = cols(FrameSync = col_skip(), 
-                            DateTime = col_datetime(format = "%m/%d/%Y %H:%M"), 
+                            DateTime = col_skip(), 
                             Temperature = col_double(), 
                             Conductivity = col_skip(), 
                             Pressure = col_double(), 
@@ -65,9 +65,11 @@ load_buoy_data <- function() {
                             Salinity = col_double(), 
                             SpecConductivity = col_skip(), 
                             OxygenSat = col_double(), 
-                            Date = col_skip(), 
-                            Time = col_skip(), 
-                            EventFlags = col_double()))
+                            Date = col_date(format = "%m %b %Y"), 
+                            Time = col_time(), 
+                            EventFlags = col_double())) %>% 
+    mutate(DateTime = as.POSIXct(paste(Date, Time), 
+                                 tz = "Etc/GMT+8"))
 }
 
 # Load in Port Susan EXO data (ST)
@@ -110,7 +112,8 @@ load_buoy_data_ST <- function() {
            OxygenSat = ODO_percent_sat, 
            Salinity = Salinity_psu) %>% 
     mutate(DateTime = as.POSIXct(paste(Date, Time), 
-                                 format = "%Y-%m-%d %H:%M:%S")) %>% 
+                                 format = "%Y-%m-%d %H:%M:%S", 
+                                 tz = "Etc/GMT+8")) %>% 
     select(DateTime, 
            Temperature, 
            Oxygen, 
