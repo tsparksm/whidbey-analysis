@@ -13,6 +13,9 @@ data_buoy <- load_buoy_data() %>%
 data_buoy_ST <- load_buoy_data_ST() %>% 
   mutate(Type = "ST")
 data_buoy_comb <- full_join(data_buoy, data_buoy_ST)
+data_buoy_avg <- data_buoy_comb %>% 
+  group_by(Date) %>% 
+  summarize()
 data_discrete <- load_whidbey_discrete() %>% 
   mutate(Type = "bottle", 
          DateTime = CollectDateTime) %>% 
@@ -26,7 +29,10 @@ data_climate <- load_climate() %>%
 
 data_river <- importDVs("12167000", 
                         sdate = "2022-01-01") %>% 
-  mutate(River = "Stillaguamish")
+  mutate(River = "Stillaguamish") %>% 
+  rename(Date = dates, 
+         Flow = val) %>% 
+  select(Date, Flow)
 
 data_tide <- tide_height(stations = "Seattle", 
                          minutes = 15, 
