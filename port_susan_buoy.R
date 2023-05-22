@@ -16,6 +16,12 @@ data_discrete <- load_whidbey_discrete() %>%
          DateTime = CollectDateTime) %>% 
   filter(Locator == "PSUSANBUOY")
 
+station <- "USW00024222"  # Everett airport
+data_climate <- load_climate() %>% 
+  filter(STATION == station) %>% 
+  rename(Date = DATE) %>% 
+  mutate(Year = year(Date))
+
 #### QC ####
 # To do: put this somewhere else, save output
 data_buoy_long <- data_buoy_comb %>% 
@@ -106,3 +112,5 @@ ggplot(data_to_plot,
            color = YearGroup, 
            shape = Type)) + 
   geom_point()
+
+#### 
