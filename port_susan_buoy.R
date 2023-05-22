@@ -1,5 +1,6 @@
 #### SETUP ####
 source(here::here("src", "utility_functions.R"))
+library(waterData)
 
 data_buoy <- load_buoy_data() %>% 
   mutate(Type = "KC") %>% 
@@ -21,6 +22,10 @@ data_climate <- load_climate() %>%
   filter(STATION == station) %>% 
   rename(Date = DATE) %>% 
   mutate(Year = year(Date))
+
+data_river <- importDVs("12167000", 
+                        sdate = "2022-01-01") %>% 
+  mutate(River = "Stillaguamish")
 
 #### QC ####
 # To do: put this somewhere else, save output
