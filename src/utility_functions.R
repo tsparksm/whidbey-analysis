@@ -65,7 +65,7 @@ load_buoy_data <- function() {
                             Salinity = col_double(), 
                             SpecConductivity = col_skip(), 
                             OxygenSat = col_double(), 
-                            Date = col_date(format = "%m %b %Y"), 
+                            Date = col_date(format = "%d %b %Y"), 
                             Time = col_time(), 
                             EventFlags = col_double())) %>% 
     mutate(DateTime = as.POSIXct(paste(Date, Time), 
