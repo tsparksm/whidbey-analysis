@@ -1,0 +1,108 @@
+#### SETUP ####
+source(here::here("src", "utility_functions.R"))
+
+data_buoy <- load_buoy_data() %>% 
+  mutate(Type = "KC") %>% 
+  select(-Turbidity, 
+         -TurbiditySD, 
+         -ChlorophyllSD, 
+         -EventFlags, 
+         -Pressure)
+data_buoy_ST <- load_buoy_data_ST() %>% 
+  mutate(Type = "ST")
+data_buoy_comb <- full_join(data_buoy, data_buoy_ST)
+data_discrete <- load_whidbey_discrete() %>% 
+  mutate(Type = "bottle", 
+         DateTime = CollectDateTime) %>% 
+  filter(Locator == "PSUSANBUOY")
+
+#### QC ####
+# To do: put this somewhere else, save output
+data_buoy_long <- data_buoy_comb %>% 
+  pivot_longer(cols = Temperature:OxygenSat, 
+               names_to = "Parameter", 
+               values_to = "Value") %>% 
+  add_column(Flag = 0)
+
+# ggplotly time!
+# yoi <- 2013
+# parm <- "Temperature"
+# g <- ggplot(data = data_buoy_long %>% 
+#          filter(Parameter == parm, 
+#                 year(DateTime) == yoi), 
+#        aes(x = DateTime, 
+#            y = Value, 
+#            color = Type)) + 
+#   geom_point() + 
+#   labs(title = paste(parm, yoi))
+# ggplotly(g)
+
+# Add flags
+data_buoy_qc <- data_buoy_long %>% 
+  # Flag all 2022 KC chl data
+  mutate(Flag = ifelse(Type == "KC" & 
+                         Parameter == "Chlorophyll" & 
+                         year(DateTime) == 2022, 
+                       4, Flag)) %>% 
+  # Flag aberrant 2022 salinity points
+  mutate(Flag = ifelse(Type == "KC" & 
+                         Parameter == "Salinity" & 
+                         year(DateTime) == 2022 & 
+                         yday(DateTime) == 271 & 
+                         Value == 0.5797, 
+                       4, Flag), 
+         Flag = ifelse(Type == "ST" & 
+                         Parameter == "Salinity" & 
+                         year(DateTime) == 2022 & 
+                         yday(DateTime) == 257 & 
+                         Value == 0.4400, 
+                       4, Flag)) %>% 
+  # Flag aberrant 2018 salinity points
+  mutate(Flag = ifelse(Parameter == "Salinity" & 
+                         DateTime %in% seq(as.POSIXct("2018-10-15 12:00:00", 
+                                                      tz = "Etc/GMT+8"), 
+                                           as.POSIXct("2018-10-15 13:00:00", 
+                                                      tz = "Etc/GMT+8"), 
+                                           by = 60*30), 
+                       4, Flag)) %>% 
+  # Flag 2019 chlorophyll points
+  mutate(Flag = ifelse(Parameter == "Chlorophyll" & 
+                         DateTime %in% seq(as.POSIXct("2019-05-28 06:00:00", 
+                                                      tz = "Etc/GMT+8"), 
+                                           as.POSIXct("2019-06-06 07:30:00", 
+                                                      tz = "Etc/GMT+8"), 
+                                           by = 60*30), 
+                       4, Flag)) %>% 
+  # Flag salinity above 32 or below 0
+  mutate(Flag = ifelse(Parameter == "Salinity" & 
+                         (Value >= 32 | Value < 0), 
+                       4, Flag)) %>% 
+  # Flag chlorophyll above 100 or below 0
+  mutate(Flag = ifelse(Parameter == "Chlorophyll" &
+                         (Value >= 100 | Value < 0), 
+                       4, Flag))
+
+write_csv(data_buoy_qc, 
+          here("data", "port_susan_buoy_qc.csv"))
+
+#### Chlorophyll ####
+yoi <- 2022
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Chlorophyll", 
+         year(DateTime) <= yoi, 
+         !(Flag %in% 3:4)) %>% 
+  mutate(YearGroup = ifelse(year(DateTime) == yoi, 
+                            yoi, 
+                            paste(min(year(DateTime)), 
+                                  yoi-1, 
+                                  sep = "-")), 
+         FakeDate = DateTime)
+year(data_to_plot$FakeDate) <- yoi
+
+ggplot(data_to_plot, 
+       aes(x = FakeDate, 
+           y = Value, 
+           color = YearGroup, 
+           shape = Type)) + 
+  geom_point()
