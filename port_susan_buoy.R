@@ -1,6 +1,7 @@
 #### SETUP ####
 source(here::here("src", "utility_functions.R"))
 library(waterData)
+library(rtide)
 
 data_buoy <- load_buoy_data() %>% 
   mutate(Type = "KC") %>% 
@@ -26,6 +27,12 @@ data_climate <- load_climate() %>%
 data_river <- importDVs("12167000", 
                         sdate = "2022-01-01") %>% 
   mutate(River = "Stillaguamish")
+
+data_tide <- tide_height(stations = "Seattle", 
+                         minutes = 15, 
+                         from = as.Date("2022-01-01"), 
+                         to = as.Date("2022-12-31"), 
+                         tz = "Etc/GMT+8")
 
 #### QC ####
 # To do: put this somewhere else, save output
@@ -118,4 +125,5 @@ ggplot(data_to_plot,
            shape = Type)) + 
   geom_point()
 
-#### 
+#### River flow ####
+
