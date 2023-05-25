@@ -132,4 +132,23 @@ ggplot(data_to_plot,
   geom_point()
 
 #### River flow ####
+data_to_plot <- data_buoy_qc %>% 
+  mutate(Date = as.Date.POSIXct(DateTime, 
+                                tz = "Etc/GMT+8")) %>% 
+  filter(!(Flag %in% 3:4), 
+         !is.na(Value)) %>% 
+  group_by(Date, Parameter) %>% 
+  summarize(Mean = mean(Value), 
+            Median = median(Value), 
+            Max = max(Value), 
+            Min = min(Value), 
+            SD = sd(Value), 
+            n = n()) %>% 
+  left_join(data_river)
 
+ggplot(data = data_to_plot %>% 
+         filter(Parameter == "Salinity"), 
+       aes(x = Flow, 
+           y = Mean)) + 
+  theme_bw() + 
+  geom_point()
