@@ -44,8 +44,8 @@ data_buoy <- read_csv(here("data", "port_susan_buoy_qc.csv")) %>%
          FakeDate = DateTime) %>% 
   arrange(DateTime)
 year(data_buoy$FakeDate) <- yoi
-max_date <- max(data_to_plot$FakeDate, na.rm = TRUE)
-min_date <- min(data_to_plot$FakeDate, na.rm = TRUE)
+max_date <- max(data_buoy$FakeDate, na.rm = TRUE)
+min_date <- min(data_buoy$FakeDate, na.rm = TRUE)
 
 bin_width <- 0.5
 data_ctd <- load_composite(bin_width, 
