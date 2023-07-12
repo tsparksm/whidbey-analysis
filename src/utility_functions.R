@@ -394,7 +394,7 @@ load_climate <- function() {
 
 # Load in raw Coupeville mooring output downloaded from Hydrosphere
 # fpath is an optional filepath specification; if blank will pop up file selection
-load_coupeville_hydrosphere <- function(fpath) {
+load_hydrosphere_coupeville <- function(fpath) {
   if (missing(fpath)) {
     fpath <- choose.files(caption = "Select file to load", 
                           multi = FALSE)
@@ -434,9 +434,9 @@ load_coupeville_hydrosphere <- function(fpath) {
 # .csv is in the correct format to upload/append to Socrata
 # Date format should be "YYYY-MM-DD"
 # Time format should be "HH:MM" in 24 hr clock
-process_coupeville_socrata <- function(start_date, 
+process_socrata_coupeville <- function(start_date, 
                                start_time) {
-  raw_data <- load_coupeville_hydrosphere() %>% 
+  raw_data <- load_hydrosphere_coupeville() %>% 
     filter(`Date(America/Los_Angeles)` >= start_date, 
            `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
   
@@ -446,5 +446,4 @@ process_coupeville_socrata <- function(start_date,
   write_csv(raw_data, 
             file = fpath)
 }
-
 
