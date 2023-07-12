@@ -379,7 +379,7 @@ p6 <- ggplot(data = data_to_plot,
                    expand = c(0, 0)) + 
   labs(x = "", 
        y = "(\u00B0C)", 
-       title = "F. Temperature")
+       title = "F. Surface temperature")
 
 #### S mooring ####
 data_to_plot <- data_buoy %>% 
@@ -404,7 +404,7 @@ p7 <- ggplot(data = data_to_plot,
                    expand = c(0, 0)) + 
   labs(x = "", 
        y = "(PSU)", 
-       title = "G. Salinity")
+       title = "G. Surface salinity")
 
 #### DO mooring ####
 data_to_plot <- data_buoy %>% 
@@ -429,7 +429,7 @@ p8 <- ggplot(data = data_to_plot,
                    expand = c(0, 0)) + 
   labs(x = "", 
        y = "(mg/L)", 
-       title = "H. Dissolved oxygen")
+       title = "H. Surface dissolved oxygen")
 
 #### Chl mooring ####
 data_to_plot <- data_buoy %>% 
@@ -454,7 +454,7 @@ p9 <- ggplot(data = data_to_plot,
                    expand = c(0, 0)) + 
   labs(x = "", 
        y = expression((mu*g/L)), 
-       title = "I. Chlorophyll fluorescence")
+       title = "I. Surface chlorophyll fluorescence")
 
 #### N bottle ####
 data_to_plot <- data_discrete %>% 
@@ -481,7 +481,7 @@ p10 <- ggplot(data = data_to_plot,
                    limits = c(min_date, max_date)) + 
   labs(x = "", 
        y = "(mg N/L)", 
-       title = "J. Nitrate + nitrite")
+       title = "J. Surface nitrate + nitrite")
 
 #### Put it all together ####
 glob_lab <- "Depth (m)"
