@@ -2,6 +2,7 @@ library(kcmarine)
 library(tidyverse)
 library(here)
 library(lubridate)
+library(hms)
 
 # Load CTD data - single or multiple sites
 # Outputs a single tibble containing one or more sites
@@ -44,7 +45,12 @@ load_whidbey_discrete <- function() {
                                         "7-10 m", 
                                         "11-15 m", 
                                         "25 m", 
-                                        "deep")))
+                                        "deep")), 
+           Year = year(CollectDate), 
+           Month = month(CollectDate), 
+           FakeDate = CollectDate)
+  year(output$FakeDate) <- 2020
+  return(output)
 }
 
 # Load in Port Susan HCEP data (KC)
@@ -437,8 +443,9 @@ load_hydrosphere_coupeville <- function(fpath) {
 process_socrata_coupeville <- function(start_date, 
                                start_time) {
   raw_data <- load_hydrosphere_coupeville() %>% 
-    filter(`Date(America/Los_Angeles)` >= start_date, 
-           `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
+    filter(`Date(America/Los_Angeles)` > start_date | 
+             `Date(America/Los_Angeles)` == start_date & 
+             `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
   
   fpath <- choose.files(caption = "Choose .csv file to save", 
                         multi = FALSE)
@@ -447,3 +454,42 @@ process_socrata_coupeville <- function(start_date,
             file = fpath)
 }
 
+# Take Coupeville Hydrosphere data and set it up for clean use in R
+load_coupeville <- function() {
+  fpath <- here("data", "raw", "Coupeville_Wharf_Mooring_Raw_Data_Output.csv")
+  raw_data <- read_csv(fpath, 
+                       col_types = cols(
+                         UnixTimestamp = col_double(), 
+                         `Date(America/Los_Angeles)` = col_date(), 
+                         `Time(America/Los_Angeles)` = col_time(), 
+                         `HCEP(TEMP)` = col_double(), 
+                         `HCEP(COND)` = col_skip(), 
+                         `HCEP(PRES)` = col_double(), 
+                         `HCEP(OXY)` = col_double(), 
+                         `HCEP(PH)` = col_double(), 
+                         `HCEP(FL)` = col_double(), 
+                         `HCEP(TURB)` = col_double(), 
+                         `HCEP(FSD)` = col_skip(), 
+                         `HCEP(TSD)` = col_skip(), 
+                         `HCEP(SAL)` = col_double(), 
+                         `HCEP(OSAT)` = col_double(), 
+                         `HCEP(VOLT)` = col_skip(), 
+                         `SUNA(M_Parameter1)` = col_skip(), 
+                         `SUNA(M_Parameter2)` = col_double()
+                       )) %>% 
+    rename(Date = `Date(America/Los_Angeles)`, 
+           Time = `Time(America/Los_Angeles)`, 
+           Temperature = `HCEP(TEMP)`, 
+           Pressure = `HCEP(PRES)`, 
+           Oxygen = `HCEP(OXY)`, 
+           pH = `HCEP(PH)`, 
+           Chlorophyll = `HCEP(FL)`, 
+           Turbidity = `HCEP(TURB)`, 
+           Salinity = `HCEP(SAL)`, 
+           OxygenSat = `HCEP(OSAT)`, 
+           NO23 = `SUNA(M_Parameter2)`) %>% 
+    mutate(DateTime = as.POSIXct(paste0(Date, Time)), 
+           Month = month(Date), 
+           Year = year(Date)) %>% 
+    arrange(DateTime)
+}
