@@ -490,6 +490,9 @@ load_coupeville <- function() {
            NO23 = `SUNA(M_Parameter2)`) %>% 
     mutate(DateTime = as.POSIXct(paste0(Date, Time)), 
            Month = month(Date), 
-           Year = year(Date)) %>% 
+           Year = year(Date), 
+           FakeDateTime = DateTime) %>% 
     arrange(DateTime)
+  year(raw_data$FakeDateTime) <- 2020
+  return(raw_data)
 }
