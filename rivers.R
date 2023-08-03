@@ -23,7 +23,7 @@ wide_data <- pivot_wider(long_data,
                          values_from = val)
 
 #### Plot year of river flows - single figure ####
-yoi <- 2022
+yoi <- 2023
 
 ggplot(data = long_data %>% 
          filter(Year == yoi), 
@@ -47,7 +47,7 @@ ggsave(here("figs",
        height = 4, width = 8)
 
 #### Plot year of river flows - multipanel ####
-yoi <- 2022
+yoi <- 2023
 
 ggplot(data = long_data %>% 
          filter(Year == yoi), 
