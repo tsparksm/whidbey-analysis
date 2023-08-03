@@ -202,8 +202,8 @@ p4 <- ggplot(data = totalchl,
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         text = element_text(size = font_size), 
-        legend.position = "none", 
-        axis.text.x = element_text(size = font_size + 2, face = "bold")) + 
+        axis.text.x = element_text(size = font_size + 2, face = "bold"), 
+        legend.position = "none") + 
   geom_point() + 
   geom_line() + 
   scale_color_brewer(palette = "Paired") + 
@@ -214,16 +214,23 @@ p4 <- ggplot(data = totalchl,
                date_labels = "%b") + 
   labs(x = "", 
        y = expression(Chl~a~(mg/m^2)), 
+       color = "", 
        title = "D. 1-50 m integrated chlorophyll a - deep stations")
 
 #### Put it all together ####
-pp <- p1 / 
+p0 <- (p3 + theme(plot.margin = unit(c(0,30,0,0), "pt"))) / 
+  (p4 + theme(plot.margin = unit(c(0,30,0,0), "pt"))) + 
+  plot_layout(guides = "collect")
+pp0 <- p1 / 
   (p2 + theme(plot.margin = unit(c(0,30,0,0), "pt"))) / 
-  (p3 + theme(plot.margin = unit(c(0,30,0,0), "pt"))) / 
-  p4 + 
-  plot_layout(heights = c(1, 2, 2, 2))
+  p0 + plot_layout(heights = c(1, 2, 4))
+# pp <- p1 / 
+#   (p2 + theme(plot.margin = unit(c(0,30,0,0), "pt"))) / 
+#   (p3 + theme(plot.margin = unit(c(0,30,0,0), "pt"))) / 
+#   p4 + 
+#   plot_layout(heights = c(1, 2, 2, 2))
 ggsave(here("figs", paste0("PSEMP_whidbey_", yoi, ".png")), 
-       pp, 
+       pp0, 
        dpi = fig_dpi, 
        height = fig_height, 
        width = fig_width)
