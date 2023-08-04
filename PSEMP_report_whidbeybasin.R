@@ -12,6 +12,7 @@ yoi <- 2022
 fig_dpi <- 600
 fig_height <- 12
 fig_width <- 8
+fig_point_size <- 4
 font_size <- 12
 
 # Plot settings
@@ -136,7 +137,8 @@ p2 <- ggplot(data = data_to_plot,
         axis.text.x = element_blank(), 
         legend.position = "right") + 
   geom_point(aes(shape = grepl("MDL", QfrCode), 
-                 color = Locator)) + 
+                 color = Locator), 
+             size = fig_point_size) + 
   geom_smooth(color = "black", se = FALSE) + 
   scale_x_date(limits = as.Date(c(paste0(yoi, "-01-01"), 
                                   paste0(yoi, "-12-31"))), 
@@ -147,7 +149,7 @@ p2 <- ggplot(data = data_to_plot,
   scale_color_manual(values = brewer.pal(6, "YlGnBu")[2:6]) + 
   labs(x = "", 
        y = "Nitrate + nitrite N (mg/L)", 
-       title = "B. Surface nitrate concentration - bottle stations", 
+       title = "B. Surface nitrate concentration", 
        color = "")
 
 #### Bottom DO ####
@@ -169,7 +171,8 @@ p3 <- ggplot(data = data_to_plot,
         text = element_text(size = font_size), 
         axis.text.x = element_blank(), 
         legend.position = "right") + 
-  geom_point(aes(color = Locator)) + 
+  geom_point(aes(color = Locator), 
+             size = fig_point_size) + 
   geom_smooth(color = "black", se = FALSE) + 
   scale_x_date(limits = as.Date(c(paste0(yoi, "-01-01"), 
                                   paste0(yoi, "-12-31"))), 
@@ -204,8 +207,8 @@ p4 <- ggplot(data = totalchl,
         text = element_text(size = font_size), 
         axis.text.x = element_text(size = font_size + 2, face = "bold"), 
         legend.position = "none") + 
-  geom_point() + 
-  geom_line() + 
+  geom_point(size = fig_point_size) + 
+  geom_line(linetype = 3) + 
   scale_color_brewer(palette = "Paired") + 
   scale_x_date(limits = as.Date(c(paste0(yoi, "-01-01"), 
                                   paste0(yoi, "-12-31"))), 
