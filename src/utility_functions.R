@@ -503,6 +503,7 @@ load_coupeville <- function() {
 get_phyto <- function() {
   phyto_url <- "https://data.kingcounty.gov/resource/ap4k-tvru.csv"
   phyto_data <- read.socrata(phyto_url) %>% 
-    rename(total_biovolume = )
-  select(locator:total_biovolume_)
+    rename(total_abundance = total_abundance_particles, 
+           total_biovolume = total_biovolume_mm_3_l) %>% 
+  select(locator:total_biovolume)
 }
