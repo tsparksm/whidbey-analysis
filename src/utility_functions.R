@@ -441,20 +441,22 @@ load_hydrosphere_coupeville <- function(fpath) {
 # Date format should be "YYYY-MM-DD"
 # Time format should be "HH:MM" in 24 hr clock
 process_socrata_coupeville <- function(start_date, 
-                               start_time) {
+                                       start_time) {
   raw_data <- load_hydrosphere_coupeville() %>% 
     filter(`Date(America/Los_Angeles)` > start_date | 
              `Date(America/Los_Angeles)` == start_date & 
              `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
   
-  fpath <- choose.files(caption = "Choose .csv file to save", 
-                        multi = FALSE)
+  fpath <- here("data", "socrata", paste0("coupeville_socrata_", 
+                                          Sys.Date(), 
+                                          ".csv"))
   
   write_csv(raw_data, 
             file = fpath)
 }
 
 # Take Coupeville Hydrosphere data and set it up for clean use in R
+# Uses static file location, downloaded from Socrata
 load_coupeville <- function() {
   fpath <- here("data", "raw", "Coupeville_Wharf_Mooring_Raw_Data_Output.csv")
   raw_data <- read_csv(fpath, 
@@ -495,4 +497,12 @@ load_coupeville <- function() {
     arrange(DateTime)
   year(raw_data$FakeDateTime) <- 2020
   return(raw_data)
+}
+
+# Download marine phytoplankton data (grouped by size class) from Socrata
+get_phyto <- function() {
+  phyto_url <- "https://data.kingcounty.gov/resource/ap4k-tvru.csv"
+  phyto_data <- read.socrata(phyto_url) %>% 
+    rename(total_biovolume = )
+  select(locator:total_biovolume_)
 }
