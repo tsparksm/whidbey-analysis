@@ -505,5 +505,59 @@ get_phyto <- function() {
   phyto_data <- read.socrata(phyto_url) %>% 
     rename(total_abundance = total_abundance_particles, 
            total_biovolume = total_biovolume_mm_3_l) %>% 
-  select(locator:total_biovolume)
+    select(locator:total_biovolume)
+}
+
+load_EIM_continuous <- function(station) {
+  data_file <- here("data", "raw", paste0(station, ".csv"))
+  read_csv(data_file, 
+           col_types = cols(
+             Study_ID = col_skip(), 
+             Study_Name = col_skip(), 
+             Location_ID = col_character(), 
+             Study_Specific_Location_ID = col_skip(), 
+             Location_Name = col_skip(), 
+             Instrument_ID = col_skip(), 
+             Field_Collection_Type = col_skip(), 
+             Field_Collector = col_skip(), 
+             Time_Zone = col_skip(), 
+             Field_Collection_Date = col_date(
+               format = "%m/%d/%Y"), 
+             Field_Collection_Time = col_skip(), 
+             Field_Collection_Date_Time = col_character(), 
+             Field_Collection_Comment = col_skip(), 
+             Matrix = col_skip(), 
+             Source = col_skip(), 
+             Depth_Value = col_number(), 
+             Depth_Value_Units = col_skip(), 
+             Result_Parameter_Name = col_character(), 
+             Result_Value = col_number(), 
+             Result_Value_Units = col_skip(), 
+             Result_Data_Qualifier = col_skip(), 
+             Result_Method = col_skip(), 
+             Result_Method_Description = col_skip(), 
+             Result_Comment = col_skip(), 
+             Result_Data_Review_Status = col_skip(), 
+             Calculated_Latitude_Decimal_Degrees_NAD83HARN = col_skip(), 
+             Calculated_Longitude_Decimal_Degrees_NAD83HARN = col_skip(), 
+             Calculated_Land_Surface_Elevation_NAVD88_FT = col_skip(), 
+             Record_Created_On = col_skip(), 
+             Continuous_Result_System_ID = col_skip()
+           )) %>% 
+    rename(Locator = Location_ID, 
+           Date = Field_Collection_Date, 
+           Datetime = Field_Collection_Date_Time, 
+           Depth = Depth_Value, 
+           Parameter = Result_Parameter_Name, 
+           Value = Result_Value) %>% 
+    mutate(Parameter = case_when(
+      Parameter == "Beam Attenuation" ~ "Attenuation", 
+      Parameter == "Dissolved Oxygen Percent Saturation" ~ "DO_Sat", 
+      Parameter == "Dissolved Oxygen" ~ "DO", 
+      Parameter == "Fluorescence" ~ "Chlorophyll", 
+      Parameter == "Temperature, water" ~ "Temperature", 
+      Parameter == "Density as sigma-t" ~ "SigmaT", 
+      Parameter == "Light Transmission" ~ "Light_Transmission",
+      TRUE ~ Parameter)) %>% 
+    pivot_wider(names_from = Parameter, values_from = Value)
 }
