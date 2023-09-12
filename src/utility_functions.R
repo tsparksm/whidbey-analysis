@@ -3,6 +3,7 @@ library(tidyverse)
 library(here)
 library(lubridate)
 library(hms)
+library(readxl)
 
 # Load CTD data - single or multiple sites
 # Outputs a single tibble containing one or more sites
@@ -560,4 +561,43 @@ load_EIM_continuous <- function(station) {
       Parameter == "Light Transmission" ~ "Light_Transmission",
       TRUE ~ Parameter)) %>% 
     pivot_wider(names_from = Parameter, values_from = Value)
+}
+
+load_ecology_nutrients <- function() {
+  data_file <- here("data", "raw", "Ecology_nutrient_data.xlsx")
+  read_xlsx(
+    data_file, 
+    sheet = "Nutrients Data", 
+    col_types = c("text",  # station
+                  "date",  # date collected
+                  "text",  # nominal depth
+                  "numeric",  # sampling depth
+                  "numeric",  # CTD cast
+                  "date",  # date analyzed
+                  "numeric",  # NH4
+                  "numeric",  # NH4 QC
+                  "text",  # NH4 QF
+                  "numeric",  # NH4 QA
+                  "numeric",  # NH4 replicate
+                  "numeric",  # NO2
+                  "numeric",  # NO2 QC
+                  "text",  # NO2 QF
+                  "numeric",  # NO2 QA
+                  "numeric",  # NO2 replicate
+                  "numeric",  # NO3
+                  "numeric",  # NO3 QC
+                  "text",  # NO3 QF
+                  "numeric",  # NO3 QA
+                  "numeric",  # NO3 replicate
+                  "numeric",  # PO4 
+                  "numeric",  # PO4 QC 
+                  "text",  # PO4 QF
+                  "numeric",  # PO4 QA
+                  "numeric",  # PO4 replicate
+                  "numeric", # SiOH4
+                  "numeric", # SiOH4 QC
+                  "text",  # SiOH4 QF
+                  "numeric",  # SiOH4 QA
+                  "numeric"  # SiOH4 replicate
+    ))
 }
