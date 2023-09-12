@@ -1,5 +1,6 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
+library(patchwork)
 
 # Identify years and scenarios to include
 years <- c(2006, 2008, 2014)
@@ -115,4 +116,68 @@ for (station in unique(locator_info$Locator)) {
 }
 
 #### Figure - CTD vs SSM DO and N; one station, few months ####
+station <- "PENNCOVEENT"
+months <- c(3, 9)
 
+p1 <- ggplot(data = data_combined_ctd %>% 
+         filter(Locator == station, 
+                Month %in% months) %>% 
+         mutate(Month = month.name[Month])) + 
+  theme_bw() + 
+  geom_ribbon(aes(x = Depth, 
+                  ymin = DO_min, 
+                  ymax = DO_max, 
+                  group = Type), 
+              fill = "light gray") + 
+  facet_wrap(~ Month) + 
+  geom_line(aes(x = Depth, 
+                y = DO, 
+                color = Type, 
+                group = Date)) + 
+  geom_point(aes(x = Depth, 
+                 y = DO, 
+                 shape = Type), 
+             color = "dark gray") + 
+  scale_shape_manual(values = c(NA, 16)) + 
+  scale_color_manual(values = c("black", "dark gray")) + 
+  coord_flip() + 
+  scale_x_reverse(expand = c(0, 0)) + 
+  labs(x = "Depth (m)", 
+       y = "DO (mg/L)", 
+       color = "", 
+       shape = "")
+
+p2 <- ggplot(data = data_combined_ctd %>% 
+               filter(Locator == station, 
+                      Month %in% months) %>% 
+               mutate(Month = month.name[Month])) + 
+  theme_bw() + 
+  geom_ribbon(aes(x = Depth, 
+                  ymin = NO23_min, 
+                  ymax = NO23_max, 
+                  group = Type), 
+              fill = "light gray") + 
+  facet_wrap(~ Month) + 
+  geom_line(aes(x = Depth, 
+                y = NO23, 
+                color = Type, 
+                group = Date)) + 
+  geom_point(aes(x = Depth, 
+                 y = NO23, 
+                 shape = Type), 
+             color = "dark gray") + 
+  scale_shape_manual(values = c(NA, 16)) + 
+  scale_color_manual(values = c("black", "dark gray")) + 
+  coord_flip() + 
+  scale_x_reverse(expand = c(0, 0)) + 
+  labs(x = "Depth (m)", 
+       y = "Nitrate + nitrite (mg N/L)", 
+       color = "", 
+       shape = "")
+
+p1 / p2 + plot_layout(guides = "collect")
+ggsave(here("figs", "ssm", 
+            paste0(station, "_", 
+                   paste(months, collapse = "_"), 
+                   ".png")), 
+       dpi = 600, height = 6, width = 6)
