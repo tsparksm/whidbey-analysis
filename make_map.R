@@ -1,6 +1,7 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
 library(ggmap)
+library(ggrepel)
 
 locators <- load_locator_all()  # use jitter version for best map
 
@@ -47,28 +48,44 @@ ggsave(here("figs", "whidbey_station_map.png"),
        dpi = 600)
 
 #### Map with just KC stations ####
-ggmap(map_transparent) + 
+data_to_plot = locators %>% 
+  filter(Agency == "King County") %>% 
+  mutate(Shape = case_when(
+    Name == "PENNCOVEPNN001" ~ "discontinued", 
+    Name == "Poss DO-2" ~ "added", 
+    Data_Type == "CTD" ~ "CTD", 
+    TRUE ~ "CTD+bottle"))
+
+g <- ggmap(map_transparent) + 
   theme_bw() + 
   theme(panel.grid = element_blank(), 
         panel.background = element_rect(fill = 'white'), 
         axis.text = element_blank(), 
         axis.ticks = element_blank(), 
-        panel.border = element_rect(colour = "black", fill=NA, size=1), 
         legend.position = "none") + 
-  geom_point(data = locators %>% 
-               filter(Agency == "King County") %>% 
-               mutate(Shape = case_when(
-                 Name == "PENNCOVEPNN001" ~ "discontinued", 
-                 Name == "Poss DO-2" ~ "added", 
-                 Data_Type == "CTD" ~ "CTD", 
-                 TRUE ~ "CTD+bottle")), 
-             aes(x = Lon, y = Lat, shape = Shape), 
-             size = 1) + 
+  geom_point(data = data_to_plot, 
+             aes(x = Lon, 
+                 y = Lat, 
+                 shape = Shape, 
+                 color = Has_Mooring), 
+             size = 2) + 
+  geom_text_repel(data = data_to_plot, 
+                  aes(x = Lon, 
+                      y = Lat, 
+                      color = Has_Mooring, 
+                      label = Name), 
+                  box.padding = 0.3, 
+                  xlim = c(NA, Inf), 
+                  ylim = c(-Inf, Inf), 
+                  min.segment.length = 0) + 
+  coord_cartesian(clip = "off") + 
   scale_shape_manual(values = c("discontinued" = 4, 
                                 "added" = 2, 
                                 "CTD" = 17, 
                                 "CTD+bottle" = 16)) + 
+  scale_color_manual(values = c("TRUE" = "red", 
+                                "FALSE" = "black")) + 
   labs(x = "", y = "", shape = "")
-ggsave(here("figs", "whidbey_station_map_KC.png"), 
+ggsave(here("figs", "whidbey_station_map_KC.png"), g, 
        dpi = 600, 
-       height = 3, width = 2.5)
+       height = 5, width = 4)
