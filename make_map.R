@@ -14,11 +14,11 @@ locators$Agency <- factor(locators$Agency,
                                      "King County"))
 
 # Load map images from Google API
-PS_map <- get_stamenmap(c(left = -122.779, 
+PS_map <- get_stadiamap(c(left = -122.779, 
                           bottom = 47.880, 
                           right = -122.172, 
                           top = 48.452), 
-                        maptype = "toner-background", 
+                        maptype = "stamen_toner_background", 
                         force = T, 
                         zoom = 10, 
                         scale = 2)
@@ -57,12 +57,15 @@ ggmap(map_transparent) +
         legend.position = "none") + 
   geom_point(data = locators %>% 
                filter(Agency == "King County") %>% 
-               mutate(Shape = case_when(!is.na(Last_Year) ~ "discontinued", 
-                                        Data_Type == "CTD" ~ "CTD", 
-                                        TRUE ~ "CTD+bottle")), 
+               mutate(Shape = case_when(
+                 Name == "PENNCOVEPNN001" ~ "discontinued", 
+                 Name == "Poss DO-2" ~ "added", 
+                 Data_Type == "CTD" ~ "CTD", 
+                 TRUE ~ "CTD+bottle")), 
              aes(x = Lon, y = Lat, shape = Shape), 
              size = 1) + 
   scale_shape_manual(values = c("discontinued" = 4, 
+                                "added" = 2, 
                                 "CTD" = 17, 
                                 "CTD+bottle" = 16)) + 
   labs(x = "", y = "", shape = "")
