@@ -191,7 +191,11 @@ load_locator_all <- function(jitter = T) {
                             PO4 = col_skip(), 
                             Chla = col_skip(), 
                             Si = col_skip(), 
-                            Notes = col_character()))
+                            Notes = col_character())) %>% 
+    mutate(Has_Mooring = Name %in% c(
+      "PENNCOVECW", 
+      "PSUSANBUOY", 
+      "PENNCOVEENT"))
 }
 
 # Load SSM summaries, combine into single tibble
