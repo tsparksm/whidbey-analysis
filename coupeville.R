@@ -91,13 +91,14 @@ ggsave(here("figs", "coupeville", paste0("NO23_", yoi, ".png")),
        height = 4, width = 6)
 
 #### Mooring - DO over time ####
-ggplot(data = raw_data, 
+ggplot(data = raw_data %>% 
+         filter(Oxygen > 0), 
        aes(x = FakeDateTime, 
            y = Oxygen, 
            color = Year == yoi)) + 
   theme_bw() + 
   theme(legend.position = "none") + 
-  geom_point() + 
+  geom_point(alpha = 0.5, size = 1) + 
   labs(y = "DO (mg/L)", 
        x = "", 
        color = "") + 
@@ -108,7 +109,8 @@ ggsave(here("figs", "coupeville", paste0("DO_", yoi, ".png")),
 
 #### Mooring - chl over time ####
 ggplot(data = raw_data %>% 
-         filter(Chlorophyll < 100), 
+         filter(Chlorophyll < 100, 
+                Chlorophyll > 0), 
        aes(x = FakeDateTime, 
            y = Chlorophyll, 
            color = Year == yoi)) + 
