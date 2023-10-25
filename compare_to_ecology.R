@@ -145,7 +145,34 @@ ggplot(
     color = "Year"
   )
 
-#### Bottom NO3 by year ####
+#### Bottom NO3 by year - single panel ####
+ggplot(
+  data = data_combined_discrete %>% 
+    filter(DepthBin == "bottom"), 
+  aes(x = FakeDate, 
+      y = NO23, 
+      shape = Agency, 
+      fill = Detect_NO23, 
+      color = as.factor(year(CollectDate)))
+) + 
+  geom_point(size = 2) + 
+  theme_bw() + 
+  labs(
+    x = "", 
+    y = "Nitrate + nitrite (mg N/L)", 
+    shape = "", 
+    color = ""
+  ) + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
+  scale_color_viridis_d(end = 0.9, direction = -1) + 
+  scale_shape_manual(values = c("KC" = 19, "ECY" = 17)) + 
+  scale_fill_manual(values = c("FALSE" = NA))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.4))
+ggsave(here("figs", "bottle", "no23", "ecy-comp", 
+            "PENNCOVEENT_bottom_N_by_year_singlepanel.png"), 
+       dpi = 600, height = 2.5, width = 6)
+
+#### Bottom NO3 by year - multipanel ####
 ggplot(
   data = data_combined_discrete %>% 
     filter(DepthBin == "bottom"), 
@@ -169,7 +196,7 @@ ggplot(
   guides(shape = "none") + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.4))
 ggsave(here("figs", "bottle", "no23", "ecy-comp", 
-            "PENNCOVEENT_bottom_N_by_year.png"), 
+            "PENNCOVEENT_bottom_N_by_year_multipanel.png"), 
        dpi = 600, height = 6, width = 4)
 
 #### Surface NO3 by year ####
@@ -194,6 +221,33 @@ ggplot(
   scale_shape_manual(values = c("TRUE" = 16, "FALSE" = 1)) + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
   guides(shape = "none")
+
+#### Surface NO3 by year - multipanel ####
+ggplot(
+  data = data_combined_discrete %>% 
+    filter(DepthBin == "surface"), 
+  aes(x = FakeDate, 
+      y = NO23, 
+      shape = Agency, 
+      fill = Detect_NO23, 
+      color = as.factor(year(CollectDate)))
+) + 
+  geom_point(size = 2) + 
+  theme_bw() + 
+  labs(
+    x = "", 
+    y = "Nitrate + nitrite (mg N/L)", 
+    shape = "", 
+    color = ""
+  ) + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
+  scale_color_viridis_d(end = 0.9, direction = -1) + 
+  scale_shape_manual(values = c("KC" = 19, "ECY" = 17)) + 
+  scale_fill_manual(values = c("FALSE" = NA))
+theme(axis.text.x = element_text(angle = 90, vjust = 0.4))
+ggsave(here("figs", "bottle", "no23", "ecy-comp", 
+            "PENNCOVEENT_bottom_N_by_year_singlepanel.png"), 
+       dpi = 600, height = 2.5, width = 6)
 
 #### Bottom PO4 by year ####
 ggplot(
