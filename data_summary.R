@@ -46,6 +46,23 @@ for (station in unique(data_ctd$Locator)) {
          height = 5, width = 5)
 }
 
+#### Figure - S CTD profiles by station, month ####
+for (station in unique(data_ctd$Locator)) {
+  ggplot(data = data_ctd %>% 
+           filter(Locator == station)) + 
+    theme_bw() + 
+    geom_line(aes(x = Depth, y = Salinity, group = Date)) + 
+    coord_flip() + 
+    scale_x_reverse(expand = c(0, 0)) + 
+    facet_wrap(~ Month) + 
+    labs(x = "Depth (m)", 
+         y = "Salinity (PSU)", 
+         title = station)
+  ggsave(filename = here("figs", "ctd-profiles", "S", 
+                         paste0(station, "_S.png")), 
+         height = 5, width = 5)
+}
+
 #### Figure - chl CTD profiles by station, month ####
 for (station in unique(data_ctd$Locator)) {
   ggplot(data = data_ctd %>% 
@@ -330,7 +347,7 @@ ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep_CvsW.png")),
        dpi = 600, height = 4, width = 6)
 
 #### Figure - minimum DO by year ####
-yoi <- 2022
+yoi <- 2023
 
 data_to_plot <- data_ctd %>% 
   filter(Year == yoi, 
@@ -362,3 +379,4 @@ ggplot(data = data_to_plot,
 
 ggsave(here("figs", paste0(yoi, "_min_DO.png")), 
        dpi = 600, height = 6, width = 11)
+
