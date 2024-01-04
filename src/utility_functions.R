@@ -54,8 +54,8 @@ load_whidbey_discrete <- function() {
   return(output)
 }
 
-# Load in Port Susan HCEP data (KC)
-load_buoy_data <- function() {
+# Load in old Port Susan HCEP data (KC; pre-Dec 20, 2023)
+load_PS_buoy_old <- function() {
   fpath <- here("data", "raw", "Port_Susan_buoy_HCEP.csv")
   read_csv(fpath, 
            col_types = cols(FrameSync = col_skip(), 
@@ -80,7 +80,7 @@ load_buoy_data <- function() {
 }
 
 # Load in Port Susan EXO data (ST)
-load_buoy_data_ST <- function() {
+load_PS_buoy_ST <- function() {
   fpath <- here("data", "raw", "prelim_PT_SUSAN_BUOY_DATA_MASTER.csv")
   read_csv(fpath, 
            col_types = cols(Timestamp = col_datetime(format = "%m/%d/%Y %H:%M"), 
