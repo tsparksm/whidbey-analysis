@@ -380,3 +380,33 @@ ggplot(data = data_to_plot,
 ggsave(here("figs", paste0(yoi, "_min_DO.png")), 
        dpi = 600, height = 6, width = 11)
 
+#### Figure - top and bottom DO by year, station ####
+yoi <- 2022
+station <- "PENNCOVEENT"
+
+data_to_plot <- data_ctd %>% 
+  filter(Year == yoi, 
+         Locator == station) %>% 
+  group_by(Date) %>% 
+  arrange(Depth) %>% 
+  summarize(Top = first(DO), 
+            Bottom = last(DO)) %>% 
+  pivot_longer(c(Top, Bottom), 
+               names_to = "Depth", 
+               values_to = "DO")
+
+ggplot(data = data_to_plot, 
+       aes(x = Date, 
+           y = DO)) + 
+  theme_bw() + 
+  geom_point() + 
+  facet_wrap(~ factor(Depth, levels = c("Top", "Bottom")), 
+             ncol = 1, 
+             scales = "free_y") + 
+  scale_x_date(breaks = "1 month", 
+               date_labels = "%b") + 
+  labs(x = "", 
+       y = "Dissolved oxygen (mg/L)", 
+       title = "Penn Cove entrance - 2022")
+ggsave(here("figs", "do", paste(station, yoi, "topbottomDO.png", sep = "_")), 
+       dpi = 600, height = 5, width = 5)
