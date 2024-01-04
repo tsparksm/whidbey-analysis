@@ -3,14 +3,14 @@ source(here::here("src", "utility_functions.R"))
 library(waterData)
 library(rtide)
 
-data_buoy <- load_buoy_data() %>% 
+data_buoy <- load_PS_buoy_old() %>% 
   mutate(Type = "KC") %>% 
   select(-Turbidity, 
          -TurbiditySD, 
          -ChlorophyllSD, 
          -EventFlags, 
          -Pressure)
-data_buoy_ST <- load_buoy_data_ST() %>% 
+data_buoy_ST <- load_PS_buoy_ST() %>% 
   mutate(Type = "ST")
 data_buoy_comb <- full_join(data_buoy, data_buoy_ST)
 data_buoy_avg <- data_buoy_comb %>% 
