@@ -129,6 +129,58 @@ load_PS_buoy_ST <- function() {
            Salinity)
 }
 
+# Load Penn Cove bottom HC-EP data
+load_PC_bottom_HCEP <- function(fpath) {
+  if (missing(fpath)) {
+    fpath <- choose.files(caption = "Select file to load", 
+                          multi = FALSE)
+  }
+  bottom_data <- read_xlsx(
+    fpath, 
+    sheet = "Data", 
+    col_types = c(
+      "text", 
+      "date", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "numeric", 
+      "skip", 
+      "skip", 
+      "numeric"
+    )
+  ) %>% 
+    rename(
+      HCEP_id = FrameSync, 
+      Datetime = `DateTime (UTC-07:00)`, 
+      Temperature_C = `Temperature (Celsius)`, 
+      Conductivity_Sm = `Conductivity (S/m)`, 
+      Pressure_dbar = `Pressure (Decibar)`, 
+      Oxygen_mgL = `Oxygen (mg/L)`, 
+      pH = `pH (pH)`, 
+      Chlorophyll_ugL = `Chlorophyll (ug/l)`, 
+      Turbidity_NTU = `Turbidity (NTU)`, 
+      Chlorophyll_SD_ugL = `Chlorophyll StdDev (ug/l)`, 
+      Turbidity_SD_ugL = `Turbidity StdDev (NTU)`, 
+      Salinity_PSU = `Salinity (psu)`, 
+      Spec_Conductivity_Sm = `Spec Conductivity (S/m)`, 
+      Oxygen_sat = `Oxygen Sat (%)`, 
+      Event_Flags = `Event Flags`
+    ) %>% 
+    mutate(
+      across(Temperature_C:Oxygen_sat, 
+             ~replace(., . == "NaN", NA))
+    )
+}
+
 # Load in summarized SSM output
 # Output generated using external script (make_SSM_summary.R)
 # Assumes scenario is Exist1 (normal model year) unless otherwise specified
