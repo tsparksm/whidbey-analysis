@@ -177,8 +177,50 @@ load_PC_bottom_HCEP <- function(fpath) {
     ) %>% 
     mutate(
       across(Temperature_C:Oxygen_sat, 
-             ~replace(., . == "NaN", NA))
+             ~replace(., . == "NaN", NA)), 
+      Datetime = round_date(Datetime, "15 mins")
     )
+  return(bottom_data)
+}
+
+# Load Penn Cove bottom SUNA data
+load_PC_bottom_SUNA <- function(fpath) {
+  if (missing(fpath)) {
+    fpath <- choose.files(caption = "Select file to load", 
+                          multi = FALSE)
+  }
+  
+  bottom_data <- read_xlsx(
+    fpath, 
+    col_types = c(
+      "text", 
+      "date", 
+      "date", 
+      "skip", 
+      "skip", 
+      "numeric", 
+      "numeric", 
+      "skip", 
+      "skip", 
+      "skip", 
+      "skip", 
+      "skip", 
+      "skip", 
+      "skip"
+    ), 
+    skip = 7
+  ) %>% 
+    rename(
+      SUNA_id = `Frame Header`, 
+      NO3_umol = `Processed NO3(uMol)`, 
+      NO3_mgNL = `Processed NO3(mg N/L)`
+    ) %>% 
+    mutate(across(NO3_umol:NO3_mgNL, 
+                  ~replace(., . == "NaN", NA)), 
+           Time = str_sub(as.character(Time), start = 12), 
+           DateTime = round_date(as.POSIXct(paste(Date, Time), 
+                                            tz = "GMT"), 
+                                 "15 mins"))
 }
 
 # Load in summarized SSM output
