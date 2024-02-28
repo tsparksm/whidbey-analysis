@@ -727,7 +727,97 @@ load_coupeville <- function() {
 # Take Penn Cove surface raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_penncovesurf <- function() {
-  # TO DO
+  fpath <- here("data", "raw", 
+                "Penn_Cove_Entrance_Buoy_Raw_Data_Output_-_Surface.csv")
+  raw_data <- read_csv(fpath, 
+                       col_types = cols(
+                         UnixTimestamp = col_double(), 
+                         `Date(America/Los_Angeles)` = col_datetime(
+                           format = "%m/%d/%Y %I:%M:%S %p" 
+                         ), 
+                         `Time(America/Los_Angeles)` = col_time(), 
+                         WindDirection = col_double(), 
+                         WindSpeed = col_double(), 
+                         `HCEP(TEMP)` = col_double(), 
+                         `HCEP(COND)` = col_skip(), 
+                         `HCEP(PRES)` = col_double(), 
+                         `HCEP(OXY)` = col_double(), 
+                         `HCEP(PH)` = col_double(), 
+                         `HCEP(FL)` = col_double(), 
+                         `HCEP(TURB)` = col_double(), 
+                         `HCEP(FSD)` = col_skip(), 
+                         `HCEP(TSD)` = col_skip(), 
+                         `HCEP(SAL)` = col_double(), 
+                         `HCEP(OSAT)` = col_double(), 
+                         `HCEP(VOLT)` = col_skip(), 
+                         `SUNA(M_Parameter1)` = col_skip(), 
+                         `SUNA(M_Parameter2)` = col_double(), 
+                         `SUNA(M_Parameter3)` = col_skip(), 
+                         `PAR(PAR_SQ-421X)` = col_double(), 
+                         `SDI-12Sensor(M_Parameter1)` = col_double(), 
+                         `SDI-12Sensor(M_Parameter2)` = col_double(), 
+                         `SDI-12Sensor(M_Parameter3)` = col_double()
+                       )) %>% 
+    rename(Date = `Date(America/Los_Angeles)`, 
+           Time = `Time(America/Los_Angeles)`, 
+           Temperature = `HCEP(TEMP)`, 
+           Pressure = `HCEP(PRES)`, 
+           Oxygen = `HCEP(OXY)`, 
+           pH = `HCEP(PH)`, 
+           Chlorophyll = `HCEP(FL)`, 
+           Turbidity = `HCEP(TURB)`, 
+           Salinity = `HCEP(SAL)`, 
+           OxygenSat = `HCEP(OSAT)`, 
+           NO23 = `SUNA(M_Parameter2)`, 
+           PAR = `PAR(PAR_SQ-421X)`, 
+           AirTemperature = `SDI-12Sensor(M_Parameter1)`, 
+           Humidity = `SDI-12Sensor(M_Parameter2)`, 
+           AirPressure = `SDI-12Sensor(M_Parameter3)`) %>% 
+    mutate(Date = as.Date(Date), 
+           DateTime = as.POSIXct(paste0(Date, Time)), 
+           Month = month(Date), 
+           Year = year(Date), 
+           FakeDateTime = DateTime) %>% 
+    arrange(DateTime)
+  year(raw_data$FakeDateTime) <- 2020
+  return(raw_data)
+}
+
+# Take Penn Cove bottom raw Socrata data and set it up for clean use in R
+# Uses static file location, downloaded from Socrata
+load_penncovebottom <- function() {
+  fpath <- here("data", "raw", 
+                "Penn_Cove_Entrance_Buoy_Raw_Data_Output_-_Bottom.csv")
+  raw_data <- read_csv(fpath, 
+                       col_types = cols(
+                         HCEP_id = col_character(), 
+                         DateTime = col_datetime(
+                           format = "%m/%d/%Y %I:%M:%S %p"
+                         ), 
+                         Temperature_C = col_double(), 
+                         Conductivity_Sm = col_double(), 
+                         Pressure_dbar = col_double(), 
+                         Oxygen_mgL = col_double(), 
+                         pH = col_double(), 
+                         Chlorophyll_ugL = col_double(), 
+                         Turbidity_NTU = col_double(), 
+                         Chlorophyll_SD_ugL = col_double(), 
+                         Turbidity_SD_ugL = col_double(), 
+                         Salinity_PSU = col_double(), 
+                         Spec_Conductivity_Sm = col_double(), 
+                         Oxygen_sat = col_double(), 
+                         Event_Flags = col_integer(), 
+                         SUNA_id = col_character(), 
+                         NO3_umol = col_double(), 
+                         NO3_mgNL = col_double(), 
+                         NO3_n = col_integer()
+                       )) %>% 
+    mutate(Month = month(DateTime), 
+           Year = year(DateTime), 
+           FakeDateTime = DateTime) %>% 
+    arrange(DateTime)
+  year(raw_data$FakeDateTime) <- 2020
+  return(raw_data)
 }
 
 # Take Port Susan buoy raw Socrata data and set it up for clean use in R
