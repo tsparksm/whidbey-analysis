@@ -812,6 +812,7 @@ load_penncovebottom <- function() {
                          NO3_mgNL = col_double(), 
                          NO3_n = col_integer()
                        )) %>% 
+    select(DateTime, everything()) %>% 
     mutate(Month = month(DateTime), 
            Year = year(DateTime), 
            FakeDateTime = DateTime) %>% 
