@@ -103,8 +103,41 @@ for (station in unique(data_discrete$Locator)) {
          height = 5, width = 5)
 }
 
+#### Figure - nitrate bottle highlight year ####
+for (station in unique(data_discrete$Locator)) {
+  ggplot(data = bottle_data %>% 
+           filter(Locator == station,  
+                  ParmId == 14), 
+         aes(x = FakeDate, 
+             y = Value, 
+             shape = Detect, 
+             color = Year == yoi)) + 
+    theme_bw() + 
+    facet_wrap(~ DepthBin, 
+               ncol = 1) + 
+    geom_point(size = 3) + 
+    scale_color_manual(values = c("TRUE" = "black", 
+                                  "FALSE" = "gray"), 
+                       labels = c("TRUE" = yoi, 
+                                  "FALSE" = paste(min(bottle_data$Year), 
+                                                  yoi-1, 
+                                                  sep = "-"))) + 
+    scale_shape_manual(values = c("TRUE" = 16, 
+                                  "FALSE" = 1)) + 
+    labs(x = "", 
+         y = expression("NO"[2]^"-"~"+"~"NO"[3]^"-"~"(mg N/L)"), 
+         shape = "Detect", 
+         color = "Year", 
+         title = paste(station, yoi)) + 
+    scale_x_datetime(date_breaks = "1 month", 
+                     date_labels = "%b")
+  ggsave(here("figs", "bottle", "no23", 
+              paste0(station, "_", yoi, "_NO23.png")), 
+         height = 5, width = 8)
+}
+
 #### Figure - N and P bottle for a single deep station, year ####
-yoi <- 2022
+yoi <- 2023
 stations <- c("SARATOGACH")
 for (station in stations) {
   ggplot(data = bottle_data %>% 
@@ -193,6 +226,72 @@ for (station in unique(data_discrete$Locator)) {
   ggsave(filename = here("figs", "bottle", "po4", 
                          paste0(station, "_PO4.png")), 
          height = 5, width = 5)
+}
+
+#### Figure - phosphate bottle highlight year ####
+for (station in unique(data_discrete$Locator)) {
+  ggplot(data = bottle_data %>% 
+           filter(Locator == station,  
+                  ParmId == 15), 
+         aes(x = FakeDate, 
+             y = Value, 
+             shape = Detect, 
+             color = Year == yoi)) + 
+    theme_bw() + 
+    facet_wrap(~ DepthBin, 
+               ncol = 1) + 
+    geom_point(size = 3) + 
+    scale_color_manual(values = c("TRUE" = "black", 
+                                  "FALSE" = "gray"), 
+                       labels = c("TRUE" = yoi, 
+                                  "FALSE" = paste(min(bottle_data$Year), 
+                                                  yoi-1, 
+                                                  sep = "-"))) + 
+    scale_shape_manual(values = c("TRUE" = 16, 
+                                  "FALSE" = 1)) + 
+    labs(x = "", 
+         y = "Phosphate (mg/L)", 
+         shape = "Detect", 
+         color = "Year", 
+         title = paste(station, yoi)) + 
+    scale_x_datetime(date_breaks = "1 month", 
+                     date_labels = "%b")
+  ggsave(here("figs", "bottle", "po4", 
+              paste0(station, "_", yoi, "_PO4.png")), 
+         height = 5, width = 8)
+}
+#### Figure - silica bottle highlight year ####
+yoi <- 2023
+for (station in unique(data_discrete$Locator)) {
+  ggplot(data = data_discrete %>% 
+           filter(Locator == station,  
+                  ParmId == 21), 
+         aes(x = FakeDate, 
+             y = Value, 
+             shape = Detect, 
+             color = Year == yoi)) + 
+    theme_bw() + 
+    facet_wrap(~ DepthBin, 
+               ncol = 1) + 
+    geom_point(size = 3) + 
+    scale_color_manual(values = c("TRUE" = "black", 
+                                  "FALSE" = "gray"), 
+                       labels = c("TRUE" = yoi, 
+                                  "FALSE" = paste(min(data_discrete$Year), 
+                                                  yoi-1, 
+                                                  sep = "-"))) + 
+    scale_shape_manual(values = c("TRUE" = 16, 
+                                  "FALSE" = 1)) + 
+    labs(x = "", 
+         y = "Silica (mg/L)", 
+         shape = "Detect", 
+         color = "Year", 
+         title = paste(station, yoi)) + 
+    scale_x_datetime(date_breaks = "1 month", 
+                     date_labels = "%b")
+  ggsave(here("figs", "bottle", "si", 
+              paste0(station, "_", yoi, "_si.png")), 
+         height = 5, width = 8)
 }
 
 #### Figure - ammonia bottle by station, depth, time ####
@@ -381,7 +480,7 @@ ggsave(here("figs", paste0(yoi, "_min_DO.png")),
        dpi = 600, height = 6, width = 11)
 
 #### Figure - top and bottom DO by year, station ####
-yoi <- 2022
+yoi <- 2023
 station <- "PENNCOVEENT"
 
 data_to_plot <- data_ctd %>% 
@@ -407,6 +506,6 @@ ggplot(data = data_to_plot,
                date_labels = "%b") + 
   labs(x = "", 
        y = "Dissolved oxygen (mg/L)", 
-       title = "Penn Cove entrance - 2022")
+       title = paste("Penn Cove entrance -", yoi))
 ggsave(here("figs", "do", paste(station, yoi, "topbottomDO.png", sep = "_")), 
        dpi = 600, height = 5, width = 5)
