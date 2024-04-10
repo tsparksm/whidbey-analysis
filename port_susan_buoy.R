@@ -3,12 +3,6 @@ source(here::here("src", "utility_functions.R"))
 library(waterData)
 library(rtide)
 
-#### Create file for import in Socrata ####
-# Will use GUI for load and save file selection
-start_time <- "09:15"  # 24 hr HH:MM
-start_date <- "2023-12-20"  # YYYY-MM-DD
-process_socrata_psusan(start_date, start_time)
-
 #### Load and combine old (pre-Dec 2023) buoy data #### 
 data_buoy <- load_PS_buoy_old() %>% 
   mutate(Type = "KC") %>% 
