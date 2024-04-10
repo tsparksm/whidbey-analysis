@@ -4,12 +4,6 @@ library(rtide)
 
 yoi <- 2023
 
-#### Create file for import in Socrata ####
-# Will use GUI for load and save file selection
-start_time <- "16:15"  # 24 hr HH:MM
-start_date <- "2023-07-12"  # YYYY-MM-DD
-process_socrata_coupeville(start_date, start_time)
-
 #### Load data ####
 # Remember to update file via Socrata download first!
 raw_data <- load_coupeville()
