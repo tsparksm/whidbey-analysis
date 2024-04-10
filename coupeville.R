@@ -32,12 +32,16 @@ ggplot(data = raw_data %>%
                         direction = -1) + 
   labs(x = expression("Temperature " ( degree*C)), 
        y = "Salinity (PSU)", 
-       color = "Month")
+       color = "Month", 
+       title = paste("Coupeville", yoi)) + 
+  lims(x = c(4, 22), 
+       y = c(0, 30))
 ggsave(here("figs", "coupeville", paste0("T_S_", yoi, ".png")), 
        height = 4, width = 6)
 
 #### Mooring - temperature over time ####
-ggplot(data = raw_data, 
+ggplot(data = raw_data %>% 
+         filter(Year <= yoi), 
        aes(x = FakeDateTime, 
            y = Temperature, 
            color = Year == yoi)) + 
@@ -46,14 +50,19 @@ ggplot(data = raw_data,
   geom_point() + 
   labs(x = "", 
        y = expression("Temperature " ( degree*C)), 
+       title = paste("Coupeville", yoi), 
        color = "") + 
   scale_color_manual(values = c("TRUE" = "black", 
-                                "FALSE" = "gray"))
+                                "FALSE" = "gray")) + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
+  lims(y = c(0, NA))
 ggsave(here("figs", "coupeville", paste0("T_", yoi, ".png")), 
        height = 4, width = 6)
 
 #### Mooring - salinity over time ####
-ggplot(data = raw_data, 
+ggplot(data = raw_data %>% 
+         filter(Year <= yoi), 
        aes(x = FakeDateTime, 
            y = Salinity, 
            color = Year == yoi)) + 
@@ -62,14 +71,19 @@ ggplot(data = raw_data,
   geom_point() + 
   labs(x = "", 
        y = "Salinity (PSU)", 
+       title = paste("Coupeville", yoi), 
        color = "") + 
   scale_color_manual(values = c("TRUE" = "black", 
-                                "FALSE" = "gray"))
+                                "FALSE" = "gray")) + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
+  lims(y = c(0, 31))
 ggsave(here("figs", "coupeville", paste0("S_", yoi, ".png")), 
        height = 4, width = 6)
 
 #### Mooring - nitrate over time ####
-ggplot(data = raw_data, 
+ggplot(data = raw_data %>% 
+         filter(Year <= yoi), 
        aes(x = FakeDateTime, 
            y = NO23, 
            color = Year == yoi)) + 
@@ -78,15 +92,19 @@ ggplot(data = raw_data,
   geom_point() + 
   labs(y = "SUNA Parameter 2", 
        x = "", 
-       color = "") + 
+       color = "", 
+       title = paste("Coupeville", yoi)) + 
   scale_color_manual(values = c("TRUE" = "black", 
-                                "FALSE" = "gray"))
+                                "FALSE" = "gray")) + 
+  lims(y = c(0, NA)) + 
+  scale_x_datetime(date_breaks = "1 month", 
+               date_labels = "%b")
 ggsave(here("figs", "coupeville", paste0("NO23_", yoi, ".png")), 
        height = 4, width = 6)
 
 #### Mooring - DO over time ####
 ggplot(data = raw_data %>% 
-         filter(Oxygen > 0), 
+         filter(Year <= yoi), 
        aes(x = FakeDateTime, 
            y = Oxygen, 
            color = Year == yoi)) + 
@@ -95,16 +113,19 @@ ggplot(data = raw_data %>%
   geom_point(alpha = 0.5, size = 1) + 
   labs(y = "DO (mg/L)", 
        x = "", 
-       color = "") + 
+       color = "", 
+       title = paste("Coupeville", yoi)) + 
   scale_color_manual(values = c("TRUE" = "black", 
-                                "FALSE" = "gray"))
+                                "FALSE" = "gray")) + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
+  lims(y = c(0, NA))
 ggsave(here("figs", "coupeville", paste0("DO_", yoi, ".png")), 
        height = 4, width = 6)
 
 #### Mooring - chl over time ####
 ggplot(data = raw_data %>% 
-         filter(Chlorophyll < 100, 
-                Chlorophyll > 0), 
+         filter(Year <= yoi), 
        aes(x = FakeDateTime, 
            y = Chlorophyll, 
            color = Year == yoi)) + 
@@ -113,9 +134,13 @@ ggplot(data = raw_data %>%
   geom_point() + 
   labs(x = "", 
        y = expression(Chlorophyll~(mu*g/L)), 
-       color = "") + 
+       color = "", 
+       title = paste("Coupeville", yoi)) + 
   scale_color_manual(values = c("TRUE" = "black", 
-                                "FALSE" = "gray"))
+                                "FALSE" = "gray")) + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
+  lims(y = c(0, 100))
 ggsave(here("figs", "coupeville", paste0("chl_", yoi, ".png")), 
        height = 4, width = 6)
 
