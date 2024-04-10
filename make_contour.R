@@ -1,7 +1,9 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
+source(here::here("src", "contour_functions.R"))
 library(metR)
 library(cmocean)
+library(scales)
 
 # What stations to plot?
 # stations <- c("SARATOGACH", "SARATOGAOP", "SARATOGARP")
@@ -17,8 +19,8 @@ stations <- "PSUSANBUOY"
 # All stations on one figure? TRUE or FALSE
 all_stations_fig <- FALSE
 
-# If all_stations_fig == FALSE, same limits? TRUE or FALSE
-all_stations_lims <- TRUE
+# If all_stations_fig == FALSE, same limits across stations? TRUE or FALSE
+all_stations_lims <- FALSE
 
 # What years to plot? c(min_year, max_year)
 years <- c(2022, 2022)
@@ -27,7 +29,7 @@ n <- length(unique(years))
 # All years on one figure? TRUE or FALSE
 all_years_fig <- TRUE
 
-# If all_years_fig == FALSE, same limits? TRUE or FALSE
+# If all_years_fig == FALSE, same limits across years? TRUE or FALSE
 all_years_lims <- TRUE
 
 # Do you want contour lines on your sigma-theta plots?
@@ -58,29 +60,36 @@ max_depth <- data_ctd %>%
          Year >= years[1]) %>% 
   group_by(Locator, Year, YearDay) %>% 
   summarize(MaxDepth = max(BinDepth, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  group_by(Locator) %>% 
   summarize(MinMaxDepth = min(MaxDepth))
 
 #### Add extra data before and after each year; filter by MinMaxDepth ####
 data_remix <- data_ctd %>% 
-  filter(Locator %in% stations)
+  filter(Locator %in% stations) %>% 
+  mutate(FakeYearDay = YearDay)
+
 for (station in stations) {
   for (yoi in years[1]:years[2]) {
-    extra_data_before <- data_remix %>% 
-      filter(Year == yoi - 1, 
-             YearDay == max(YearDay), 
-             Locator == station) %>% 
-      mutate(YearDay = YearDay - 365, 
-             Year = yoi)
-      
-    data_remix <- add_row(data_remix, extra_data_before)
-    
-    extra_data_after <- data_remix %>% 
-      filter(Year == yoi + 1, 
-             YearDay == min(YearDay), 
-             Locator == station) %>% 
-      mutate(YearDay = YearDay + 365, 
-             Year = yoi)
-    data_remix <- add_row(data_remix, extra_data_after)
+    if (min(data_remix$Year) < yoi) {
+      extra_data_before <- data_remix %>% 
+        filter(Year == yoi - 1, 
+               Locator == station) %>% 
+        filter(YearDay == max(YearDay)) %>% 
+        mutate(FakeYearDay = YearDay - 365, 
+               Year = yoi)
+      data_remix <- add_row(data_remix, extra_data_before)
+    }
+
+    if (max(data_remix$Year) > yoi) {
+      extra_data_after <- data_remix %>% 
+        filter(Year == yoi + 1, 
+               Locator == station) %>% 
+        filter(YearDay == min(YearDay)) %>% 
+        mutate(FakeYearDay = YearDay + 365, 
+               Year = yoi)
+      data_remix <- add_row(data_remix, extra_data_after)
+    }
   }
 }
 
