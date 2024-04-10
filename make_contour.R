@@ -719,25 +719,26 @@ data_to_plot <- data_remix %>%
   filter(Locator %in% stations, 
          !is.na(Temperature), 
          BinDepth <= MinMaxDepth) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(Temperature = mean(Temperature, na.rm = TRUE)) %>% 
   ungroup()
 
-min_lim <- round_any(min(data_to_plot$Temperature, na.rm = T),
-                     accuracy = acc_T, f = floor)
-max_lim <- round_any(max(data_to_plot$Temperature, na.rm = T),
-                     accuracy = acc_T, f = ceiling)
-mybreaks <- seq(min_lim, max_lim, by = acc_T)
-mylabels <- mybreaks
-mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-
 if (all_stations_fig) {
+  
+  min_lim <- round_any(min(data_to_plot$Temperature, na.rm = T),
+                       accuracy = acc_T, f = floor)
+  max_lim <- round_any(max(data_to_plot$Temperature, na.rm = T),
+                       accuracy = acc_T, f = ceiling)
+  mybreaks <- seq(min_lim, max_lim, by = acc_T)
+  mylabels <- mybreaks
+  mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+  
   ggplot(data = data_to_plot) + 
     theme_classic() + 
     facet_wrap(~ Locator, 
                ncol = 1, 
                scales = "free_y") + 
-    metR::geom_contour_fill(aes(x = YearDay, 
+    metR::geom_contour_fill(aes(x = FakeYearDay, 
                                 y = BinDepth, 
                                 z = Temperature), 
                             na.fill = TRUE, 
@@ -763,7 +764,7 @@ if (all_stations_fig) {
                                   yday(paste(yoi, "-11-01", sep = "")), 
                                   yday(paste(yoi, "-12-01", sep = ""))), 
                        labels = month.abb) + 
-    geom_vline(aes(xintercept = YearDay), 
+    geom_vline(aes(xintercept = FakeYearDay), 
                alpha = 0.2) + 
     labs(x = "", 
          y = "Depth (m)", 
@@ -779,11 +780,21 @@ if (all_stations_fig) {
          dpi = 600)
 } else {
   for (station in stations) {
-    ggplot(data = data_to_plot %>% filter(Locator == station)) + 
+    temp <- data_to_plot %>% filter(Locator == station)
+    
+    min_lim <- round_any(min(temp$Temperature, na.rm = T),
+                         accuracy = acc_T, f = floor)
+    max_lim <- round_any(max(temp$Temperature, na.rm = T),
+                         accuracy = acc_T, f = ceiling)
+    mybreaks <- seq(min_lim, max_lim, by = acc_T)
+    mylabels <- mybreaks
+    mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+    
+    ggplot(data = temp) + 
       theme_classic() + 
       facet_wrap(~ Year, 
                  ncol = 1) + 
-      metR::geom_contour_fill(aes(x = YearDay, 
+      metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
                                   z = Temperature), 
                               na.fill = TRUE, 
@@ -809,7 +820,7 @@ if (all_stations_fig) {
                                     yday(paste(yoi, "-11-01", sep = "")), 
                                     yday(paste(yoi, "-12-01", sep = ""))), 
                          labels = month.abb) + 
-      geom_vline(aes(xintercept = YearDay), 
+      geom_vline(aes(xintercept = FakeYearDay), 
                  alpha = 0.2) + 
       labs(x = "", 
            y = "Depth (m)", 
