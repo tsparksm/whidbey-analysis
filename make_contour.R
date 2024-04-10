@@ -845,35 +845,35 @@ data_to_plot <- data_remix %>%
   filter(Locator %in% stations, 
          !is.na(Salinity), 
          BinDepth <= max_depth) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(Salinity = mean(Salinity, na.rm = TRUE)) %>% 
   ungroup()
 
-if (exists("min_lim")) {
-  data_to_plot <- data_to_plot %>% 
-    mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
-} else {
-  min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
-                       accurac = acc_S, f = floor)
-  set_min <- FALSE
-}
-
-max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
-                     accuracy = acc_S, f = ceiling)
-mybreaks <- seq(min_lim, max_lim, by = acc_S)
-mylabels <- mybreaks
-mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-if (set_min) {
-  mylabels[1] <- paste0("<", min_lim)
-}
-
 if (all_stations_fig) {
+  if (exists("min_lim")) {
+    data_to_plot <- data_to_plot %>% 
+      mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+  } else {
+    min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
+                         accurac = acc_S, f = floor)
+    set_min <- FALSE
+  }
+  
+  max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
+                       accuracy = acc_S, f = ceiling)
+  mybreaks <- seq(min_lim, max_lim, by = acc_S)
+  mylabels <- mybreaks
+  mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+  if (set_min) {
+    mylabels[1] <- paste0("<", min_lim)
+  }
+  
   ggplot(data = data_to_plot) + 
     theme_classic() + 
     facet_wrap(~ Locator, 
                ncol = 1, 
                scales = "free_y") + 
-    metR::geom_contour_fill(aes(x = YearDay, 
+    metR::geom_contour_fill(aes(x = FakeYearDay, 
                                 y = BinDepth, 
                                 z = Salinity), 
                             na.fill = TRUE, 
@@ -901,7 +901,7 @@ if (all_stations_fig) {
                                   yday(paste(yoi, "-11-01", sep = "")), 
                                   yday(paste(yoi, "-12-01", sep = ""))), 
                        labels = month.abb) + 
-    geom_vline(aes(xintercept = YearDay), 
+    geom_vline(aes(xintercept = FakeYearDay), 
                alpha = 0.2) + 
     labs(x = "", 
          y = "Depth (m)", 
@@ -917,11 +917,32 @@ if (all_stations_fig) {
          dpi = 600)
 } else {
   for (station in stations) {
-    ggplot(data = data_to_plot %>% filter(Locator == station)) + 
+    temp <- data_to_plot %>% 
+      filter(Locator == station)
+    
+    if (exists("min_lim")) {
+      temp <- data_to_plot %>% 
+        mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+    } else {
+      min_lim <- round_any(min(temp$Salinity, na.rm = TRUE), 
+                           accurac = acc_S, f = floor)
+      set_min <- FALSE
+    }
+    
+    max_lim <- round_any(max(temp$Salinity, na.rm = TRUE), 
+                         accuracy = acc_S, f = ceiling)
+    mybreaks <- seq(min_lim, max_lim, by = acc_S)
+    mylabels <- mybreaks
+    mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+    if (set_min) {
+      mylabels[1] <- paste0("<", min_lim)
+    }
+      
+    ggplot(data = temp) + 
       theme_classic() + 
       facet_wrap(~ Year, 
                  ncol = 1) + 
-      metR::geom_contour_fill(aes(x = YearDay, 
+      metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
                                   z = Salinity), 
                               na.fill = TRUE, 
@@ -949,7 +970,7 @@ if (all_stations_fig) {
                                     yday(paste(yoi, "-11-01", sep = "")), 
                                     yday(paste(yoi, "-12-01", sep = ""))), 
                          labels = month.abb) + 
-      geom_vline(aes(xintercept = YearDay), 
+      geom_vline(aes(xintercept = FakeYearDay), 
                  alpha = 0.2) + 
       labs(x = "", 
            y = "Depth (m)", 
