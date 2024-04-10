@@ -109,7 +109,7 @@ data_to_plot <- data_remix %>%
   filter(Locator %in% stations, 
          !is.na(SigmaTheta), 
          BinDepth <= MinMaxDepth) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
   ungroup() %>% 
   mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
@@ -117,65 +117,14 @@ data_to_plot <- data_remix %>%
                                 TRUE ~ SigmaTheta))
 
 if (all_stations_fig) {
-  ggplot(data = data_to_plot %>% 
-           filter(Year %in% years[1]:years[2])) + 
-    theme_classic() + 
-    facet_wrap(~ Locator, ncol = 1, 
-               scales = "free_y") + 
-    metR::geom_contour_fill(aes(x = YearDay, 
-                                y = BinDepth, 
-                                z = SigmaTheta), 
-                            na.fill = TRUE, 
-                            breaks = mybreaks, 
-                            color = alpha("white", sigmat_contour_alpha)) + 
-    scale_fill_cmocean(name = "dense", 
-                       breaks = mybreaks, 
-                       limits = lims, 
-                       labels = mylabels, 
-                       guide = guide_colorbar(show.limits = TRUE, 
-                                              ticks = FALSE, 
-                                              reverse = TRUE)) + 
-    scale_y_reverse(expand = c(0, 0)) + 
-    coord_cartesian(xlim = c(0, 366)) + 
-    scale_x_continuous(expand = c(0, 0), 
-                       breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                  yday(paste(yoi, "-02-01", sep = "")), 
-                                  yday(paste(yoi, "-03-01", sep = "")), 
-                                  yday(paste(yoi, "-04-01", sep = "")), 
-                                  yday(paste(yoi, "-05-01", sep = "")), 
-                                  yday(paste(yoi, "-06-01", sep = "")), 
-                                  yday(paste(yoi, "-07-01", sep = "")), 
-                                  yday(paste(yoi, "-08-01", sep = "")), 
-                                  yday(paste(yoi, "-09-01", sep = "")), 
-                                  yday(paste(yoi, "-10-01", sep = "")), 
-                                  yday(paste(yoi, "-11-01", sep = "")), 
-                                  yday(paste(yoi, "-12-01", sep = ""))), 
-                       labels = month.abb) + 
-    geom_vline(aes(xintercept = YearDay), 
-               alpha = 0.2) + 
-    labs(x = "", 
-         y = "Depth (m)", 
-         fill = expression(kg/m^3), 
-         title = bquote(sigma[Theta]))
-  ggsave(here("figs", "contour", "sigmat", 
-              paste0(paste(stations, collapse = "_"), 
-                     "_sigmat_", 
-                     years[1], "_", years[2], 
-                     ".png")), 
-         height = 2*length(stations), 
-         width = 8, 
-         dpi = 600)
-} else {
-  for (station in stations) {
-    data_to_plot <- data_to_plot %>% 
-      filter(Locator == station)
-    
+  if (all_years_fig) {
     ggplot(data = data_to_plot %>% 
              filter(Year %in% years[1]:years[2])) + 
       theme_classic() + 
-      facet_wrap(~ Year, 
-                 ncol = 1) + 
-      metR::geom_contour_fill(aes(x = YearDay, 
+      facet_grid(rows = vars(Locator), 
+                 cols = vars(Year), 
+                 scales = "free_y") + 
+      metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
                                   z = SigmaTheta), 
                               na.fill = TRUE, 
@@ -204,24 +153,183 @@ if (all_stations_fig) {
                                     yday(paste(yoi, "-11-01", sep = "")), 
                                     yday(paste(yoi, "-12-01", sep = ""))), 
                          labels = month.abb) + 
-      geom_vline(aes(xintercept = YearDay), 
+      geom_vline(aes(xintercept = FakeYearDay), 
                  alpha = 0.2) + 
       labs(x = "", 
            y = "Depth (m)", 
            fill = expression(kg/m^3), 
-           title = bquote(.(station)~sigma[Theta]))
-    ggsave(here("figs", "contour", "sigmat", station, 
-                paste0(station, "_sigmat_", 
-                       years[1], "_", years[2], 
+           title = bquote(sigma[Theta]))
+    ggsave(here("figs", "contour", "sigmat", 
+                paste0(paste(stations, collapse = "_"), 
+                       "_sigmat_", 
+                       years[1], "-", years[2], 
                        ".png")), 
-           height = 2*n, 
-           width = 8, 
+           height = 1.5*length(stations), 
+           width = 5*n, 
            dpi = 600)
+  } else {
+    for (yoi in years[1]:years[2]) {
+      ggplot(data = data_to_plot %>% 
+               filter(Year %in% yoi)) + 
+        theme_classic() + 
+        facet_wrap(~ Locator, 
+                   ncol = 1, 
+                   scales = "free_y") + 
+        metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                    y = BinDepth, 
+                                    z = SigmaTheta), 
+                                na.fill = TRUE, 
+                                breaks = mybreaks, 
+                                color = alpha("white", sigmat_contour_alpha)) + 
+        scale_fill_cmocean(name = "dense", 
+                           breaks = mybreaks, 
+                           limits = lims, 
+                           labels = mylabels, 
+                           guide = guide_colorbar(show.limits = TRUE, 
+                                                  ticks = FALSE, 
+                                                  reverse = TRUE)) + 
+        scale_y_reverse(expand = c(0, 0)) + 
+        coord_cartesian(xlim = c(0, 366)) + 
+        scale_x_continuous(expand = c(0, 0), 
+                           breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                      yday(paste(yoi, "-02-01", sep = "")), 
+                                      yday(paste(yoi, "-03-01", sep = "")), 
+                                      yday(paste(yoi, "-04-01", sep = "")), 
+                                      yday(paste(yoi, "-05-01", sep = "")), 
+                                      yday(paste(yoi, "-06-01", sep = "")), 
+                                      yday(paste(yoi, "-07-01", sep = "")), 
+                                      yday(paste(yoi, "-08-01", sep = "")), 
+                                      yday(paste(yoi, "-09-01", sep = "")), 
+                                      yday(paste(yoi, "-10-01", sep = "")), 
+                                      yday(paste(yoi, "-11-01", sep = "")), 
+                                      yday(paste(yoi, "-12-01", sep = ""))), 
+                           labels = month.abb) + 
+        geom_vline(aes(xintercept = FakeYearDay), 
+                   alpha = 0.2) + 
+        labs(x = "", 
+             y = "Depth (m)", 
+             fill = expression(kg/m^3), 
+             title = bquote(sigma[Theta]~yoi))
+      ggsave(here("figs", "contour", "sigmat", 
+                  paste0(paste(stations, collapse = "_"), 
+                         "_sigmat_", 
+                         yoi, 
+                         ".png")), 
+             height = 1.5*length(stations), 
+             width = 5, 
+             dpi = 600)
+    }
+  }
+} else { 
+  for (station in stations) {
+    if (all_years_fig) {
+      ggplot(data = data_to_plot %>% 
+               filter(Year %in% years[1]:years[2], 
+                      Locator == station)) + 
+        theme_classic() + 
+        facet_wrap(~ Year, 
+                   ncol = 1, 
+                   scales = "free_y") + 
+        metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                    y = BinDepth, 
+                                    z = SigmaTheta), 
+                                na.fill = TRUE, 
+                                breaks = mybreaks, 
+                                color = alpha("white", sigmat_contour_alpha)) + 
+        scale_fill_cmocean(name = "dense", 
+                           breaks = mybreaks, 
+                           limits = lims, 
+                           labels = mylabels, 
+                           guide = guide_colorbar(show.limits = TRUE, 
+                                                  ticks = FALSE, 
+                                                  reverse = TRUE)) + 
+        scale_y_reverse(expand = c(0, 0)) + 
+        coord_cartesian(xlim = c(0, 366)) + 
+        scale_x_continuous(expand = c(0, 0), 
+                           breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                      yday(paste(yoi, "-02-01", sep = "")), 
+                                      yday(paste(yoi, "-03-01", sep = "")), 
+                                      yday(paste(yoi, "-04-01", sep = "")), 
+                                      yday(paste(yoi, "-05-01", sep = "")), 
+                                      yday(paste(yoi, "-06-01", sep = "")), 
+                                      yday(paste(yoi, "-07-01", sep = "")), 
+                                      yday(paste(yoi, "-08-01", sep = "")), 
+                                      yday(paste(yoi, "-09-01", sep = "")), 
+                                      yday(paste(yoi, "-10-01", sep = "")), 
+                                      yday(paste(yoi, "-11-01", sep = "")), 
+                                      yday(paste(yoi, "-12-01", sep = ""))), 
+                           labels = month.abb) + 
+        geom_vline(aes(xintercept = FakeYearDay), 
+                   alpha = 0.2) + 
+        labs(x = "", 
+             y = "Depth (m)", 
+             fill = expression(kg/m^3), 
+             title = bquote(.(station)~sigma[Theta]))
+      ggsave(here("figs", "contour", "sigmat", station, 
+                  paste0(station, "_sigmat_", 
+                         years[1], "-", years[2], 
+                         ".png")), 
+             height = 1.5*n, 
+             width = 5, 
+             dpi = 600)
+    } else {
+      for (yoi in years[1]:years[2]) {
+        ggplot(data = data_to_plot %>% 
+                 filter(Year == yoi, 
+                        Locator == station)) + 
+          theme_classic() + 
+          theme(panel.border = element_rect(colour = "black", 
+                                            fill = NA, 
+                                            linewidth = 0.5)) + 
+          metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                      y = BinDepth, 
+                                      z = SigmaTheta), 
+                                  na.fill = TRUE, 
+                                  breaks = mybreaks, 
+                                  color = alpha("white", sigmat_contour_alpha)) + 
+          scale_fill_cmocean(name = "dense", 
+                             breaks = mybreaks, 
+                             limits = lims, 
+                             labels = mylabels, 
+                             guide = guide_colorbar(show.limits = TRUE, 
+                                                    ticks = FALSE, 
+                                                    reverse = TRUE)) + 
+          scale_y_reverse(expand = c(0, 0)) + 
+          coord_cartesian(xlim = c(0, 366)) + 
+          scale_x_continuous(expand = c(0, 0), 
+                             breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                        yday(paste(yoi, "-02-01", sep = "")), 
+                                        yday(paste(yoi, "-03-01", sep = "")), 
+                                        yday(paste(yoi, "-04-01", sep = "")), 
+                                        yday(paste(yoi, "-05-01", sep = "")), 
+                                        yday(paste(yoi, "-06-01", sep = "")), 
+                                        yday(paste(yoi, "-07-01", sep = "")), 
+                                        yday(paste(yoi, "-08-01", sep = "")), 
+                                        yday(paste(yoi, "-09-01", sep = "")), 
+                                        yday(paste(yoi, "-10-01", sep = "")), 
+                                        yday(paste(yoi, "-11-01", sep = "")), 
+                                        yday(paste(yoi, "-12-01", sep = ""))), 
+                             labels = month.abb) + 
+          geom_vline(aes(xintercept = FakeYearDay), 
+                     alpha = 0.2) + 
+          labs(x = "", 
+               y = "Depth (m)", 
+               fill = expression(kg/m^3), 
+               title = bquote(.(station)~sigma[Theta]~yoi))
+        ggsave(here("figs", "contour", "sigmat", station, 
+                    paste0(station, "_sigmat_", 
+                           yoi, 
+                           ".png")), 
+               height = 2, 
+               width = 5, 
+               dpi = 600)
+      }
+    }
   }
 }
 
 #### Surface sigma-t contour plot ####
-max_depth <- 40
+surface_depth <- 40
 lims <- c(20, 23.6)  # min and max sigma-t values
 mybreaks <- seq(lims[1], lims[2], by = acc_sigmaT)
 mylabels <- mybreaks
@@ -232,8 +340,8 @@ mylabels[length(mylabels)] <- paste0(">", lims[2])
 data_to_plot <- data_remix %>% 
   filter(Locator %in% stations, 
          !is.na(SigmaTheta), 
-         BinDepth <= max_depth) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
+         BinDepth <= surface_depth) %>% 
+  group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(SigmaTheta = mean(SigmaTheta, na.rm = TRUE)) %>% 
   ungroup() %>% 
   mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
@@ -241,65 +349,14 @@ data_to_plot <- data_remix %>%
                                 TRUE ~ SigmaTheta))
 
 if (all_stations_fig) {
-  ggplot(data = data_to_plot %>% 
-           filter(Year %in% years[1]:years[2])) + 
-    theme_classic() + 
-    facet_wrap(~ Locator, ncol = 1, 
-               scales = "free_y") + 
-    metR::geom_contour_fill(aes(x = YearDay, 
-                                y = BinDepth, 
-                                z = SigmaTheta), 
-                            na.fill = TRUE, 
-                            breaks = mybreaks, 
-                            color = alpha("white", sigmat_contour_alpha)) + 
-    scale_fill_cmocean(name = "dense", 
-                       breaks = mybreaks, 
-                       limits = lims, 
-                       labels = mylabels, 
-                       guide = guide_colorbar(show.limits = TRUE, 
-                                              ticks = FALSE, 
-                                              reverse = TRUE)) + 
-    scale_y_reverse(expand = c(0, 0)) + 
-    coord_cartesian(xlim = c(0, 366)) + 
-    scale_x_continuous(expand = c(0, 0), 
-                       breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                  yday(paste(yoi, "-02-01", sep = "")), 
-                                  yday(paste(yoi, "-03-01", sep = "")), 
-                                  yday(paste(yoi, "-04-01", sep = "")), 
-                                  yday(paste(yoi, "-05-01", sep = "")), 
-                                  yday(paste(yoi, "-06-01", sep = "")), 
-                                  yday(paste(yoi, "-07-01", sep = "")), 
-                                  yday(paste(yoi, "-08-01", sep = "")), 
-                                  yday(paste(yoi, "-09-01", sep = "")), 
-                                  yday(paste(yoi, "-10-01", sep = "")), 
-                                  yday(paste(yoi, "-11-01", sep = "")), 
-                                  yday(paste(yoi, "-12-01", sep = ""))), 
-                       labels = month.abb) + 
-    geom_vline(aes(xintercept = YearDay), 
-               alpha = 0.2) + 
-    labs(x = "", 
-         y = "Depth (m)", 
-         fill = expression(kg/m^3), 
-         title = bquote(Surface~sigma[Theta]))
-  ggsave(here("figs", "contour", "sigmat", 
-              paste0(paste(stations, collapse = "_"), 
-                     "_surface_sigmat_", 
-                     years[1], "_", years[2], 
-                     ".png")), 
-         height = 2*length(stations), 
-         width = 8, 
-         dpi = 600)
-} else {
-  for (station in stations) {
-    data_to_plot <- data_to_plot %>% 
-      filter(Locator == station)
-    
+  if (all_years_fig) {
     ggplot(data = data_to_plot %>% 
              filter(Year %in% years[1]:years[2])) + 
       theme_classic() + 
-      facet_wrap(~ Year, 
-                 ncol = 1) + 
-      metR::geom_contour_fill(aes(x = YearDay, 
+      facet_grid(rows = vars(Locator), 
+                 cols = vars(Year), 
+                 scales = "free_y") + 
+      metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
                                   z = SigmaTheta), 
                               na.fill = TRUE, 
@@ -328,19 +385,178 @@ if (all_stations_fig) {
                                     yday(paste(yoi, "-11-01", sep = "")), 
                                     yday(paste(yoi, "-12-01", sep = ""))), 
                          labels = month.abb) + 
-      geom_vline(aes(xintercept = YearDay), 
+      geom_vline(aes(xintercept = FakeYearDay), 
                  alpha = 0.2) + 
       labs(x = "", 
            y = "Depth (m)", 
            fill = expression(kg/m^3), 
-           title = bquote(.(station)~surface~sigma[Theta]))
-    ggsave(here("figs", "contour", "sigmat", station, 
-                paste0(station, "_surface_sigmat_", 
-                       years[1], "_", years[2], 
+           title = bquote(sigma[Theta]~surface))
+    ggsave(here("figs", "contour", "sigmat", 
+                paste0(paste(stations, collapse = "_"), 
+                       "_surface_sigmat_", 
+                       years[1], "-", years[2], 
                        ".png")), 
-           height = 2*n, 
-           width = 8, 
+           height = 1.5*length(stations), 
+           width = 5*n, 
            dpi = 600)
+  } else {
+    for (yoi in years[1]:years[2]) {
+      ggplot(data = data_to_plot %>% 
+               filter(Year %in% yoi)) + 
+        theme_classic() + 
+        facet_wrap(~ Locator, 
+                   ncol = 1, 
+                   scales = "free_y") + 
+        metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                    y = BinDepth, 
+                                    z = SigmaTheta), 
+                                na.fill = TRUE, 
+                                breaks = mybreaks, 
+                                color = alpha("white", sigmat_contour_alpha)) + 
+        scale_fill_cmocean(name = "dense", 
+                           breaks = mybreaks, 
+                           limits = lims, 
+                           labels = mylabels, 
+                           guide = guide_colorbar(show.limits = TRUE, 
+                                                  ticks = FALSE, 
+                                                  reverse = TRUE)) + 
+        scale_y_reverse(expand = c(0, 0)) + 
+        coord_cartesian(xlim = c(0, 366)) + 
+        scale_x_continuous(expand = c(0, 0), 
+                           breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                      yday(paste(yoi, "-02-01", sep = "")), 
+                                      yday(paste(yoi, "-03-01", sep = "")), 
+                                      yday(paste(yoi, "-04-01", sep = "")), 
+                                      yday(paste(yoi, "-05-01", sep = "")), 
+                                      yday(paste(yoi, "-06-01", sep = "")), 
+                                      yday(paste(yoi, "-07-01", sep = "")), 
+                                      yday(paste(yoi, "-08-01", sep = "")), 
+                                      yday(paste(yoi, "-09-01", sep = "")), 
+                                      yday(paste(yoi, "-10-01", sep = "")), 
+                                      yday(paste(yoi, "-11-01", sep = "")), 
+                                      yday(paste(yoi, "-12-01", sep = ""))), 
+                           labels = month.abb) + 
+        geom_vline(aes(xintercept = FakeYearDay), 
+                   alpha = 0.2) + 
+        labs(x = "", 
+             y = "Depth (m)", 
+             fill = expression(kg/m^3), 
+             title = bquote(sigma[Theta]~yoi~surface))
+      ggsave(here("figs", "contour", "sigmat", 
+                  paste0(paste(stations, collapse = "_"), 
+                         "_surface_sigmat_", 
+                         yoi, 
+                         ".png")), 
+             height = 1.5*length(stations), 
+             width = 5, 
+             dpi = 600)
+    }
+  }
+} else { 
+  for (station in stations) {
+    if (all_years_fig) {
+      ggplot(data = data_to_plot %>% 
+               filter(Year %in% years[1]:years[2], 
+                      Locator == station)) + 
+        theme_classic() + 
+        facet_wrap(~ Year, 
+                   ncol = 1, 
+                   scales = "free_y") + 
+        metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                    y = BinDepth, 
+                                    z = SigmaTheta), 
+                                na.fill = TRUE, 
+                                breaks = mybreaks, 
+                                color = alpha("white", sigmat_contour_alpha)) + 
+        scale_fill_cmocean(name = "dense", 
+                           breaks = mybreaks, 
+                           limits = lims, 
+                           labels = mylabels, 
+                           guide = guide_colorbar(show.limits = TRUE, 
+                                                  ticks = FALSE, 
+                                                  reverse = TRUE)) + 
+        scale_y_reverse(expand = c(0, 0)) + 
+        coord_cartesian(xlim = c(0, 366)) + 
+        scale_x_continuous(expand = c(0, 0), 
+                           breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                      yday(paste(yoi, "-02-01", sep = "")), 
+                                      yday(paste(yoi, "-03-01", sep = "")), 
+                                      yday(paste(yoi, "-04-01", sep = "")), 
+                                      yday(paste(yoi, "-05-01", sep = "")), 
+                                      yday(paste(yoi, "-06-01", sep = "")), 
+                                      yday(paste(yoi, "-07-01", sep = "")), 
+                                      yday(paste(yoi, "-08-01", sep = "")), 
+                                      yday(paste(yoi, "-09-01", sep = "")), 
+                                      yday(paste(yoi, "-10-01", sep = "")), 
+                                      yday(paste(yoi, "-11-01", sep = "")), 
+                                      yday(paste(yoi, "-12-01", sep = ""))), 
+                           labels = month.abb) + 
+        geom_vline(aes(xintercept = FakeYearDay), 
+                   alpha = 0.2) + 
+        labs(x = "", 
+             y = "Depth (m)", 
+             fill = expression(kg/m^3), 
+             title = bquote(.(station)~sigma[Theta]~surface))
+      ggsave(here("figs", "contour", "sigmat", station, 
+                  paste0(station, "_surface_sigmat_", 
+                         years[1], "-", years[2], 
+                         ".png")), 
+             height = 1.5*n, 
+             width = 5, 
+             dpi = 600)
+    } else {
+      for (yoi in years[1]:years[2]) {
+        ggplot(data = data_to_plot %>% 
+                 filter(Year == yoi, 
+                        Locator == station)) + 
+          theme_classic() + 
+          theme(panel.border = element_rect(colour = "black", 
+                                            fill = NA, 
+                                            linewidth = 0.5)) + 
+          metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                      y = BinDepth, 
+                                      z = SigmaTheta), 
+                                  na.fill = TRUE, 
+                                  breaks = mybreaks, 
+                                  color = alpha("white", sigmat_contour_alpha)) + 
+          scale_fill_cmocean(name = "dense", 
+                             breaks = mybreaks, 
+                             limits = lims, 
+                             labels = mylabels, 
+                             guide = guide_colorbar(show.limits = TRUE, 
+                                                    ticks = FALSE, 
+                                                    reverse = TRUE)) + 
+          scale_y_reverse(expand = c(0, 0)) + 
+          coord_cartesian(xlim = c(0, 366)) + 
+          scale_x_continuous(expand = c(0, 0), 
+                             breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                        yday(paste(yoi, "-02-01", sep = "")), 
+                                        yday(paste(yoi, "-03-01", sep = "")), 
+                                        yday(paste(yoi, "-04-01", sep = "")), 
+                                        yday(paste(yoi, "-05-01", sep = "")), 
+                                        yday(paste(yoi, "-06-01", sep = "")), 
+                                        yday(paste(yoi, "-07-01", sep = "")), 
+                                        yday(paste(yoi, "-08-01", sep = "")), 
+                                        yday(paste(yoi, "-09-01", sep = "")), 
+                                        yday(paste(yoi, "-10-01", sep = "")), 
+                                        yday(paste(yoi, "-11-01", sep = "")), 
+                                        yday(paste(yoi, "-12-01", sep = ""))), 
+                             labels = month.abb) + 
+          geom_vline(aes(xintercept = FakeYearDay), 
+                     alpha = 0.2) + 
+          labs(x = "", 
+               y = "Depth (m)", 
+               fill = expression(kg/m^3), 
+               title = bquote(.(station)~sigma[Theta]~yoi~surface))
+        ggsave(here("figs", "contour", "sigmat", station, 
+                    paste0(station, "_surface_sigmat_", 
+                           yoi, 
+                           ".png")), 
+               height = 2, 
+               width = 5, 
+               dpi = 600)
+      }
+    }
   }
 }
 
