@@ -76,7 +76,8 @@ load_PS_buoy_old <- function() {
                             Date = col_skip(), 
                             Time = col_skip(), 
                             EventFlags = col_double())) %>% 
-    mutate(DateTime = as.POSIXct(DateTime))
+    mutate(DateTime = as.POSIXct(DateTime, 
+                                 format = "%m/%d/%Y %H:%M:%S %p"))
 }
 
 # Load in Port Susan EXO data (ST)
