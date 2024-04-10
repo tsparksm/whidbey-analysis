@@ -4,6 +4,7 @@ library(here)
 library(lubridate)
 library(hms)
 library(readxl)
+library(svDialogs)
 
 # Load CTD data - single or multiple sites
 # Outputs a single tibble containing one or more sites
@@ -59,7 +60,7 @@ load_PS_buoy_old <- function() {
   fpath <- here("data", "raw", "Port_Susan_buoy_HCEP.csv")
   read_csv(fpath, 
            col_types = cols(FrameSync = col_skip(), 
-                            DateTime = col_skip(), 
+                            DateTime = col_character(), 
                             Temperature = col_double(), 
                             Conductivity = col_skip(), 
                             Pressure = col_double(), 
@@ -72,11 +73,10 @@ load_PS_buoy_old <- function() {
                             Salinity = col_double(), 
                             SpecConductivity = col_skip(), 
                             OxygenSat = col_double(), 
-                            Date = col_date(format = "%d %b %Y"), 
-                            Time = col_time(), 
+                            Date = col_skip(), 
+                            Time = col_skip(), 
                             EventFlags = col_double())) %>% 
-    mutate(DateTime = as.POSIXct(paste(Date, Time), 
-                                 tz = "Etc/GMT+8"))
+    mutate(DateTime = as.POSIXct(DateTime))
 }
 
 # Load in Port Susan EXO data (ST)
@@ -127,100 +127,6 @@ load_PS_buoy_ST <- function() {
            Chlorophyll, 
            OxygenSat, 
            Salinity)
-}
-
-# Load Penn Cove bottom HC-EP data
-load_PC_bottom_HCEP <- function(fpath) {
-  if (missing(fpath)) {
-    fpath <- choose.files(caption = "Select file to load", 
-                          multi = FALSE)
-  }
-  bottom_data <- read_xlsx(
-    fpath, 
-    sheet = "Data", 
-    col_types = c(
-      "text", 
-      "date", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "numeric", 
-      "skip", 
-      "skip", 
-      "numeric"
-    )
-  ) %>% 
-    rename(
-      HCEP_id = FrameSync, 
-      Datetime = `DateTime (UTC-07:00)`, 
-      Temperature_C = `Temperature (Celsius)`, 
-      Conductivity_Sm = `Conductivity (S/m)`, 
-      Pressure_dbar = `Pressure (Decibar)`, 
-      Oxygen_mgL = `Oxygen (mg/L)`, 
-      pH = `pH (pH)`, 
-      Chlorophyll_ugL = `Chlorophyll (ug/l)`, 
-      Turbidity_NTU = `Turbidity (NTU)`, 
-      Chlorophyll_SD_ugL = `Chlorophyll StdDev (ug/l)`, 
-      Turbidity_SD_ugL = `Turbidity StdDev (NTU)`, 
-      Salinity_PSU = `Salinity (psu)`, 
-      Spec_Conductivity_Sm = `Spec Conductivity (S/m)`, 
-      Oxygen_sat = `Oxygen Sat (%)`, 
-      Event_Flags = `Event Flags`
-    ) %>% 
-    mutate(
-      across(Temperature_C:Oxygen_sat, 
-             ~replace(., . == "NaN", NA)), 
-      Datetime = round_date(Datetime, "15 mins")
-    )
-  return(bottom_data)
-}
-
-# Load Penn Cove bottom SUNA data
-load_PC_bottom_SUNA <- function(fpath) {
-  if (missing(fpath)) {
-    fpath <- choose.files(caption = "Select file to load", 
-                          multi = FALSE)
-  }
-  
-  bottom_data <- read_xlsx(
-    fpath, 
-    col_types = c(
-      "text", 
-      "date", 
-      "date", 
-      "skip", 
-      "skip", 
-      "numeric", 
-      "numeric", 
-      "skip", 
-      "skip", 
-      "skip", 
-      "skip", 
-      "skip", 
-      "skip", 
-      "skip"
-    ), 
-    skip = 7
-  ) %>% 
-    rename(
-      SUNA_id = `Frame Header`, 
-      NO3_umol = `Processed NO3(uMol)`, 
-      NO3_mgNL = `Processed NO3(mg N/L)`
-    ) %>% 
-    mutate(across(NO3_umol:NO3_mgNL, 
-                  ~replace(., . == "NaN", NA)), 
-           Time = str_sub(as.character(Time), start = 12), 
-           DateTime = round_date(as.POSIXct(paste(Date, Time), 
-                                            tz = "GMT"), 
-                                 "15 mins"))
 }
 
 # Load in summarized SSM output
@@ -495,233 +401,6 @@ load_climate <- function() {
                             WT03_ATTRIBUTES = col_skip(), 
                             WT08 = col_skip(), 
                             WT08_ATTRIBUTES = col_skip()))
-}
-
-# Load in raw Coupeville mooring output downloaded from Hydrosphere
-# fpath is an optional filepath specification; if blank will pop up file selection
-load_hydrosphere_coupeville <- function(fpath) {
-  if (missing(fpath)) {
-    fpath <- choose.files(caption = "Select file to load", 
-                          multi = FALSE)
-  }
-
-  mooring_data <- read_csv(fpath, 
-                           col_types = cols(
-                             UnixTimestamp = col_double(), 
-                             `Date(America/Los_Angeles)` = col_date(
-                               format = "%m/%d/%Y"), 
-                             `Time(America/Los_Angeles)` = col_time(), 
-                             SystemBattery = col_double(), 
-                             `HCEP(TEMP)` = col_double(), 
-                             `HCEP(COND)` = col_double(), 
-                             `HCEP(PRES)` = col_double(), 
-                             `HCEP(OXY)` = col_double(), 
-                             `HCEP(PH)` = col_double(), 
-                             `HCEP(FL)` = col_double(), 
-                             `HCEP(TURB)` = col_double(), 
-                             `HCEP(FSD)` = col_double(), 
-                             `HCEP(TSD)` = col_double(), 
-                             `HCEP(SAL)` = col_double(), 
-                             `HCEP(SNDV)` = col_double(), 
-                             `HCEP(SPC)` = col_double(), 
-                             `HCEP(OSAT)` = col_double(), 
-                             `HCEP(VOLT)` = col_double(), 
-                             `HCEP(NUM)` = col_double(), 
-                             `SUNA(M_Parameter1)` = col_double(), 
-                             `SUNA(M_Parameter2)` = col_double(), 
-                             `SUNA(M_Parameter3)` = col_double(), 
-                             `SUNA(M_Parameter4)` = col_double(), 
-                             `HCEP(ERR)` = col_double()
-                           ))
-}
-
-# Load in raw Penn Cove surface mooring output downloaded from Hydrosphere
-# fpath is an optional filepath specification; if blank will pop up file selection
-load_hydrosphere_penncovesurf <- function(fpath) {
-  if (missing(fpath)) {
-    fpath <- choose.files(caption = "Select file to load", 
-                          multi = FALSE)
-  }
-  
-  mooring_data <- read_csv(fpath, 
-                           col_types = cols(
-                             UnixTimestamp = col_double(), 
-                             `Date(America/Los_Angeles)` = col_date(
-                               format = "%m/%d/%Y"), 
-                             `Time(America/Los_Angeles)` = col_time(), 
-                             WindDirection = col_double(), 
-                             WindSpeed = col_double(), 
-                             SystemBattery = col_double(), 
-                             `HCEP(TEMP)` = col_double(), 
-                             `HCEP(COND)` = col_double(), 
-                             `HCEP(PRES)` = col_double(), 
-                             `HCEP(OXY)` = col_double(), 
-                             `HCEP(PH)` = col_double(), 
-                             `HCEP(FL)` = col_double(), 
-                             `HCEP(TURB)` = col_double(), 
-                             `HCEP(FSD)` = col_double(), 
-                             `HCEP(TSD)` = col_double(), 
-                             `HCEP(SAL)` = col_double(), 
-                             `HCEP(SNDV)` = col_double(), 
-                             `HCEP(SPC)` = col_double(), 
-                             `HCEP(OSAT)` = col_double(), 
-                             `HCEP(VOLT)` = col_double(), 
-                             `HCEP(NUM)` = col_double(), 
-                             `SUNA(M_Parameter1)` = col_double(), 
-                             `SUNA(M_Parameter2)` = col_double(), 
-                             `SUNA(M_Parameter3)` = col_double(), 
-                             `SUNA(M_Parameter4)` = col_double(), 
-                             `HCEP(ERR)` = col_double(), 
-                             `PAR(PAR_SQ-421X)` = col_double(), 
-                             `SDI-12Sensor(M_Parameter1)` = col_double(), 
-                             `SDI-12Sensor(M_Parameter2)` = col_double(), 
-                             `SDI-12Sensor(M_Parameter3)` = col_double()
-                           ))
-}
-
-# Load in raw Port Susan buoy output downloaded from Hydrosphere
-# fpath is an optional filepath specification; if blank will pop up file selection
-load_hydrosphere_psusan <- function(fpath) {
-  if (missing(fpath)) {
-    fpath <- choose.files(caption = "Select file to load", 
-                          multi = FALSE)
-  }
-  
-  mooring_data <- read_csv(fpath, 
-                           col_types = cols(
-                             UnixTimestamp = col_double(), 
-                             `Date(America/Los_Angeles)` = col_date(
-                               format = "%m/%d/%Y"), 
-                             `Time(America/Los_Angeles)` = col_time(), 
-                             WindDirection = col_double(), 
-                             WindSpeed = col_double(), 
-                             SystemBattery = col_double(), 
-                             `HCEP(TEMP)` = col_double(), 
-                             `HCEP(COND)` = col_double(), 
-                             `HCEP(PRES)` = col_double(), 
-                             `HCEP(OXY)` = col_double(), 
-                             `HCEP(PH)` = col_double(), 
-                             `HCEP(FL)` = col_double(), 
-                             `HCEP(TURB)` = col_double(), 
-                             `HCEP(FSD)` = col_double(), 
-                             `HCEP(TSD)` = col_double(), 
-                             `HCEP(SAL)` = col_double(), 
-                             `HCEP(SNDV)` = col_double(), 
-                             `HCEP(SPC)` = col_double(), 
-                             `HCEP(OSAT)` = col_double(), 
-                             `HCEP(VOLT)` = col_double(), 
-                             `HCEP(NUM)` = col_double(), 
-                             `SUNA(M_Parameter1)` = col_double(), 
-                             `SUNA(M_Parameter2)` = col_double(), 
-                             `SUNA(M_Parameter3)` = col_double(), 
-                             `SUNA(M_Parameter4)` = col_double(), 
-                             `HCEP(ERR)` = col_double(), 
-                             `PAR(PAR_SQ-421X)` = col_double(), 
-                             `WTX534(Temp)` = col_double(), 
-                             `WTX534(Humidity)` = col_double(), 
-                             `WTX534(Pressure)` = col_double()
-                           ))
-}
-
-# Take raw hydrosphere output from Coupeville, filter by datetime, and save .csv
-# .csv is in the correct format to upload/append to Socrata
-# Date format should be "YYYY-MM-DD"
-# Time format should be "HH:MM" in 24 hr clock
-process_socrata_coupeville <- function(start_date, 
-                                       start_time) {
-  raw_data <- load_hydrosphere_coupeville() %>% 
-    filter(`Date(America/Los_Angeles)` > start_date | 
-             `Date(America/Los_Angeles)` == start_date & 
-             `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
-  
-  fpath <- here("data", "socrata", paste0("coupeville_socrata_", 
-                                          Sys.Date(), 
-                                          ".csv"))
-  
-  write_csv(raw_data, 
-            file = fpath)
-}
-
-# Take raw hydrosphere output from Penn Cove surface, filter by datetime, and save .csv
-# .csv is in the correct format to upload/append to Socrata
-# Date format should be "YYYY-MM-DD"
-# Time format should be "HH:MM" in 24 hr clock
-process_socrata_penncovesurf <- function(start_date, 
-                                       start_time) {
-  raw_data <- load_hydrosphere_penncovesurf() %>% 
-    filter(`Date(America/Los_Angeles)` > start_date | 
-             `Date(America/Los_Angeles)` == start_date & 
-             `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
-  
-  fpath <- here("data", "socrata", paste0("penncovesurf_socrata_", 
-                                          Sys.Date(), 
-                                          ".csv"))
-  
-  write_csv(raw_data, 
-            file = fpath)
-}
-
-# Take raw hydrosphere output from Port Susan buoy, filter by datetime, and save .csv
-# .csv is in the correct format to upload/append to Socrata
-# Date format should be "YYYY-MM-DD"
-# Time format should be "HH:MM" in 24 hr clock
-process_socrata_psusan <- function(start_date, 
-                                         start_time) {
-  raw_data <- load_hydrosphere_psusan() %>% 
-    filter(`Date(America/Los_Angeles)` > start_date | 
-             `Date(America/Los_Angeles)` == start_date & 
-             `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
-  
-  fpath <- here("data", "socrata", paste0("psusan_socrata_", 
-                                          Sys.Date(), 
-                                          ".csv"))
-  
-  write_csv(raw_data, 
-            file = fpath)
-}
-
-# Take Coupeville raw Socrata data and set it up for clean use in R
-# Uses static file location, downloaded from Socrata
-load_coupeville <- function() {
-  fpath <- here("data", "raw", "Coupeville_Wharf_Mooring_Raw_Data_Output.csv")
-  raw_data <- read_csv(fpath, 
-                       col_types = cols(
-                         UnixTimestamp = col_double(), 
-                         `Date(America/Los_Angeles)` = col_date(), 
-                         `Time(America/Los_Angeles)` = col_time(), 
-                         `HCEP(TEMP)` = col_double(), 
-                         `HCEP(COND)` = col_skip(), 
-                         `HCEP(PRES)` = col_double(), 
-                         `HCEP(OXY)` = col_double(), 
-                         `HCEP(PH)` = col_double(), 
-                         `HCEP(FL)` = col_double(), 
-                         `HCEP(TURB)` = col_double(), 
-                         `HCEP(FSD)` = col_skip(), 
-                         `HCEP(TSD)` = col_skip(), 
-                         `HCEP(SAL)` = col_double(), 
-                         `HCEP(OSAT)` = col_double(), 
-                         `HCEP(VOLT)` = col_skip(), 
-                         `SUNA(M_Parameter1)` = col_skip(), 
-                         `SUNA(M_Parameter2)` = col_double()
-                       )) %>% 
-    rename(Date = `Date(America/Los_Angeles)`, 
-           Time = `Time(America/Los_Angeles)`, 
-           Temperature = `HCEP(TEMP)`, 
-           Pressure = `HCEP(PRES)`, 
-           Oxygen = `HCEP(OXY)`, 
-           pH = `HCEP(PH)`, 
-           Chlorophyll = `HCEP(FL)`, 
-           Turbidity = `HCEP(TURB)`, 
-           Salinity = `HCEP(SAL)`, 
-           OxygenSat = `HCEP(OSAT)`, 
-           NO23 = `SUNA(M_Parameter2)`) %>% 
-    mutate(DateTime = as.POSIXct(paste0(Date, Time)), 
-           Month = month(Date), 
-           Year = year(Date), 
-           FakeDateTime = DateTime) %>% 
-    arrange(DateTime)
-  year(raw_data$FakeDateTime) <- 2020
-  return(raw_data)
 }
 
 # Take Penn Cove surface raw Socrata data and set it up for clean use in R
