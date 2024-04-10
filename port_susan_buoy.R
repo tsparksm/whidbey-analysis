@@ -113,8 +113,8 @@ data_buoy_qc <- data_buoy_long %>%
 write_csv(data_buoy_qc, 
           here("data", "port_susan_buoy_qc.csv"))
 
-#### Chlorophyll ####
-yoi <- 2022
+#### Figure - chlorophyll, all years ####
+yoi <- 2023
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
@@ -132,6 +132,20 @@ ggplot(data_to_plot,
        aes(x = FakeDate, 
            y = Value, 
            color = YearGroup, 
+           shape = Type)) + 
+  geom_point()
+
+#### Figure - chlorophyll, single year ####
+yoi <- 2023
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Chlorophyll", 
+         year(DateTime) == yoi, 
+         !(Flag %in% 3:4))
+
+ggplot(data_to_plot, 
+       aes(x = DateTime, 
+           y = Value, 
            shape = Type)) + 
   geom_point()
 
@@ -156,3 +170,7 @@ ggplot(data = data_to_plot %>%
            y = Mean)) + 
   theme_bw() + 
   geom_point()
+
+
+
+
