@@ -6,7 +6,7 @@ library(cmocean)
 library(scales)
 
 # What stations to plot?
-# stations <- c("SARATOGACH", "SARATOGAOP", "SARATOGARP")
+stations <- c("SARATOGACH", "SARATOGAOP", "SARATOGARP")
 # stations <- c("PSUSANENT", "PSUSANKP", "PSUSANBUOY")
 # stations <- c("PENNCOVECW", "PENNCOVEENT", "PENNCOVEWEST")
 # stations <- c("SARATOGACH", "SARATOGAOP", "SARATOGARP",
@@ -14,7 +14,6 @@ library(scales)
 #               "PENNCOVECW", "PENNCOVEENT", "PENNCOVEWEST")
 # stations <- c("Poss DO-2", "PSUSANENT", "PSUSANKP", 
 #               "SARATOGACH", "SARATOGAOP", "SARATOGARP")
-stations <- "PSUSANBUOY"
 
 # All stations on one figure? TRUE or FALSE
 all_stations_fig <- FALSE
@@ -23,7 +22,7 @@ all_stations_fig <- FALSE
 all_stations_lims <- FALSE
 
 # What years to plot? c(min_year, max_year)
-years <- c(2022, 2022)
+years <- c(2022, 2023)
 n <- length(unique(years))
 
 # All years on one figure? TRUE or FALSE
