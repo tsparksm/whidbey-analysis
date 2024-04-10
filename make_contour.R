@@ -565,122 +565,152 @@ data_to_plot <- data_remix %>%
   filter(Locator %in% stations, 
          !is.na(DO), 
          BinDepth <= MinMaxDepth) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(DO = mean(DO, na.rm = TRUE)) %>% 
   ungroup()
 
+# Calculate whole dataset limits - will be overwritten as needed later
 min_lim <- round_any(min(data_to_plot$DO, na.rm = T),
                      accuracy = acc_DO, f = floor)
 max_lim <- round_any(max(data_to_plot$DO, na.rm = T),
                      accuracy = acc_DO, f = ceiling)
 mybreaks <- seq(min_lim, max_lim, by = acc_DO)
 mylabels <- mybreaks
-mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
 
 if (all_stations_fig) {
-  ggplot(data = data_to_plot) + 
-    theme_classic() + 
-    facet_wrap(~ Locator, 
-               ncol = 1, 
-               scales = "free_y") + 
-    metR::geom_contour_fill(aes(x = YearDay, 
-                                y = BinDepth, 
-                                z = DO), 
-                            na.fill = TRUE, 
-                            breaks = mybreaks) + 
-    metR::geom_contour2(aes(x = YearDay, y = BinDepth, z = DO), 
-                        na.fill = T, breaks = 6) + 
-    metR::geom_contour2(aes(x = YearDay, y = BinDepth, z = DO), 
-                        na.fill = T, breaks = 2, color = "red") +  
-    scale_fill_craftfermenter(
-      breaks = mybreaks, 
-      palette = "PuBu", 
-      direction = -1, 
-      limits = c(min_lim, max_lim), 
-      labels = mylabels, 
-      guide = guide_colorbar(show.limits = T, ticks = F)) + 
-    scale_y_reverse(expand = c(0, 0)) + 
-    coord_cartesian(xlim = c(0, 366)) + 
-    scale_x_continuous(expand = c(0, 0), 
-                       breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                  yday(paste(yoi, "-02-01", sep = "")), 
-                                  yday(paste(yoi, "-03-01", sep = "")), 
-                                  yday(paste(yoi, "-04-01", sep = "")), 
-                                  yday(paste(yoi, "-05-01", sep = "")), 
-                                  yday(paste(yoi, "-06-01", sep = "")), 
-                                  yday(paste(yoi, "-07-01", sep = "")), 
-                                  yday(paste(yoi, "-08-01", sep = "")), 
-                                  yday(paste(yoi, "-09-01", sep = "")), 
-                                  yday(paste(yoi, "-10-01", sep = "")), 
-                                  yday(paste(yoi, "-11-01", sep = "")), 
-                                  yday(paste(yoi, "-12-01", sep = ""))), 
-                       labels = month.abb) + 
-    geom_vline(aes(xintercept = YearDay), 
-               alpha = 0.2) + 
-    labs(x = "", 
-         y = "Depth (m)", 
-         fill = "mg/L", 
-         title = "DO")
-  ggsave(here("figs", "contour", "DO", 
-              paste0(paste(stations, collapse = "_"), 
-                     "_DO_", 
-                     years[1], "_", years[2], 
-                     ".png")), 
-         height = 2*length(stations), 
-         width = 8, 
-         dpi = 600)
+  if (all_years_fig) {
+    
+    p <- contour_do(data_to_plot, mybreaks, mylabels, min_lim, max_lim) + 
+      facet_grid(rows = vars(Locator), 
+                 cols = vars(Year), 
+                 scales = "free_y")
+    
+    ggsave(here("figs", "contour", "DO", 
+                paste0(paste(stations, collapse = "_"), 
+                       "_DO_", 
+                       years[1], "-", years[2], 
+                       ".png")), 
+           p, 
+           height = 1.5*length(stations), 
+           width = 5*n, 
+           dpi = 600)
+    
+  } else {
+    for (yoi in years[1]:years[2]) {
+      temp <- data_to_plot %>% 
+        filter(Year == yoi)
+      
+      if (!all_years_lims) {
+        min_lim <- round_any(min(temp$DO, na.rm = T),
+                             accuracy = acc_DO, f = floor)
+        max_lim <- round_any(max(temp$DO, na.rm = T),
+                             accuracy = acc_DO, f = ceiling)
+        mybreaks <- seq(min_lim, max_lim, by = acc_DO)
+        mylabels <- mybreaks
+        mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
+      }
+      
+      p <- contour_do(temp, mybreaks, mylabels, min_lim, max_lim) + 
+        facet_wrap(~ Locator, 
+                   ncol = 1, 
+                   scales = "free_y") + 
+        labs(title = paste("DO", yoi))
+          
+      ggsave(here("figs", "contour", "DO", 
+                  paste0(paste(stations, collapse = "_"), 
+                         "_DO_", 
+                         yoi, 
+                         ".png")), 
+             p, 
+             height = 1.5*length(stations), 
+             width = 5, 
+             dpi = 600)
+    }
+  }
 } else {
   for (station in stations) {
-    ggplot(data = data_to_plot %>% filter(Locator == station)) + 
-      theme_classic() + 
-      facet_wrap(~ Year, 
-                 ncol = 1) + 
-      metR::geom_contour_fill(aes(x = YearDay, 
-                                  y = BinDepth, 
-                                  z = DO), 
-                              na.fill = TRUE, 
-                              breaks = mybreaks) + 
-      metR::geom_contour2(aes(x = YearDay, y = BinDepth, z = DO), 
-                          na.fill = T, breaks = 6) + 
-      metR::geom_contour2(aes(x = YearDay, y = BinDepth, z = DO), 
-                          na.fill = T, breaks = 2, color = "red") +  
-      scale_fill_craftfermenter(
-        breaks = mybreaks, 
-        palette = "PuBu", 
-        direction = -1, 
-        limits = c(min_lim, max_lim), 
-        labels = mylabels, 
-        guide = guide_colorbar(show.limits = T, ticks = F)) + 
-      scale_y_reverse(expand = c(0, 0)) + 
-      coord_cartesian(xlim = c(0, 366)) + 
-      scale_x_continuous(expand = c(0, 0), 
-                         breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                    yday(paste(yoi, "-02-01", sep = "")), 
-                                    yday(paste(yoi, "-03-01", sep = "")), 
-                                    yday(paste(yoi, "-04-01", sep = "")), 
-                                    yday(paste(yoi, "-05-01", sep = "")), 
-                                    yday(paste(yoi, "-06-01", sep = "")), 
-                                    yday(paste(yoi, "-07-01", sep = "")), 
-                                    yday(paste(yoi, "-08-01", sep = "")), 
-                                    yday(paste(yoi, "-09-01", sep = "")), 
-                                    yday(paste(yoi, "-10-01", sep = "")), 
-                                    yday(paste(yoi, "-11-01", sep = "")), 
-                                    yday(paste(yoi, "-12-01", sep = ""))), 
-                         labels = month.abb) + 
-      geom_vline(aes(xintercept = YearDay), 
-                 alpha = 0.2) + 
-      labs(x = "", 
-           y = "Depth (m)", 
-           fill = "mg/L", 
-           title = paste(station, "DO"))
-    ggsave(here("figs", "contour", "DO", station, 
-                paste0(station, 
-                       "_DO_", 
-                       years[1], "_", years[2], 
-                       ".png")), 
-           height = 2*n, 
-           width = 8, 
-           dpi = 600) 
+    
+    temp <- data_to_plot %>% filter(Locator == station)
+    
+    if (all_years_fig) {
+      if (!all_stations_lims) {
+        min_lim <- round_any(min(temp$DO, na.rm = T),
+                             accuracy = acc_DO, f = floor)
+        max_lim <- round_any(max(temp$DO, na.rm = T) + acc_DO,
+                             accuracy = acc_DO, f = ceiling)
+        mybreaks <- seq(min_lim, max_lim, by = acc_DO)
+        mylabels <- mybreaks
+        mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
+      }
+      
+      p <- contour_do(temp, mybreaks, mylabels, min_lim, max_lim) + 
+        facet_wrap(~ Year, 
+                   ncol = 1, 
+                   scales = "free_y") + 
+        labs(title = station)
+      
+      ggsave(here("figs", "contour", "DO", station, 
+                  paste0(station, 
+                         "_DO_", 
+                         years[1], "-", years[2], 
+                         ".png")), 
+             p, 
+             height = 1.5*n, 
+             width = 5, 
+             dpi = 600)
+      
+    } else {
+      
+      for (yoi in years[1]:years[2]) {
+        
+        temp <- data_to_plot %>% filter(Locator == station, 
+                                        Year == yoi)
+        
+        if (!all_stations_lims & !all_years_lims) {
+          min_lim <- round_any(min(temp$DO, na.rm = T),
+                               accuracy = acc_DO, f = floor)
+          max_lim <- round_any(max(temp$DO, na.rm = T) + acc_DO,
+                               accuracy = acc_DO, f = ceiling)
+          mybreaks <- seq(min_lim, max_lim, by = acc_DO)
+          mylabels <- mybreaks
+          mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
+        }
+        if (all_stations_lims & !all_years_lims) {
+          temp_lim <- data_to_plot %>% filter(Year == yoi)
+          min_lim <- round_any(min(temp_lim$DO, na.rm = T),
+                               accuracy = acc_DO, f = floor)
+          max_lim <- round_any(max(temp_lim$DO, na.rm = T),
+                               accuracy = acc_DO, f = ceiling)
+          mybreaks <- seq(min_lim, max_lim, by = acc_DO)
+          mylabels <- mybreaks
+          mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
+        } 
+        if (!all_stations_lims & all_years_lims) {
+          temp_lim <- data_to_plot %>% filter(Locator == station)
+          min_lim <- round_any(min(temp_lim$DO, na.rm = T),
+                               accuracy = acc_DO, f = floor)
+          max_lim <- round_any(max(temp_lim$DO, na.rm = T) + acc_DO,
+                               accuracy = acc_DO, f = ceiling)
+          mybreaks <- seq(min_lim, max_lim, by = acc_DO)
+          mylabels <- mybreaks
+          mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
+        }
+        
+        p <- contour_do(temp, mybreaks, mylabels, min_lim, max_lim) + 
+          labs(title = paste(station, yoi))
+        
+        ggsave(here("figs", "contour", "DO", station, 
+                    paste0(station, 
+                           "_DO_", 
+                           yoi, 
+                           ".png")), 
+               p, 
+               height = 2, 
+               width = 7, 
+               dpi = 600)
+      }
+    }
   }
 }
 
