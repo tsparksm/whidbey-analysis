@@ -15,7 +15,7 @@ data_buoy_ST <- load_PS_buoy_ST() %>%
   mutate(Type = "ST")
 data_buoy_comb <- full_join(data_buoy, data_buoy_ST)
 data_buoy_avg <- data_buoy_comb %>% 
-  group_by(Date) %>% 
+  group_by(DateTime) %>% 
   summarize()
 
 #### Load discrete data ####
