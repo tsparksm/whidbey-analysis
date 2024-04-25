@@ -21,7 +21,11 @@ data_buoy_comb <- full_join(data_buoy_comb, data_buoy_new) %>%
          Month = month(DateTime))
 data_buoy_avg <- data_buoy_comb %>% 
   group_by(DateTime) %>% 
-  summarize()
+  summarize(Temperature = mean(Temperature, na.rm = TRUE), 
+            Salinity = mean(Salinity, na.rm = TRUE), 
+            Oxygen = mean(Oxygen, na.rm = TRUE), 
+            Chlorophyll = mean(Chlorophyll, na.rm = TRUE), 
+            NO23 = mean(NO23, na.rm = TRUE))
 
 #### Load discrete data ####
 data_discrete <- load_whidbey_discrete() %>% 
