@@ -12,6 +12,8 @@ raw_data <- load_coupeville()
 # download_whidbey_discrete()
 bottle_data <- load_whidbey_discrete()
 
+ctd_data <- load_CTD("PENNCOVECW")
+
 #### Load/generate tide data ####
 tide_data <- tide_height(stations = "Seattle", 
                          minutes = 15, 
