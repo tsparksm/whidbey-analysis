@@ -13,7 +13,12 @@ data_buoy <- load_PS_buoy_old() %>%
          -Pressure)
 data_buoy_ST <- load_PS_buoy_ST() %>% 
   mutate(Type = "ST")
+data_buoy_new <- load_psusan() %>% 
+  mutate(Type = "KC")
 data_buoy_comb <- full_join(data_buoy, data_buoy_ST)
+data_buoy_comb <- full_join(data_buoy_comb, data_buoy_new) %>% 
+  mutate(Year = year(DateTime), 
+         Month = month(DateTime))
 data_buoy_avg <- data_buoy_comb %>% 
   group_by(DateTime) %>% 
   summarize()
