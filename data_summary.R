@@ -140,7 +140,7 @@ for (station in unique(data_discrete$Locator)) {
 yoi <- 2023
 stations <- c("SARATOGACH")
 for (station in stations) {
-  ggplot(data = bottle_data %>% 
+  ggplot(data = data_discrete %>% 
            filter(Locator == station, 
                   year(CollectDate) == yoi, 
                   ParmId %in% c(14, 15)), 
