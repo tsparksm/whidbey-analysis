@@ -27,11 +27,13 @@ data_buoy_avg <- data_buoy_comb %>%
             Chlorophyll = mean(Chlorophyll, na.rm = TRUE), 
             NO23 = mean(NO23, na.rm = TRUE))
 
-#### Load discrete data ####
+#### Load discrete and CTD data ####
 data_discrete <- load_whidbey_discrete() %>% 
   mutate(Type = "bottle", 
          DateTime = CollectDateTime) %>% 
   filter(Locator == "PSUSANBUOY")
+
+data_ctd <- load_CTD("PSUSANBUOY")
 
 #### Load climate, tide, and river data ####
 station <- "USW00024222"  # Everett airport
