@@ -526,8 +526,8 @@ load_psusan <- function() {
                          `HCEP(FSD)` = col_skip(), 
                          `HCEP(TSD)` = col_skip(), 
                          `HCEP(SAL)` = col_double(),  
-                         `HCEP(SNDV)` = col_double(), # what is this? 
-                         `HCEP(SPC)` = col_double(),  # what is this?
+                         `HCEP(SNDV)` = col_skip(), # what is this? 
+                         `HCEP(SPC)` = col_skip(),  # what is this?
                          `HCEP(OSAT)` = col_double(), 
                          `HCEP(VOLT)` = col_skip(), 
                          `HCEP(NUM)` = col_skip(), 
