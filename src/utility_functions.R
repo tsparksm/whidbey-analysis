@@ -58,32 +58,35 @@ load_whidbey_discrete <- function() {
 # Load in old Port Susan HCEP data (KC; pre-Dec 20, 2023)
 load_PS_buoy_old <- function() {
   fpath <- here("data", "raw", "Port_Susan_buoy_HCEP.csv")
-  read_csv(fpath, 
-           col_types = cols(FrameSync = col_skip(), 
-                            DateTime = col_character(), 
-                            Temperature = col_double(), 
-                            Conductivity = col_skip(), 
-                            Pressure = col_double(), 
-                            Oxygen = col_double(), 
-                            pH = col_double(), 
-                            Chlorophyll = col_double(), 
-                            Turbidity = col_double(), 
-                            ChlorophyllSD = col_double(), 
-                            TurbiditySD = col_double(), 
-                            Salinity = col_double(), 
-                            SpecConductivity = col_skip(), 
-                            OxygenSat = col_double(), 
-                            Date = col_skip(), 
-                            Time = col_skip(), 
-                            EventFlags = col_double())) %>% 
+  raw_data <- read_csv(fpath, 
+                       col_types = cols(FrameSync = col_skip(), 
+                                        DateTime = col_character(), 
+                                        Temperature = col_double(), 
+                                        Conductivity = col_skip(), 
+                                        Pressure = col_double(), 
+                                        Oxygen = col_double(), 
+                                        pH = col_double(), 
+                                        Chlorophyll = col_double(), 
+                                        Turbidity = col_double(), 
+                                        ChlorophyllSD = col_double(), 
+                                        TurbiditySD = col_double(), 
+                                        Salinity = col_double(), 
+                                        SpecConductivity = col_skip(), 
+                                        OxygenSat = col_double(), 
+                                        Date = col_skip(), 
+                                        Time = col_skip(), 
+                                        EventFlags = col_double())) %>% 
     mutate(DateTime = as.POSIXct(DateTime, 
-                                 format = "%m/%d/%Y %H:%M:%S %p"))
+                                 format = "%m/%d/%Y %H:%M:%S %p"), 
+           FakeDateTime = DateTime)
+  year(raw_data$FakeDateTime) <- 2020
+  return(raw_data)
 }
 
 # Load in Port Susan EXO data (ST)
 load_PS_buoy_ST <- function() {
   fpath <- here("data", "raw", "prelim_PT_SUSAN_BUOY_DATA_MASTER.csv")
-  read_csv(fpath, 
+  raw_data <- read_csv(fpath, 
            col_types = cols(Timestamp = col_datetime(format = "%m/%d/%Y %H:%M"), 
                             Date = col_date(format = "%m/%d/%Y"), 
                             Time = col_time(), 
@@ -121,13 +124,17 @@ load_PS_buoy_ST <- function() {
            Salinity = Salinity_psu) %>% 
     mutate(DateTime = as.POSIXct(paste(Date, Time), 
                                  format = "%Y-%m-%d %H:%M:%S", 
-                                 tz = "Etc/GMT+8")) %>% 
+                                 tz = "Etc/GMT+8"), 
+           FakeDateTime = DateTime) %>% 
     select(DateTime, 
+           FakeDateTime, 
            Temperature, 
            Oxygen, 
            Chlorophyll, 
            OxygenSat, 
            Salinity)
+  year(raw_data$FakeDateTime) <- 2020
+  return(raw_data)
 }
 
 # Load in summarized SSM output
