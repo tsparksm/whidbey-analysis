@@ -11,6 +11,10 @@ bottom_data <- load_penncovebottom() %>%
   rename_with(~str_c(., "_bottom"), .cols = HCEP_id:NO3_n)
 combo_data <- full_join(surf_data, bottom_data)
 
+#### Load CTD and discrete data ####
+discrete_data <- load_whidbey_discrete()
+ctd_data <- load_CTD("PENNCOVEENT")
+
 #### Figure: year of DO, top vs bottom ####
 data_to_plot <- combo_data %>% 
   select(DateTime, Oxygen_mgL_bottom, Oxygen_surface) %>% 
