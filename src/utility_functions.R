@@ -504,7 +504,66 @@ load_penncovebottom <- function() {
 # Take Port Susan buoy raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_psusan <- function() {
-  # TO DO
+  fpath <- here("data", "raw", 
+                "Port_Susan_Buoy_Raw_Data_Output.csv")
+  raw_data <- read_csv(fpath, 
+                       col_types = cols(
+                         UnixTimestamp = col_double(), 
+                         `Date(America/Los_Angeles)` = col_datetime(
+                           format = "%m/%d/%Y %I:%M:%S %p" 
+                         ), 
+                         `Time(America/Los_Angeles)` = col_time(), 
+                         WindDirection = col_double(), 
+                         WindSpeed = col_double(), 
+                         SystemBattery = col_double(), 
+                         `HCEP(TEMP)` = col_double(), 
+                         `HCEP(COND)` = col_skip(), 
+                         `HCEP(PRES)` = col_double(), 
+                         `HCEP(OXY)` = col_double(), 
+                         `HCEP(PH)` = col_double(), 
+                         `HCEP(FL)` = col_double(), 
+                         `HCEP(TURB)` = col_double(), 
+                         `HCEP(FSD)` = col_skip(), 
+                         `HCEP(TSD)` = col_skip(), 
+                         `HCEP(SAL)` = col_double(),  
+                         `HCEP(SNDV)` = col_double(), # what is this? 
+                         `HCEP(SPC)` = col_double(),  # what is this?
+                         `HCEP(OSAT)` = col_double(), 
+                         `HCEP(VOLT)` = col_skip(), 
+                         `HCEP(NUM)` = col_skip(), 
+                         `SUNA(M_Parameter1)` = col_skip(), 
+                         `SUNA(M_Parameter2)` = col_double(), 
+                         `SUNA(M_Parameter3)` = col_skip(), 
+                         `SUNA(M_Parameter4)` = col_skip(), 
+                         `HCEP(ERR)` = col_skip(), 
+                         `PAR(PAR_SQ-421X)` = col_double(), 
+                         `WTX534(Temp)` = col_double(), 
+                         `WTX534(Humidity)` = col_double(), 
+                         `WTX534(Pressure)` = col_double()
+                       )) %>% 
+    rename(Date = `Date(America/Los_Angeles)`, 
+           Time = `Time(America/Los_Angeles)`, 
+           Temperature = `HCEP(TEMP)`, 
+           Pressure = `HCEP(PRES)`, 
+           Oxygen = `HCEP(OXY)`, 
+           pH = `HCEP(PH)`, 
+           Chlorophyll = `HCEP(FL)`, 
+           Turbidity = `HCEP(TURB)`, 
+           Salinity = `HCEP(SAL)`, 
+           OxygenSat = `HCEP(OSAT)`, 
+           NO23 = `SUNA(M_Parameter2)`, 
+           PAR = `PAR(PAR_SQ-421X)`, 
+           AirTemperature = `WTX534(Temp)`, 
+           Humidity = `WTX534(Humidity)`, 
+           AirPressure = `WTX534(Pressure)`) %>% 
+    mutate(Date = as.Date(Date), 
+           DateTime = as.POSIXct(paste0(Date, Time)), 
+           Month = month(Date), 
+           Year = year(Date), 
+           FakeDateTime = DateTime) %>% 
+    arrange(DateTime)
+  year(raw_data$FakeDateTime) <- 2020
+  return(raw_data)
 }
 
 # Download marine phytoplankton data (grouped by size class) from Socrata
