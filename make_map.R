@@ -89,3 +89,31 @@ g <- ggmap(map_transparent) +
 ggsave(here("figs", "whidbey_station_map_KC.png"), g, 
        dpi = 600, 
        height = 5, width = 4)
+
+#### Map with just KC stations - no text ####
+data_to_plot = locators %>% 
+  filter(Agency == "King County", 
+         is.na(Last_Year))
+
+g <- ggmap(map_transparent) + 
+  theme_bw() + 
+  theme(panel.grid = element_blank(), 
+        panel.background = element_rect(fill = 'white'), 
+        axis.text = element_blank(), 
+        axis.ticks = element_blank(), 
+        legend.position = "none") + 
+  geom_point(data = data_to_plot, 
+             aes(x = Lon, 
+                 y = Lat, 
+                 shape = Data_Type, 
+                 color = Has_Mooring), 
+             size = 4) + 
+  coord_cartesian(clip = "off") + 
+  scale_shape_manual(values = c("CTD" = 17, 
+                                "CTD, bottle" = 16)) + 
+  scale_color_manual(values = c("TRUE" = "red", 
+                                "FALSE" = "black")) + 
+  labs(x = "", y = "", shape = "")
+ggsave(here("figs", "whidbey_station_map_KC_notext.png"), g, 
+       dpi = 600, 
+       height = 5, width = 4)
