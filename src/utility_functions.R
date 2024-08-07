@@ -5,6 +5,7 @@ library(lubridate)
 library(hms)
 library(readxl)
 library(svDialogs)
+library(RSocrata)
 
 # Load CTD data - single or multiple sites
 # Outputs a single tibble containing one or more sites
