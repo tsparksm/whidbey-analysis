@@ -97,6 +97,22 @@ data_buoy_qc <- data_buoy_long %>%
                          yday(DateTime) == 257 & 
                          Value == 0.4400, 
                        4, Flag)) %>% 
+  # Flag aberrant 2023 ST points %>% 
+  mutate(Flag = ifelse(Type == "ST" & 
+                         round_date(DateTime, unit = "15 minutes") %in% as.POSIXct(
+                           c("2023-03-15 11:45", 
+                             "2023-03-15 10:00", 
+                             "2023-08-11 14:00", 
+                             "2023-06-27 11:00"), 
+                           tz = "Etc/GMT+8"), 
+                           4, Flag)) %>% 
+  # Flag August-Sep 2023 KC DO %>%
+  mutate(Flag = ifelse(Type == "KC" & 
+                         Parameter == "Oxygen" & 
+                         between(DateTime, 
+                                 as.POSIXct("2023-08-12 13:00", tz = "Etc/GMT+8"), 
+                                 as.POSIXct("2023-09-13 15:15", tz = "Etc/GMT+8")), 
+                       4, Flag)) %>% 
   # Flag aberrant 2018 salinity points
   mutate(Flag = ifelse(Parameter == "Salinity" & 
                          DateTime %in% seq(as.POSIXct("2018-10-15 12:00:00", 
