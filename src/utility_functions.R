@@ -78,7 +78,7 @@ load_PS_buoy_old <- function() {
                                         Time = col_skip(), 
                                         EventFlags = col_double())) %>% 
     mutate(DateTime = as.POSIXct(DateTime, 
-                                 format = "%m/%d/%Y %H:%M:%S %p"), 
+                                 format = "%m/%d/%Y %H:%M"), 
            FakeDateTime = DateTime)
   year(raw_data$FakeDateTime) <- 2020
   return(raw_data)
@@ -86,7 +86,7 @@ load_PS_buoy_old <- function() {
 
 # Load in Port Susan EXO data (ST)
 load_PS_buoy_ST <- function() {
-  fpath <- here("data", "raw", "prelim_PT_SUSAN_BUOY_DATA_MASTER.csv")
+  fpath <- here("data", "raw", "Stilly_BUOY_DATA_01052024.csv")
   raw_data <- read_csv(fpath, 
            col_types = cols(Timestamp = col_datetime(format = "%m/%d/%Y %H:%M"), 
                             Date = col_date(format = "%m/%d/%Y"), 
