@@ -6,11 +6,12 @@ library(rtide)
 #### Load and combine old (pre-Dec 2023) buoy data #### 
 data_buoy <- load_PS_buoy_old() %>% 
   mutate(Type = "KC") %>% 
+  filter(Pressure > 0.5) %>% 
   select(-Turbidity, 
          -TurbiditySD, 
          -ChlorophyllSD, 
          -EventFlags, 
-         -Pressure)
+         -Pressure) 
 data_buoy_ST <- load_PS_buoy_ST() %>% 
   mutate(Type = "ST")
 data_buoy_new <- load_psusan() %>% 
