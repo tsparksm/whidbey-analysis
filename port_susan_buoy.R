@@ -169,14 +169,160 @@ yoi <- 2023
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
+         year(DateTime) == yoi)
+
+data_to_plot2 <- data_discrete %>% 
+  filter(ParmId == 1, 
+         year(CollectDate) == yoi)
+
+ggplot() + 
+  geom_point(data = data_to_plot, 
+             aes(x = DateTime, 
+                 y = Value, 
+                 color = Type)) + 
+  geom_point(data = data_to_plot2, 
+             aes(x = CollectDateTime, 
+                 y = Value), 
+             color = "red") + 
+  theme_bw() + 
+  labs(x = "", 
+       y = expression(Chlorophyll~(mu*g/L)), 
+       title = paste("Pt. Susan buoy", 2023)) + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b")
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_chlorophyll.png")), 
+       dpi = 600, height = 4, width = 6)
+
+#### Figure - oxygen, all years ####
+yoi <- 2023
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Oxygen", 
+         year(DateTime) <= yoi, 
+         !(Flag %in% 3:4)) %>% 
+  mutate(YearGroup = ifelse(year(DateTime) == yoi, 
+                            yoi, 
+                            paste(min(year(DateTime)), 
+                                  yoi-1, 
+                                  sep = "-")), 
+         FakeDate = DateTime) %>% 
+  arrange(YearGroup)
+year(data_to_plot$FakeDate) <- yoi
+
+ggplot(data_to_plot, 
+       aes(x = FakeDate, 
+           y = Value, 
+           color = YearGroup, 
+           shape = Type)) + 
+  geom_point()
+
+
+#### Figure - oxygen, single year ####
+yoi <- 2023
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Oxygen", 
          year(DateTime) == yoi, 
-         !(Flag %in% 3:4))
+         Type == "KC")
+
+data_to_plot2 <- data_discrete %>% 
+  filter(ParmId %in% 5:6, 
+         year(CollectDate) == yoi)
+
+ggplot() + 
+  geom_point(data = data_to_plot, 
+             aes(x = DateTime, 
+                 y = Value)) + 
+  geom_point(data = data_to_plot2, 
+             aes(x = CollectDateTime, 
+                 y = Value), 
+             color = "red") + 
+  theme_bw() + 
+  labs(x = "", 
+       y = "Oxygen (mg/L)")
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_DO.png")), 
+       dpi = 600, height = 6, width = 4)
+
+#### Figure - nitrate, single year ####
+yoi <- 2023
+
+data_to_plot <- data_buoy_new %>% 
+  filter(year(DateTime) == yoi)
 
 ggplot(data_to_plot, 
        aes(x = DateTime, 
-           y = Value, 
-           shape = Type)) + 
-  geom_point()
+           y = NO23)) + 
+  geom_point() + 
+  theme_bw() + 
+  labs(x = "", 
+       y = expression("NO"[2]^"-"~"+"~"NO"[3]^"-"~"(mg N/L)"))
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_no23.png")), 
+       dpi = 600, height = 6, width = 4)
+
+#### Figure - daily mean temperature ####
+yoi <- 2023
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Temperature", 
+         year(DateTime) <= yoi, 
+         !(Flag %in% 3:4)) %>% 
+  mutate(Date = as.Date(DateTime)) %>% 
+  group_by(Date) %>% 
+  summarize(Mean = mean(Value)) %>% 
+  ungroup() %>% 
+  mutate(FakeDate = Date)
+year(data_to_plot$FakeDate) <- yoi
+
+data_avg <- data_to_plot %>% 
+  group_by(FakeDate) %>% 
+  summarize(AllMean = mean(Mean, na.rm = TRUE), 
+            Meanplus = AllMean + 2*sd(Mean, na.rm = TRUE), 
+            Meanminus = AllMean - 2*sd(Mean, na.rm = TRUE))
+
+ggplot() + 
+  theme_bw() + 
+  geom_ribbon(
+    data = data_avg, 
+    aes(x = FakeDate, 
+        ymin = Meanminus, 
+        ymax = Meanplus, 
+        color = "L1"), 
+    fill = "gray") + 
+  geom_line(
+    data = data_to_plot %>% filter(year(Date) == yoi), 
+    aes(x = FakeDate, y = Mean, color = "L2"), 
+    linewidth = 1.2, 
+    fill = NA
+  ) + 
+  geom_line(
+    data = data_avg, 
+    aes(x = FakeDate, 
+        y = AllMean, 
+        color = "L3"), 
+    fill = NA,
+  ) + 
+  scale_color_manual(
+    values = c("L1" = "gray", 
+      "L2" = "black", 
+      "L3" = "red"), 
+    labels = c(
+      paste0("2011-", yoi-1), 
+      yoi, 
+      "Mean"
+    )
+  ) + 
+  scale_x_date(date_breaks = "1 month", 
+               date_labels = "%b") + 
+  labs(x = "", 
+       y = expression("Temperature " ( degree*C)), 
+       title = "Pt. Susan buoy", 
+       color = "")
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_daily_mean_T.png")), 
+       dpi = 600, height = 4, width = 6)
 
 #### River flow ####
 data_to_plot <- data_buoy_qc %>% 
