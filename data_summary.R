@@ -514,6 +514,46 @@ ggplot(data = data_to_plot,
 ggsave(here("figs", paste0(yoi, "_min_DO.png")), 
        dpi = 600, height = 6, width = 11)
 
+#### Figure - minimum DO, all years ####
+yoi <- 2023
+
+data_to_plot <- data_ctd %>% 
+  filter(Locator != "PENNCOVEPNN001", 
+         Year >= 2020) %>% 
+  group_by(Locator, Date) %>% 
+  summarize(MinDO = min(DO)) %>% 
+  mutate(FakeDate = Date)
+year(data_to_plot$FakeDate) <- 2020 
+
+ggplot(data = data_to_plot, 
+       aes(x = FakeDate, 
+           y = MinDO, 
+           color = year(Date) == yoi)) + 
+  theme_bw() + 
+  theme(legend.position = "none") + 
+  geom_point() + 
+  facet_wrap(~ Locator, 
+             ncol = 5) + 
+  labs(x = "", 
+       y = "Minimum DO (mg/L)", 
+       color = "", 
+       title = yoi) + 
+  scale_x_date(date_breaks = "2 month", 
+               date_labels = "%b") + 
+  scale_color_manual(values = c("gray", "black")) + 
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.4)) + 
+  geom_hline(yintercept = 6,  
+             linetype = "dashed", 
+             color = "black") + 
+  geom_hline(yintercept = 2, 
+             linetype = "dashed", 
+             color = "red")
+
+ggsave(here("figs", paste0(yoi, "_min_DO.png")), 
+       dpi = 600, height = 6, width = 11)
+
+
 #### Figure - top and bottom DO by year, station ####
 yoi <- 2023
 station <- "PENNCOVEENT"
