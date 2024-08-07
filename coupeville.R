@@ -92,13 +92,13 @@ ggplot(data = raw_data %>%
   theme_bw() + 
   theme(legend.position = "none") + 
   geom_point() + 
-  labs(y = "SUNA Parameter 2", 
+  labs(y = expression("NO"[2]^"-"~"+"~"NO"[3]^"-"~"(mg N/L)"), 
        x = "", 
        color = "", 
        title = paste("Coupeville", yoi)) + 
   scale_color_manual(values = c("TRUE" = "black", 
                                 "FALSE" = "gray")) + 
-  lims(y = c(0, NA)) + 
+  lims(y = c(0, 0.5)) + 
   scale_x_datetime(date_breaks = "1 month", 
                date_labels = "%b")
 ggsave(here("figs", "coupeville", paste0("NO23_", yoi, ".png")), 
