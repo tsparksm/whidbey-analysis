@@ -82,7 +82,7 @@ data_buoy_qc <- data_buoy_long %>%
   # Flag all 2022 KC chl data
   mutate(Flag = ifelse(Type == "KC" & 
                          Parameter == "Chlorophyll" & 
-                         year(DateTime) == 2022, 
+                         year(DateTime) %in% 2022:2023, 
                        4, Flag)) %>% 
   # Flag aberrant 2022 salinity points
   mutate(Flag = ifelse(Type == "KC" & 
