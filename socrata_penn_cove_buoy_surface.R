@@ -41,10 +41,7 @@ load_hydrosphere_penncovesurf <- function(fpath) {
                              `PAR(PAR_SQ-421X)` = col_double(), 
                              `WTX534(Temp)` = col_double(), 
                              `WTX534(Humidity)` = col_double(), 
-                             `WTX534(Pressure)` = col_double(), 
-                             `SDI-12Sensor(M_Parameter1)` = col_double(), 
-                             `SDI-12Sensor(M_Parameter2)` = col_double(), 
-                             `SDI-12Sensor(M_Parameter3)` = col_double()
+                             `WTX534(Pressure)` = col_double()
                            ))
 }
 
@@ -59,15 +56,9 @@ process_socrata_penncovesurf <- function(start_date,
              `Date(America/Los_Angeles)` == start_date & 
              `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00"))) %>% 
     rowwise() %>% 
-    mutate(`SDI-12Sensor(M_Parameter1)` = mean(c(`SDI-12Sensor(M_Parameter1)`, 
-                                                 `WTX534(Temp)`), 
-                                               na.rm = TRUE), 
-           `SDI-12Sensor(M_Parameter2)` = mean(c(`SDI-12Sensor(M_Parameter2)`, 
-                                                 `WTX534(Humidity)`), 
-                                               na.rm = TRUE), 
-           `SDI-12Sensor(M_Parameter3)` = mean(c(`SDI-12Sensor(M_Parameter3)`, 
-                                                 `WTX534(Pressure)`), 
-                                               na.rm = TRUE)) %>% 
+    mutate(`SDI-12Sensor(M_Parameter1)` = `WTX534(Temp)`, 
+           `SDI-12Sensor(M_Parameter2)` = `WTX534(Humidity)`, 
+           `SDI-12Sensor(M_Parameter3)` = `WTX534(Pressure)`) %>% 
     select(-`WTX534(Temp)`, -`WTX534(Humidity)`, -`WTX534(Pressure)`)
   
   fpath <- here("data", "socrata", paste0("penncovesurf_socrata_", 
