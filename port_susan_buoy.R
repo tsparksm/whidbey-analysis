@@ -153,7 +153,8 @@ data_to_plot <- data_buoy_qc %>%
                             paste(min(year(DateTime)), 
                                   yoi-1, 
                                   sep = "-")), 
-         FakeDate = DateTime)
+         FakeDate = DateTime) %>% 
+  arrange(YearGroup)
 year(data_to_plot$FakeDate) <- yoi
 
 ggplot(data_to_plot, 
