@@ -6,7 +6,7 @@ library(pracma)
 library(RColorBrewer)
 library(patchwork)
 
-yoi <- 2022
+yoi <- 2023
 
 # Figure settings
 fig_dpi <- 600
@@ -46,14 +46,16 @@ data_ctd <- load_composite(bin_width,
 # Add extra CTD data before/after each year
 extra_data_before <- data_ctd %>% 
   filter(Year == yoi - 1, 
-         YearDay == max(YearDay)) %>% 
+         Locator == "SARATOGACH") %>% 
+  filter(YearDay == max(YearDay)) %>% 
   mutate(YearDay = YearDay - 365, 
          Year = yoi)
 data_ctd <- add_row(data_ctd, extra_data_before)
 
 extra_data_after <- data_ctd %>% 
   filter(Year == yoi + 1, 
-         YearDay == min(YearDay)) %>% 
+         Locator == "SARATOGACH") %>% 
+  filter(YearDay == min(YearDay)) %>% 
   mutate(YearDay = YearDay + 365, 
          Year = yoi)
 data_ctd <- add_row(data_ctd, extra_data_after) %>% 
@@ -208,7 +210,6 @@ p4 <- ggplot(data = totalchl,
         axis.text.x = element_text(size = font_size + 2, face = "bold"), 
         legend.position = "none") + 
   geom_point(size = fig_point_size) + 
-  geom_line(linetype = 3) + 
   scale_color_brewer(palette = "Paired") + 
   scale_x_date(limits = as.Date(c(paste0(yoi, "-01-01"), 
                                   paste0(yoi, "-12-31"))), 
