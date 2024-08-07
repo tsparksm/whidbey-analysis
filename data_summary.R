@@ -136,9 +136,40 @@ for (station in unique(data_discrete$Locator)) {
          height = 5, width = 8)
 }
 
+#### Figure - nitrate + chl bottle ####
+station <- "PSUSANBUOY"
+title <- "Pt. Susan buoy - surface"
+yoi <- 2023
+
+data_to_plot <- data_discrete %>% 
+  filter(ParmId %in% c(1, 14), 
+         Locator == station, 
+         Depth < 1.6) %>% 
+  mutate(Name = ifelse(ParmId == 1, "Chlorophyll", "Nitrate+nitrite"), 
+         FakeDate = CollectDate)
+year(data_to_plot$FakeDate) <- yoi
+
+ggplot(data = data_to_plot, 
+       aes(x = FakeDate, 
+           y = Value, 
+           color = year(CollectDate) == yoi, 
+           shape = Detect)) + 
+  theme_bw() + 
+  theme(legend.position = "bottom") + 
+  facet_wrap(~ Name, scales = "free_y") + 
+  geom_point() + 
+  scale_color_manual(values = c("TRUE" = "black", "FALSE" = "gray"), 
+                     labels = c("TRUE" = yoi, "FALSE" = "2022")) + 
+  scale_shape_manual(values = c("TRUE" = 16, "FALSE" = 1)) + 
+  labs(x = "", y = "", color = "Year", title = title) + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b")
+ggsave(here("figs", station, paste0(yoi, "_chl_NO23.png")), 
+       dpi = 600, height = 5, width = 8)
+
 #### Figure - N and P bottle for a single deep station, year ####
 yoi <- 2023
-stations <- c("SARATOGACH")
+stations <- c("PENNCOVEENT")
 for (station in stations) {
   ggplot(data = data_discrete %>% 
            filter(Locator == station, 
