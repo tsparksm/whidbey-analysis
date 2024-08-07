@@ -434,7 +434,7 @@ ggplot(data = totalchl,
   geom_point() + 
   geom_line() + 
   labs(x = "", 
-       y = "Chlorophyll fluorescence (mg/L*m)", 
+       y = expression(Chlorophyll~fluorescence~(mg/m^2)), 
        color = "", 
        title = paste(yoi, "1-50 m integrated chlorophyll")) + 
   scale_color_brewer(palette = "Dark2") + 
@@ -445,7 +445,7 @@ ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep.png")),
        dpi = 600, height = 4, width = 6)
 
 
-yoi <- 2022
+yoi <- 2023
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2", 
               "KSBP01", "JSUR01", "NSEX01", "LSEP01", "LSNT01")
@@ -455,6 +455,7 @@ totalchl <- data_ctd %>%
   filter(Depth >= 1, 
          Depth <= 50, 
          Year == yoi, 
+         !is.na(Chlorophyll), 
          Locator %in% stations) %>% 
   group_by(Basin, Locator, Date) %>% 
   summarize(Int_chl = pracma::trapz(Depth, Chlorophyll))
@@ -467,24 +468,26 @@ ggplot(data = totalchl,
   geom_point() + 
   geom_smooth(se = FALSE) + 
   labs(x = "", 
-       y = "Chlorophyll fluorescence (mg/L*m)", 
+       y = expression(Chlorophyll~fluorescence~(mg/m^2)), 
        color = "", 
        title = paste(yoi, "1-50 m integrated chlorophyll")) + 
   scale_color_brewer(palette = "Paired") + 
+  lims(y = c(0, NA)) + 
   scale_x_date(date_breaks = "1 month", 
                date_labels = "%b")
 
 ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep_CvsW.png")), 
        dpi = 600, height = 4, width = 6)
 
-#### Figure - minimum DO by year ####
+#### Figure - minimum DO, single year ####
 yoi <- 2023
 
 data_to_plot <- data_ctd %>% 
   filter(Year == yoi, 
          Locator != "PENNCOVEPNN001") %>% 
   group_by(Locator, Date) %>% 
-  summarize(MinDO = min(DO))
+  summarize(MinDO = min(DO), 
+            DepthMinDO = Depth[which.min(DO)])
 
 ggplot(data = data_to_plot, 
        aes(x = Date, 
