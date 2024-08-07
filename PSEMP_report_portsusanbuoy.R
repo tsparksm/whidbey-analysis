@@ -3,7 +3,7 @@ source(here::here("src", "utility_functions.R"))
 library(metR)
 library(cmocean)
 
-yoi <- 2022
+yoi <- 2023
 
 # Figure settings
 fig_dpi <- 600
@@ -57,14 +57,16 @@ data_ctd <- load_composite(bin_width,
 # Add extra CTD data before/after each year
 extra_data_before <- data_ctd %>% 
   filter(Year == yoi - 1, 
-         YearDay == max(YearDay)) %>% 
+         Locator == "PSUSANBUOY") %>% 
+  filter(YearDay == max(YearDay)) %>% 
   mutate(YearDay = YearDay - 365, 
          Year = yoi)
 data_ctd <- add_row(data_ctd, extra_data_before)
 
 extra_data_after <- data_ctd %>% 
   filter(Year == yoi + 1, 
-         YearDay == min(YearDay)) %>% 
+         Locator == "PSUSANBUOY") %>% 
+  filter(YearDay == min(YearDay)) %>% 
   mutate(YearDay = YearDay + 365, 
          Year = yoi)
 data_ctd <- add_row(data_ctd, extra_data_after) %>% 
