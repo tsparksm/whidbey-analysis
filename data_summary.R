@@ -502,7 +502,7 @@ ggplot(data = data_to_plot,
        title = yoi) + 
   scale_x_date(date_breaks = "2 month", 
                date_labels = "%b") + 
-  scale_y_continuous(breaks = seq(0, 12, by = 2)) + 
+  # scale_y_continuous(breaks = seq(0, 12, by = 2)) + 
   theme(axis.text.x = element_text(angle = 90, 
                                    vjust = 0.4)) + 
   geom_hline(aes(yintercept = 6, color = "WA WQS"), 
