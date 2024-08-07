@@ -413,7 +413,7 @@ ggsave(here("figs", paste0(yoi, "_50m_int_chl.png")),
        dpi = 600, height = 4, width = 6)
 
 #### Figure - integrated chl by year - deep stations basin comparison ####
-yoi <- 2022
+yoi <- 2023
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2")
 
@@ -421,7 +421,8 @@ totalchl <- data_ctd %>%
   filter(Depth >= 1, 
          Depth <= 50, 
          Year == yoi, 
-         Locator %in% stations) %>% 
+         Locator %in% stations, 
+         !is.na(Chlorophyll)) %>% 
   group_by(Locator, Date) %>% 
   summarize(Int_chl = pracma::trapz(Depth, Chlorophyll))
 
