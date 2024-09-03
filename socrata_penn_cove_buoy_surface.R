@@ -124,14 +124,14 @@ processed_data <- mooring_data %>%
   mutate(rn = row_number(), 
          DateTime = as.POSIXct(paste(Date, Time), tz = "UTC"), 
          NewTime = case_when(
-           rn <= 6252 ~ DateTime - 1*60*60, 
-           rn > 18345 ~ DateTime - 1*60*60, 
+           between(rn, 3657, 15749) ~ DateTime + 1*60*60, 
            TRUE ~ DateTime), 
          Date = str_sub(as.character(NewTime), 1, 10), 
          Time = str_sub(as.character(NewTime), 12, 16)
   ) %>% 
+  filter(rn >= 34) %>% 
   select(-NewTime, -DateTime, -rn)
 
-fpath <- here("data", "socrata", "coupeville_socrata_initial.csv")
+fpath <- here("data", "socrata", "penncovesurf_socrata_initial.csv")
 
 write_csv(processed_data, file = fpath)
