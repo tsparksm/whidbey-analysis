@@ -105,7 +105,7 @@ for (station in unique(data_discrete$Locator)) {
 
 #### Figure - nitrate bottle highlight year ####
 for (station in unique(data_discrete$Locator)) {
-  ggplot(data = bottle_data %>% 
+  ggplot(data = data_discrete %>% 
            filter(Locator == station,  
                   ParmId == 14), 
          aes(x = FakeDate, 
@@ -119,7 +119,7 @@ for (station in unique(data_discrete$Locator)) {
     scale_color_manual(values = c("TRUE" = "black", 
                                   "FALSE" = "gray"), 
                        labels = c("TRUE" = yoi, 
-                                  "FALSE" = paste(min(bottle_data$Year), 
+                                  "FALSE" = paste(min(data_discrete$Year), 
                                                   yoi-1, 
                                                   sep = "-"))) + 
     scale_shape_manual(values = c("TRUE" = 16, 
