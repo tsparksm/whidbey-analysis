@@ -508,6 +508,37 @@ ggplot(data = totalchl,
 ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep_CvsW.png")), 
        dpi = 600, height = 4, width = 6)
 
+#### Figure - integrated chl over time ####
+totalchl <- data_ctd %>% 
+  full_join(data_central) %>% 
+  filter(Depth >= 1, 
+         Depth <= 50, 
+         !is.na(Chlorophyll), 
+         Locator %in% stations) %>% 
+  group_by(Basin, Locator, Date) %>% 
+  summarize(Int_chl = pracma::trapz(Depth, Chlorophyll))
+
+ggplot(data = totalchl %>% 
+         filter(Basin == "Whidbey", 
+                year(Date) >= 2022), 
+       aes(x = Date, 
+           y = Int_chl, 
+           color = as.factor(year(Date)))) + 
+  theme_bw() + 
+  theme(text = element_text(size = 16)) + 
+  geom_point() + 
+  geom_smooth(se = FALSE, size = 2) + 
+  labs(x = "", 
+       y = expression(Chlorophyll~fluorescence~(mg/m^2)), 
+       color = "", 
+       title = "1-50 m integrated chlorophyll") + 
+  scale_color_viridis_d(end = 0.9, direction = -1)
+lims(y = c(0, NA)) + 
+  scale_x_date(date_breaks = "1 month", 
+               date_labels = "%b")
+ggsave(here("figs", "whidbey_int_chl.png"), 
+       dpi = 600, height = 5, width = 8)
+  
 #### Figure - minimum DO, single year ####
 yoi <- 2023
 
