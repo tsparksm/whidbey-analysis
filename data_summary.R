@@ -136,6 +136,35 @@ for (station in unique(data_discrete$Locator)) {
          height = 5, width = 8)
 }
 
+#### Figure - Penn Cove entrance surface nitrate by year ####
+station <- "PENNCOVEENT"
+ggplot(
+  data_discrete %>% 
+    filter(Locator == station, 
+           ParmId == 14, 
+           DepthBin == "surface") %>% 
+    arrange(CollectDate), 
+  aes(x = FakeDate, 
+      y = Value, 
+      shape = Detect, 
+      color = as.factor(Year))
+) + 
+  geom_point(size = 5) + 
+  theme_bw() + 
+  theme(text = element_text(size = 16)) + 
+  scale_shape_manual(values = c("TRUE" = 16, 
+                                "FALSE" = 1)) + 
+  labs(x = "", 
+       y = "Nitrate + nitrite N (mg/L)", 
+       color = "", 
+       title = "Penn Cove - surface") + 
+  scale_x_datetime(date_breaks = "1 month", 
+               date_labels = "%b") + 
+  scale_color_viridis_d(end = 0.9, direction = -1)
+ggsave(here("figs", "penncovesurfaceN.png"), 
+       dpi = 600, 
+       height = 5, width = 8)
+
 #### Figure - nitrate + chl bottle ####
 station <- "PSUSANBUOY"
 title <- "Pt. Susan buoy - surface"
