@@ -166,7 +166,7 @@ ggsave(here("figs", "coupeville", paste0("turb_", yoi, ".png")),
 #### Mooring - pressure and tide height over a month ####
 ggplot(data = comb_data %>% 
          filter(Year == yoi, 
-                Month == 4), 
+                Month == 9), 
        aes(x = DateTime)) + 
   theme_bw() + 
   geom_point(aes(y = Pressure)) + 
@@ -177,7 +177,7 @@ ggplot(data = comb_data %>%
 #### Mooring - pressure vs tide height over a month ####
 ggplot(data = comb_data %>% 
          filter(Year == yoi, 
-                Month == 4), 
+                Month == 9), 
        aes(x = Pressure, 
            y = TideHeight)) + 
   theme_bw() + 
