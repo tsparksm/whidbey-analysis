@@ -54,8 +54,8 @@ acc_sigmaT <- 0.2  # sigma-theta density; 0.2
 acc_NO23 <- 0.05
 
 # Set figure sizes
-h <- 1.5
-w <- 6
+h <- 2.5
+w <- 6.5
 
 #### Calculate max_depth for each station ####
 max_depth <- data_ctd %>% 
