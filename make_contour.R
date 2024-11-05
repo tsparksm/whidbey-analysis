@@ -354,7 +354,8 @@ data_to_plot <- data_remix %>%
   ungroup() %>% 
   mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
                                 SigmaTheta > lims[2] ~ lims[2], 
-                                TRUE ~ SigmaTheta))
+                                TRUE ~ SigmaTheta)) %>% 
+  arrange(desc(Year))
 
 if (all_stations_fig) {
   if (all_years_fig) {
@@ -579,7 +580,8 @@ data_to_plot <- data_remix %>%
          BinDepth <= MinMaxDepth) %>% 
   group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(DO = mean(DO, na.rm = TRUE)) %>% 
-  ungroup()
+  ungroup() %>% 
+  arrange(desc(Year))
 
 # Calculate whole dataset limits - will be overwritten as needed later
 min_lim <- round_any(min(data_to_plot$DO, na.rm = T),
@@ -736,7 +738,8 @@ data_to_plot <- data_remix %>%
          BinDepth <= MinMaxDepth) %>% 
   group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(Temperature = mean(Temperature, na.rm = TRUE)) %>% 
-  ungroup()
+  ungroup() %>% 
+  arrange(desc(Year))
 
 if (all_stations_fig) {
   
@@ -1015,7 +1018,8 @@ data_to_plot <- data_remix %>%
          BinDepth <= max_depth) %>% 
   group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
   summarize(Salinity = mean(Salinity, na.rm = TRUE)) %>% 
-  ungroup()
+  ungroup() %>% 
+  arrange(desc(Year))
 
 if (all_stations_fig) {
   if (exists("min_lim")) {
