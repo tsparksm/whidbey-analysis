@@ -6,7 +6,7 @@ ctd_data <- load_composite(0.5, monthly = FALSE)
 
 #### Pycnocline depth vs chl max depth ####
 # Calculate chl max depth
-yoi <- 2022
+yoi <- 2024
 
 chlmax <- ctd_data %>% 
   group_by(Locator, Date) %>% 
@@ -37,7 +37,7 @@ ggsave(here("figs", "strat",
        dpi = 600, width = 8, height = 4)
 
 #### Pycnocline depth vs integrated chl ####
-yoi <- 2022
+yoi <- 2024
 
 totalchl <- ctd_data %>% 
   filter(Depth >= 1, 
@@ -71,7 +71,7 @@ ggsave(here("figs", "strat",
        dpi = 600, width = 8, height = 4)
 
 #### Stratification vs integrated chl ####
-yoi <- 2022
+yoi <- 2024
 
 totalchl <- ctd_data %>% 
   filter(Depth >= 1, 
@@ -106,7 +106,7 @@ ggsave(here("figs", "strat",
        dpi = 600, width = 8, height = 4)
 
 #### Stratification over the year ####
-yoi <- 2022
+yoi <- 2024
 
 temp <- strat_data %>% 
   filter(Year == yoi, 
