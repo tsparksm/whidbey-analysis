@@ -46,27 +46,33 @@ data_combined_ctd <- full_join(data_ctd, data_ssm_avg)
 # TO DO
 
 #### Figure - CTD vs SSM DO; all stations, months ####
+yoi <- 2024
 for (station in unique(locator_info$Locator)) {
   for (month in 1:12) {
     ggplot(data = data_combined_ctd %>% 
              filter(Locator == station, 
-                    Month == month)) + 
+                    Month == month) %>% 
+             mutate(HiLite = case_when(
+               Year == yoi ~ as.character(yoi), 
+               is.na(Year) ~ "SSM", 
+               TRUE ~ paste0("2021-", yoi-1)
+             ))) + 
       theme_bw() + 
       geom_ribbon(aes(x = Depth, 
                       ymin = DO_min, 
                       ymax = DO_max, 
                       group = Type), 
                   fill = "light gray") + 
-      geom_line(aes(x = Depth, 
-                    y = DO, 
-                    color = Type, 
-                    group = Date)) + 
       geom_point(aes(x = Depth, 
                      y = DO, 
                      shape = Type), 
                  color = "dark gray") + 
+      geom_line(aes(x = Depth, 
+                    y = DO, 
+                    color = HiLite, 
+                    group = Date)) + 
       scale_shape_manual(values = c(NA, 16)) + 
-      scale_color_manual(values = c("black", "dark gray")) + 
+      scale_color_manual(values = c("black", "red", "dark grey")) + 
       coord_flip() + 
       scale_x_reverse(expand = c(0, 0)) + 
       labs(x = "Depth (m)", 
