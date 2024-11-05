@@ -35,6 +35,7 @@ contour_do <- function(data_to_plot, mybreaks, mylabels, min_lim, max_lim) {
                        labels = month.abb) + 
     geom_vline(aes(xintercept = FakeYearDay), 
                alpha = 0.2) + 
+    guides(fill = guide_colorbar(ticks.colour = NA)) + 
     labs(x = "", 
          y = "Depth (m)", 
          fill = "DO (mg/L)")
