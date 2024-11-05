@@ -2,7 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(rtide)
 
-yoi <- 2023
+yoi <- 2024
 
 #### Load data ####
 # Remember to update file via Socrata download first!
