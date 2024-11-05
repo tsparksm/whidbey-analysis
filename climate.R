@@ -10,7 +10,7 @@ data_climate <- load_climate() %>%
 data_strat <- load_strat()
 
 #### Single year wind ####
-yoi <- 2022
+yoi <- 2024
 
 data_to_plot <- data_climate %>% 
   filter(Year == yoi)
