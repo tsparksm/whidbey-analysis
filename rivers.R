@@ -47,7 +47,7 @@ ggsave(here("figs",
        height = 4, width = 8)
 
 #### Plot year of river flows - multipanel ####
-yoi <- 2023
+yoi <- 2024
 
 ggplot(data = long_data %>% 
          filter(Year == yoi), 
