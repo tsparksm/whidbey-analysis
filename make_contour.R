@@ -117,7 +117,8 @@ data_to_plot <- data_remix %>%
   ungroup() %>% 
   mutate(SigmaTheta = case_when(SigmaTheta < lims[1] ~ lims[1], 
                                 SigmaTheta > lims[2] ~ lims[2], 
-                                TRUE ~ SigmaTheta))
+                                TRUE ~ SigmaTheta)) %>% 
+  arrange(desc(Year))
 
 if (all_stations_fig) {
   if (all_years_fig) {
