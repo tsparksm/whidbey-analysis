@@ -135,7 +135,7 @@ ggplot(data = raw_data %>%
   theme(legend.position = "none") + 
   geom_point() + 
   labs(x = "", 
-       y = expression(Chlorophyll~(mu*g/L)), 
+       y = expression(Chlorophyll~fluorescence~(mu*g/L)), 
        color = "", 
        title = paste("Coupeville", yoi)) + 
   scale_color_manual(values = c("TRUE" = "black", 
