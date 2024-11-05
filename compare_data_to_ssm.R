@@ -187,3 +187,12 @@ ggsave(here("figs", "ssm",
                    paste(months, collapse = "_"), 
                    ".png")), 
        dpi = 600, height = 6, width = 6)
+
+#### Penn Cove minimum DO by year
+data_to_plot <- data_ssm %>% 
+  filter(Locator == "PENNCOVEENT") %>% 
+  group_by()
+  summarize(MinDO = min())
+
+ggplot(data_to_plot, 
+       )
