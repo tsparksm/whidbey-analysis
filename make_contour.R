@@ -159,6 +159,7 @@ if (all_stations_fig) {
                          labels = month.abb) + 
       geom_vline(aes(xintercept = FakeYearDay), 
                  alpha = 0.2) + 
+      guides(fill = guide_colorbar(ticks.colour = NA)) + 
       labs(x = "", 
            y = "Depth (m)", 
            fill = expression(kg/m^3), 
@@ -168,8 +169,8 @@ if (all_stations_fig) {
                        "_sigmat_", 
                        years[1], "-", years[2], 
                        ".png")), 
-           height = 1.5*length(stations), 
-           width = 5*n, 
+           height = h*length(stations), 
+           width = w*n, 
            dpi = 600)
   } else {
     for (yoi in years[1]:years[2]) {
@@ -210,6 +211,7 @@ if (all_stations_fig) {
                            labels = month.abb) + 
         geom_vline(aes(xintercept = FakeYearDay), 
                    alpha = 0.2) + 
+        guides(fill = guide_colorbar(ticks.colour = NA)) + 
         labs(x = "", 
              y = "Depth (m)", 
              fill = expression(kg/m^3), 
@@ -219,8 +221,8 @@ if (all_stations_fig) {
                          "_sigmat_", 
                          yoi, 
                          ".png")), 
-             height = 1.5*length(stations), 
-             width = 5, 
+             height = h*length(stations), 
+             width = w, 
              dpi = 600)
     }
   }
@@ -231,7 +233,7 @@ if (all_stations_fig) {
                filter(Year %in% years[1]:years[2], 
                       Locator == station)) + 
         theme_classic() + 
-        facet_wrap(~ Year, 
+        facet_wrap(~factor(Year, levels = unique(temp$Year)), 
                    ncol = 1, 
                    scales = "free_y") + 
         metR::geom_contour_fill(aes(x = FakeYearDay, 
@@ -265,6 +267,7 @@ if (all_stations_fig) {
                            labels = month.abb) + 
         geom_vline(aes(xintercept = FakeYearDay), 
                    alpha = 0.2) + 
+        guides(fill = guide_colorbar(ticks.colour = NA)) + 
         labs(x = "", 
              y = "Depth (m)", 
              fill = expression(kg/m^3), 
@@ -273,8 +276,8 @@ if (all_stations_fig) {
                   paste0(station, "_sigmat_", 
                          years[1], "-", years[2], 
                          ".png")), 
-             height = 1.5*n, 
-             width = 5, 
+             height = h*n, 
+             width = w, 
              dpi = 600)
     } else {
       for (yoi in years[1]:years[2]) {
@@ -316,6 +319,7 @@ if (all_stations_fig) {
                              labels = month.abb) + 
           geom_vline(aes(xintercept = FakeYearDay), 
                      alpha = 0.2) + 
+          guides(fill = guide_colorbar(ticks.colour = NA)) + 
           labs(x = "", 
                y = "Depth (m)", 
                fill = expression(kg/m^3), 
@@ -324,8 +328,8 @@ if (all_stations_fig) {
                     paste0(station, "_sigmat_", 
                            yoi, 
                            ".png")), 
-               height = 2, 
-               width = 5, 
+               height = h, 
+               width = w, 
                dpi = 600)
       }
     }
@@ -394,14 +398,15 @@ if (all_stations_fig) {
       labs(x = "", 
            y = "Depth (m)", 
            fill = expression(kg/m^3), 
-           title = bquote(sigma[Theta]~surface))
+           title = bquote(sigma[Theta]~surface)) + 
+      guides(fill = guide_colorbar(ticks.colour = NA))
     ggsave(here("figs", "contour", "sigmat", 
                 paste0(paste(stations, collapse = "_"), 
                        "_surface_sigmat_", 
                        years[1], "-", years[2], 
                        ".png")), 
-           height = 1.5*length(stations), 
-           width = 5*n, 
+           height = h*length(stations), 
+           width = w*n, 
            dpi = 600)
   } else {
     for (yoi in years[1]:years[2]) {
@@ -445,14 +450,15 @@ if (all_stations_fig) {
         labs(x = "", 
              y = "Depth (m)", 
              fill = expression(kg/m^3), 
-             title = bquote(sigma[Theta]~yoi~surface))
+             title = bquote(sigma[Theta]~yoi~surface)) + 
+        guides(fill = guide_colorbar(ticks.colour = NA))
       ggsave(here("figs", "contour", "sigmat", 
                   paste0(paste(stations, collapse = "_"), 
                          "_surface_sigmat_", 
                          yoi, 
                          ".png")), 
-             height = 1.5*length(stations), 
-             width = 5, 
+             height = h*length(stations), 
+             width = w, 
              dpi = 600)
     }
   }
@@ -463,7 +469,7 @@ if (all_stations_fig) {
                filter(Year %in% years[1]:years[2], 
                       Locator == station)) + 
         theme_classic() + 
-        facet_wrap(~ Year, 
+        facet_wrap(~factor(Year, levels = unique(temp$Year)), 
                    ncol = 1, 
                    scales = "free_y") + 
         metR::geom_contour_fill(aes(x = FakeYearDay, 
@@ -500,13 +506,14 @@ if (all_stations_fig) {
         labs(x = "", 
              y = "Depth (m)", 
              fill = expression(kg/m^3), 
-             title = bquote(.(station)~sigma[Theta]~surface))
+             title = bquote(.(station)~sigma[Theta]~surface)) + 
+        guides(fill = guide_colorbar(ticks.colour = NA))
       ggsave(here("figs", "contour", "sigmat", station, 
                   paste0(station, "_surface_sigmat_", 
                          years[1], "-", years[2], 
                          ".png")), 
-             height = 1.5*n, 
-             width = 5, 
+             height = h*n, 
+             width = w, 
              dpi = 600)
     } else {
       for (yoi in years[1]:years[2]) {
@@ -551,13 +558,14 @@ if (all_stations_fig) {
           labs(x = "", 
                y = "Depth (m)", 
                fill = expression(kg/m^3), 
-               title = bquote(.(station)~sigma[Theta]~yoi~surface))
+               title = bquote(.(station)~sigma[Theta]~yoi~surface)) + 
+          guides(fill = guide_colorbar(ticks.colour = NA))
         ggsave(here("figs", "contour", "sigmat", station, 
                     paste0(station, "_surface_sigmat_", 
                            yoi, 
                            ".png")), 
-               height = 2, 
-               width = 5, 
+               height = h, 
+               width = w, 
                dpi = 600)
       }
     }
@@ -588,7 +596,8 @@ if (all_stations_fig) {
     p <- contour_do(data_to_plot, mybreaks, mylabels, min_lim, max_lim) + 
       facet_grid(rows = vars(Locator), 
                  cols = vars(Year), 
-                 scales = "free_y")
+                 scales = "free_y") + 
+      guides(fill = guide_colorbar(ticks.colour = NA))
     
     ggsave(here("figs", "contour", "DO", 
                 paste0(paste(stations, collapse = "_"), 
@@ -596,8 +605,8 @@ if (all_stations_fig) {
                        years[1], "-", years[2], 
                        ".png")), 
            p, 
-           height = 1.5*length(stations), 
-           width = 5*n, 
+           height = h*length(stations), 
+           width = w*n, 
            dpi = 600)
     
   } else {
@@ -619,7 +628,8 @@ if (all_stations_fig) {
         facet_wrap(~ Locator, 
                    ncol = 1, 
                    scales = "free_y") + 
-        labs(title = paste("DO", yoi))
+        labs(title = paste("DO", yoi)) + 
+        guides(fill = guide_colorbar(ticks.colour = NA))
           
       ggsave(here("figs", "contour", "DO", 
                   paste0(paste(stations, collapse = "_"), 
@@ -627,8 +637,8 @@ if (all_stations_fig) {
                          yoi, 
                          ".png")), 
              p, 
-             height = 1.5*length(stations), 
-             width = 5, 
+             height = h*length(stations), 
+             width = w, 
              dpi = 600)
     }
   }
@@ -649,10 +659,11 @@ if (all_stations_fig) {
       }
       
       p <- contour_do(temp, mybreaks, mylabels, min_lim, max_lim) + 
-        facet_wrap(~ Year, 
+        facet_wrap(~factor(Year, levels = unique(temp$Year)), 
                    ncol = 1, 
                    scales = "free_y") + 
-        labs(title = station)
+        labs(title = station) + 
+        guides(fill = guide_colorbar(ticks.colour = NA))
       
       ggsave(here("figs", "contour", "DO", station, 
                   paste0(station, 
@@ -660,8 +671,8 @@ if (all_stations_fig) {
                          years[1], "-", years[2], 
                          ".png")), 
              p, 
-             height = 1.5*n, 
-             width = 5, 
+             height = h*n, 
+             width = w, 
              dpi = 600)
       
     } else {
@@ -710,8 +721,8 @@ if (all_stations_fig) {
                            yoi, 
                            ".png")), 
                p, 
-               height = 2, 
-               width = 7, 
+               height = h, 
+               width = w, 
                dpi = 600)
       }
     }
@@ -773,14 +784,15 @@ if (all_stations_fig) {
     labs(x = "", 
          y = "Depth (m)", 
          fill = expression( degree*C), 
-         title = ("Temperature"))
+         title = ("Temperature")) + 
+    guides(fill = guide_colorbar(ticks.colour = NA))
   ggsave(here("figs", "contour", "T", 
               paste0(paste(stations, collapse = "_"), 
                      "_T_", 
                      years[1], "_", years[2], 
                      ".png")), 
-         height = 2*length(stations), 
-         width = 8, 
+         height = h*length(stations), 
+         width = w, 
          dpi = 600)
 } else {
   for (station in stations) {
@@ -796,7 +808,7 @@ if (all_stations_fig) {
     
     ggplot(data = temp) + 
       theme_classic() + 
-      facet_wrap(~ Year, 
+      facet_wrap(~factor(Year, levels = unique(temp$Year)), 
                  ncol = 1) + 
       metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
@@ -829,17 +841,169 @@ if (all_stations_fig) {
       labs(x = "", 
            y = "Depth (m)", 
            fill = expression( degree*C), 
-           title = paste(station, "temperature"))
+           title = paste(station, "temperature")) + 
+      guides(fill = guide_colorbar(ticks.colour = NA))
     ggsave(here("figs", "contour", "T", station, 
                 paste0(station, "_T_", 
                        years[1], "_", years[2], 
                        ".png")), 
-           height = 2*n, 
-           width = 8, 
+           height = h*n, 
+           width = w, 
            dpi = 600)
   }
 }
   
+#### Salinity contour plot ####
+# if (exists("min_lim")) rm(min_lim)
+# min_lim <- 15
+
+data_to_plot <- data_remix %>% 
+  filter(Locator %in% stations, 
+         !is.na(Salinity)) %>% 
+  group_by(Locator, Year, FakeYearDay, BinDepth) %>% 
+  summarize(Salinity = mean(Salinity, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  arrange(desc(Year))
+
+if (all_stations_fig) {
+  if (exists("min_lim")) {
+    data_to_plot <- data_to_plot %>% 
+      mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+  } else {
+    min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
+                         accurac = acc_S, f = floor)
+    set_min <- FALSE
+  }
+  
+  max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
+                       accuracy = acc_S, f = ceiling)
+  mybreaks <- seq(min_lim, max_lim, by = acc_S)
+  mylabels <- mybreaks
+  mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+  if (set_min) {
+    mylabels[1] <- paste0("<", min_lim)
+  }
+  
+  ggplot(data = data_to_plot) + 
+    theme_classic() + 
+    facet_wrap(~ Locator, 
+               ncol = 1, 
+               scales = "free_y") + 
+    metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                y = BinDepth, 
+                                z = Salinity), 
+                            na.fill = TRUE, 
+                            breaks = mybreaks) + 
+    scale_fill_cmocean(name = "haline", 
+                       breaks = mybreaks, 
+                       limits = c(min_lim, max_lim), 
+                       labels = mylabels, 
+                       guide = guide_colorbar(show.limits = T, 
+                                              ticks = F, 
+                                              reverse = T)) + 
+    scale_y_reverse(expand = c(0, 0)) + 
+    coord_cartesian(xlim = c(0, 366)) + 
+    scale_x_continuous(expand = c(0, 0), 
+                       breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                  yday(paste(yoi, "-02-01", sep = "")), 
+                                  yday(paste(yoi, "-03-01", sep = "")), 
+                                  yday(paste(yoi, "-04-01", sep = "")), 
+                                  yday(paste(yoi, "-05-01", sep = "")), 
+                                  yday(paste(yoi, "-06-01", sep = "")), 
+                                  yday(paste(yoi, "-07-01", sep = "")), 
+                                  yday(paste(yoi, "-08-01", sep = "")), 
+                                  yday(paste(yoi, "-09-01", sep = "")), 
+                                  yday(paste(yoi, "-10-01", sep = "")), 
+                                  yday(paste(yoi, "-11-01", sep = "")), 
+                                  yday(paste(yoi, "-12-01", sep = ""))), 
+                       labels = month.abb) + 
+    geom_vline(aes(xintercept = FakeYearDay), 
+               alpha = 0.2) + 
+    labs(x = "", 
+         y = "Depth (m)", 
+         fill = "PSU", 
+         title = "Salinity") + 
+    guides(fill = guide_colorbar(ticks.colour = NA))
+  ggsave(here("figs", "contour", "S", 
+              paste0(paste(stations, collapse = "_"), 
+                     "_S_", 
+                     years[1], "_", years[2], 
+                     ".png")), 
+         height = h*length(stations), 
+         width = w, 
+         dpi = 600)
+} else {
+  for (station in stations) {
+    temp <- data_to_plot %>% 
+      filter(Locator == station)
+    
+    if (exists("min_lim")) {
+      temp <- temp %>% 
+        mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+    } else {
+      min_lim <- round_any(min(temp$Salinity, na.rm = TRUE), 
+                           accurac = acc_S, f = floor)
+      set_min <- FALSE
+    }
+    
+    max_lim <- round_any(max(temp$Salinity, na.rm = TRUE), 
+                         accuracy = acc_S, f = ceiling)
+    mybreaks <- seq(min_lim, max_lim, by = acc_S)
+    mylabels <- mybreaks
+    mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+    if (set_min) {
+      mylabels[1] <- paste0("<", min_lim)
+    }
+    
+    ggplot(data = temp) + 
+      theme_classic() + 
+      facet_wrap(~factor(Year, levels = unique(temp$Year)), 
+                 ncol = 1) + 
+      metR::geom_contour_fill(aes(x = FakeYearDay, 
+                                  y = BinDepth, 
+                                  z = Salinity), 
+                              na.fill = TRUE, 
+                              breaks = mybreaks) + 
+      scale_fill_cmocean(name = "haline", 
+                         breaks = mybreaks, 
+                         limits = c(min_lim, max_lim), 
+                         labels = mylabels, 
+                         guide = guide_colorbar(show.limits = T, 
+                                                ticks = F, 
+                                                reverse = T)) + 
+      scale_y_reverse(expand = c(0, 0)) + 
+      coord_cartesian(xlim = c(0, 366)) + 
+      scale_x_continuous(expand = c(0, 0), 
+                         breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+                                    yday(paste(yoi, "-02-01", sep = "")), 
+                                    yday(paste(yoi, "-03-01", sep = "")), 
+                                    yday(paste(yoi, "-04-01", sep = "")), 
+                                    yday(paste(yoi, "-05-01", sep = "")), 
+                                    yday(paste(yoi, "-06-01", sep = "")), 
+                                    yday(paste(yoi, "-07-01", sep = "")), 
+                                    yday(paste(yoi, "-08-01", sep = "")), 
+                                    yday(paste(yoi, "-09-01", sep = "")), 
+                                    yday(paste(yoi, "-10-01", sep = "")), 
+                                    yday(paste(yoi, "-11-01", sep = "")), 
+                                    yday(paste(yoi, "-12-01", sep = ""))), 
+                         labels = month.abb) + 
+      geom_vline(aes(xintercept = FakeYearDay), 
+                 alpha = 0.2) + 
+      labs(x = "", 
+           y = "Depth (m)", 
+           fill = "PSU", 
+           title = paste(station, "salinity")) + 
+      guides(fill = guide_colorbar(ticks.colour = NA))
+    ggsave(here("figs", "contour", "S", station, 
+                paste0(station, "_S_", 
+                       years[1], "_", years[2], 
+                       ".png")), 
+           height = h*n, 
+           width = w, 
+           dpi = 600)
+  }
+}
+
 #### Salinity contour plot - surface ####
 max_depth <- 20
 if (exists("min_lim")) rm(min_lim)
@@ -910,14 +1074,15 @@ if (all_stations_fig) {
     labs(x = "", 
          y = "Depth (m)", 
          fill = "PSU", 
-         title = "Surface salinity")
+         title = "Surface salinity") + 
+    guides(fill = guide_colorbar(ticks.colour = NA))
   ggsave(here("figs", "contour", "S", 
               paste0(paste(stations, collapse = "_"), 
                      "_surface_S_", 
                      years[1], "_", years[2], 
                      ".png")), 
-         height = 2*length(stations), 
-         width = 8, 
+         height = h*length(stations), 
+         width = w, 
          dpi = 600)
 } else {
   for (station in stations) {
@@ -944,7 +1109,7 @@ if (all_stations_fig) {
       
     ggplot(data = temp) + 
       theme_classic() + 
-      facet_wrap(~ Year, 
+      facet_wrap(~factor(Year, levels = unique(temp$Year)), 
                  ncol = 1) + 
       metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
@@ -979,13 +1144,14 @@ if (all_stations_fig) {
       labs(x = "", 
            y = "Depth (m)", 
            fill = "PSU", 
-           title = paste(station, "surface salinity"))
+           title = paste(station, "surface salinity")) + 
+      guides(fill = guide_colorbar(ticks.colour = NA))
     ggsave(here("figs", "contour", "S", station, 
                 paste0(station, "_surface_S_", 
                        years[1], "_", years[2], 
                        ".png")), 
-           height = 2*n, 
-           width = 8, 
+           height = h*n, 
+           width = w, 
            dpi = 600)
   }
 }
