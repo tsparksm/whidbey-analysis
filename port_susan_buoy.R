@@ -142,7 +142,7 @@ write_csv(data_buoy_qc,
           here("data", "port_susan_buoy_qc.csv"))
 
 #### Figure - chlorophyll, all years ####
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
@@ -162,10 +162,22 @@ ggplot(data_to_plot,
            y = Value, 
            color = YearGroup, 
            shape = Type)) + 
-  geom_point()
+  theme_bw() + 
+  geom_point() + 
+  scale_color_manual(values = c("gray", "black")) + 
+  labs(x = "", 
+       y = expression(Chlorophyll~fluorescence~(mu*g/L)), 
+       color = "", 
+       shape = "", 
+       title = "Port Susan buoy") + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b")
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_chlorophyll_comparison.png")), 
+       dpi = 600, height = 4, width = 6)
 
 #### Figure - chlorophyll, single year ####
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
@@ -173,29 +185,30 @@ data_to_plot <- data_buoy_qc %>%
 
 data_to_plot2 <- data_discrete %>% 
   filter(ParmId == 1, 
-         year(CollectDate) == yoi)
+         year(CollectDate) == yoi, 
+         DepthBin == "surface")
 
 ggplot() + 
   geom_point(data = data_to_plot, 
              aes(x = DateTime, 
-                 y = Value, 
-                 color = Type)) + 
+                 y = Value)) + 
   geom_point(data = data_to_plot2, 
              aes(x = CollectDateTime, 
                  y = Value), 
              color = "red") + 
   theme_bw() + 
   labs(x = "", 
-       y = expression(Chlorophyll~(mu*g/L)), 
-       title = paste("Pt. Susan buoy", 2023)) + 
+       y = expression(Chlorophyll~fluorescence~(mu*g/L)), 
+       title = paste("Pt. Susan buoy", yoi)) + 
   scale_x_datetime(date_breaks = "1 month", 
-                   date_labels = "%b")
+                   date_labels = "%b") + 
+  scale_y_continuous(limits = c(0, 100))
 ggsave(here("figs", "psusanbuoy", 
             paste0(yoi, "_chlorophyll.png")), 
        dpi = 600, height = 4, width = 6)
 
 #### Figure - oxygen, all years ####
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
@@ -215,8 +228,11 @@ ggplot(data_to_plot,
            y = Value, 
            color = YearGroup, 
            shape = Type)) + 
-  geom_point()
-
+  geom_point() + 
+  scale_y_continuous(limits = c(0, NA))
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_DO_comparison.png")), 
+       dpi = 600, height = 4, width = 6)
 
 #### Figure - oxygen, single year ####
 yoi <- 2023
@@ -246,7 +262,7 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 6, width = 4)
 
 #### Figure - nitrate, single year ####
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_buoy_new %>% 
   filter(year(DateTime) == yoi)
@@ -257,13 +273,14 @@ ggplot(data_to_plot,
   geom_point() + 
   theme_bw() + 
   labs(x = "", 
-       y = expression("NO"[2]^"-"~"+"~"NO"[3]^"-"~"(mg N/L)"))
+       y = expression("NO"[2]^"-"~"+"~"NO"[3]^"-"~"(mg N/L)")) + 
+  scale_y_continuous(limits = c(0, NA))
 ggsave(here("figs", "psusanbuoy", 
             paste0(yoi, "_no23.png")), 
        dpi = 600, height = 6, width = 4)
 
 #### Figure - daily mean temperature ####
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Temperature", 
