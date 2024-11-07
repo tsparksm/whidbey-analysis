@@ -12,9 +12,8 @@ load_hydrosphere_penncovesurf <- function(fpath) {
   mooring_data <- read_csv(fpath, 
                            col_types = cols(
                              UnixTimestamp = col_double(), 
-                             `Date(America/Los_Angeles)` = col_date(
-                               format = "%m/%d/%Y"), 
-                             `Time(America/Los_Angeles)` = col_time(), 
+                             Date = col_date(), 
+                             Time = col_time(), 
                              WindDirection = col_double(), 
                              WindSpeed = col_double(), 
                              SystemBattery = col_double(), 
@@ -52,9 +51,18 @@ load_hydrosphere_penncovesurf <- function(fpath) {
 process_socrata_penncovesurf <- function(start_date, 
                                          start_time) {
   raw_data <- load_hydrosphere_penncovesurf() %>% 
-    filter(`Date(America/Los_Angeles)` > start_date | 
-             `Date(America/Los_Angeles)` == start_date & 
-             `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
+    mutate(DateTime = as.POSIXct(paste(Date, Time), 
+                                 tz = "UTC"), 
+           NewDateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
+           Date = as.Date(str_sub(NewDateTime, 1, 10)), 
+           Time = parse_time(str_sub(NewDateTime, 12, 16)), 
+           `SDI-12Sensor(M_Parameter1)(Inactive-1)` = NA, 
+           `SDI-12Sensor(M_Parameter2)(Inactive-2)` = NA, 
+           `SDI-12Sensor(M_Parameter3)(Inactive-3)` = NA) %>% 
+    select(-DateTime, -NewDateTime) %>% 
+    filter(Date > start_date | 
+             Date == start_date & 
+             Time >= as_hms(paste0(start_time, ":00")))
   
   fpath <- here("data", "socrata", paste0("penncovesurf_socrata_", 
                                           Sys.Date(), 
