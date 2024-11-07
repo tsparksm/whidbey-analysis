@@ -13,9 +13,8 @@ load_hydrosphere_coupeville <- function(fpath) {
   mooring_data <- read_csv(fpath, 
                            col_types = cols(
                              UnixTimestamp = col_double(), 
-                             `Date(America/Los_Angeles)` = col_date(
-                               format = "%m/%d/%Y"), 
-                             `Time(America/Los_Angeles)` = col_time(), 
+                             Date = col_date(), 
+                             Time = col_time(), 
                              SystemBattery = col_double(), 
                              `HCEP(TEMP)` = col_double(), 
                              `HCEP(COND)` = col_double(), 
@@ -47,9 +46,15 @@ load_hydrosphere_coupeville <- function(fpath) {
 process_socrata_coupeville <- function(start_date, 
                                        start_time) {
   raw_data <- load_hydrosphere_coupeville() %>% 
-    filter(`Date(America/Los_Angeles)` > start_date | 
-             `Date(America/Los_Angeles)` == start_date & 
-             `Time(America/Los_Angeles)` >= as_hms(paste0(start_time, ":00")))
+    mutate(DateTime = as.POSIXct(paste(Date, Time), 
+                                 tz = "UTC"), 
+           NewDateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
+           Date = as.Date(str_sub(NewDateTime, 1, 10)), 
+           Time = parse_time(str_sub(NewDateTime, 12, 16))) %>% 
+    select(-DateTime, -NewDateTime) %>% 
+    filter(Date > start_date | 
+             Date == start_date & 
+             Time >= as_hms(paste0(start_time, ":00")))
   
   fpath <- here("data", "socrata", paste0("coupeville_socrata_", 
                                           Sys.Date(), 
@@ -103,14 +108,47 @@ processed_data <- mooring_data %>%
   mutate(rn = row_number(), 
          DateTime = as.POSIXct(paste(Date, Time), tz = "UTC"), 
          NewTime = case_when(
-           between(rn, 5142, 27984) ~ DateTime - 1*60*60, 
-           rn >= 40078 ~ DateTime - 1*60*60, 
+           rn <= 5141 ~ DateTime + 1*60*60, 
+           # between(rn, 22938, 27984) ~ DateTime + 1*60*60, 
+           between(rn, 27985, 34939) ~ DateTime + 1*60*60, 
+           between(rn, 34940, 40077) ~ DateTime + 1*60*60, 
            TRUE ~ DateTime), 
          Date = str_sub(as.character(NewTime), 1, 10), 
          Time = str_sub(as.character(NewTime), 12, 16)
   ) %>% 
   select(-NewTime, -DateTime, -rn)
+  # select(-DateTime) %>% 
+  # rename(DateTime = NewTime) %>% 
+  # mutate(DateTime = force_tz(DateTime, tzone = "Etc/GMT-8"))
 
 fpath <- here("data", "socrata", "coupeville_socrata_initial.csv")
 
 write_csv(processed_data, file = fpath)
+
+#### Tide comparison ####
+# Uncomment 114-116 to attach
+library(rtide)
+library(plotly)
+
+tide_data <- tide_height(stations = "Seattle", 
+                         minutes = 15, 
+                         from = min(as.Date(processed_data$Date)) - 1, 
+                         to = max(as.Date(processed_data$Date)) + 1, 
+                         tz = "Etc/GMT-8")
+
+comb_data <- left_join(processed_data, 
+                       tide_data %>% 
+                         select(-Station) %>% 
+                         mutate(DateTime = DateTime - 16*60*60))
+
+p <- ggplot(data = comb_data %>% 
+         filter(year(DateTime) == 2024, 
+                month(DateTime) == 3), 
+       aes(x = DateTime)) + 
+  theme_bw() + 
+  geom_point(aes(y = `HCEP(PRES)`)) + 
+  geom_point(aes(y = TideHeight), color = "red") + 
+  scale_x_datetime(date_breaks = "1 day") + 
+  labs(x = "", 
+       y = "Pressure/depth")
+ggplotly(p)
