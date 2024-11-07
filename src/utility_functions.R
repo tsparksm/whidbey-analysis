@@ -357,7 +357,9 @@ scale_fill_craftfermenter <- function(..., type = "seq",
   if (type == "qual") {
     warn("Using a discrete colour palette in a binned scale.\n  Consider using type = \"seq\" or type = \"div\" instead")
   }
-  binned_scale(aesthetics, "fermenter", ggplot2:::binned_pal(craftbrewer_pal(type, palette, direction)), na.value = na.value, guide = guide, ...)
+  binned_scale(aesthetics, "fermenter", 
+               ggplot2:::pal_binned(craftbrewer_pal(type, palette, direction)), 
+               na.value = na.value, guide = guide, ...)
 }
 
 # Load climate data from NOAA
