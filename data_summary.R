@@ -620,8 +620,45 @@ ggsave(here("figs", paste0(yoi, "_min_DO.png")),
        dpi = 600, height = 6, width = 11)
 
 
+#### Figure - minimum DO, all years single station ####
+station <- "Poss DO-2"
+
+data_to_plot <- data_ctd %>% 
+  filter(Locator == station) %>% 
+  group_by(Locator, Date) %>% 
+  summarize(MinDO = min(DO)) %>% 
+  mutate(FakeDate = Date)
+year(data_to_plot$FakeDate) <- 2020 
+
+ggplot(data = data_to_plot, 
+       aes(x = FakeDate, 
+           y = MinDO, 
+           color = as.factor(year(Date)))) + 
+  theme_bw() + 
+  theme(text = element_text(size = 16)) + 
+  geom_hline(yintercept = 6,
+             linetype = "dashed",
+             color = "black") +
+  # geom_hline(yintercept = 2,
+  #            linetype = "dashed",
+  #            color = "red") +
+  geom_point(size = 5) + 
+  geom_smooth(se = FALSE) + 
+  labs(x = "", 
+       y = "Minimum DO (mg/L)", 
+       color = "", 
+       title = "Possession Sound") + 
+  scale_x_date(date_breaks = "2 month", 
+               date_labels = "%b") + 
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.4)) + 
+  scale_color_viridis_d(end = 0.9, direction = -1)
+
+ggsave(here("figs", paste0(station, "_minDO.png")), 
+       dpi = 600, height = 5, width = 8)
+
 #### Figure - top and bottom DO by year, station ####
-yoi <- 2023
+yoi <- 2024
 station <- "PENNCOVEENT"
 
 data_to_plot <- data_ctd %>% 
