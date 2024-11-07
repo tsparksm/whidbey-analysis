@@ -34,6 +34,7 @@ load_CTD <- function(sites, type = "qcd") {
 load_whidbey_discrete <- function() {
   fpath <- here("data", "raw", "whidbey_discrete.csv")
   output <- import_discrete(fpath) %>% 
+    mutate(CollectDateTime = with_tz(CollectDateTime, tzone = "Etc/GMT+8")) %>% 
     mutate(Detect = !is.na(Value), 
            Value = ifelse(Detect, Value, Mdl), 
            DepthBin = case_when(Depth < 2 ~ "surface", 
@@ -77,9 +78,12 @@ load_PS_buoy_old <- function() {
                                         Date = col_skip(), 
                                         Time = col_skip(), 
                                         EventFlags = col_double())) %>% 
-    mutate(DateTime = as.POSIXct(DateTime, 
-                                 format = "%m/%d/%Y %H:%M"), 
-           FakeDateTime = DateTime)
+    mutate(
+      DateTime = with_tz(
+        as.POSIXct(DateTime, format = "%m/%d/%Y %H:%M"), 
+        "Etc/GMT+8"), 
+      FakeDateTime = DateTime
+    )
   year(raw_data$FakeDateTime) <- 2020
   return(raw_data)
 }
@@ -415,14 +419,15 @@ load_climate <- function() {
 # Take Penn Cove surface raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_penncovesurf <- function() {
-  fpath <- here("data", "raw", 
-                "Penn_Cove_Entrance_Buoy_Raw_Data_Output_-_Surface.csv")
-  raw_data <- read_csv(fpath, 
+  fpath <- list.files(
+    path = here("data", "raw"), 
+    pattern = "Penn_Cove_.*Surface"
+  )
+  
+  raw_data <- read_csv(here("data", "raw", fpath), 
                        col_types = cols(
                          UnixTimestamp = col_double(), 
-                         `Date(America/Los_Angeles)` = col_datetime(
-                           format = "%m/%d/%Y %I:%M:%S %p" 
-                         ), 
+                         `Date(America/Los_Angeles)` = col_character(), 
                          `Time(America/Los_Angeles)` = col_time(), 
                          WindDirection = col_double(), 
                          WindSpeed = col_double(), 
@@ -462,7 +467,7 @@ load_penncovesurf <- function() {
            Humidity = `SDI-12Sensor(M_Parameter2)`, 
            AirPressure = `SDI-12Sensor(M_Parameter3)`) %>% 
     mutate(Date = as.Date(Date), 
-           DateTime = as.POSIXct(paste0(Date, Time)), 
+           DateTime = as.POSIXct(paste(Date, Time), tz = "Etc/GMT+8"), 
            Month = month(Date), 
            Year = year(Date), 
            FakeDateTime = DateTime) %>% 
@@ -474,9 +479,11 @@ load_penncovesurf <- function() {
 # Take Penn Cove bottom raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_penncovebottom <- function() {
-  fpath <- here("data", "raw", 
-                "Penn_Cove_Entrance_Buoy_Raw_Data_Output_-_Bottom.csv")
-  raw_data <- read_csv(fpath, 
+  fpath <- list.files(
+    path = here("data", "raw"), 
+    pattern = "Penn_Cove_.*Bottom"
+  )
+  raw_data <- read_csv(here("data", "raw", fpath), 
                        col_types = cols(
                          HCEP_id = col_character(), 
                          DateTime = col_datetime(
@@ -501,7 +508,8 @@ load_penncovebottom <- function() {
                          NO3_n = col_integer()
                        )) %>% 
     select(DateTime, everything()) %>% 
-    mutate(Month = month(DateTime), 
+    mutate(DateTime = force_tz(DateTime, tzone = "Etc/GMT+8"), 
+           Month = month(DateTime), 
            Year = year(DateTime), 
            FakeDateTime = DateTime) %>% 
     arrange(DateTime)
@@ -512,14 +520,14 @@ load_penncovebottom <- function() {
 # Take Port Susan buoy raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_psusan <- function() {
-  fpath <- here("data", "raw", 
-                "Port_Susan_Buoy_Raw_Data_Output.csv")
-  raw_data <- read_csv(fpath, 
+  fpath <- list.files(
+    path = here("data", "raw"), 
+    pattern = "Port_Susan_Buoy_Raw"
+  )
+  raw_data <- read_csv(here("data", "raw", fpath), 
                        col_types = cols(
                          UnixTimestamp = col_double(), 
-                         `Date(America/Los_Angeles)` = col_datetime(
-                           format = "%m/%d/%Y %I:%M:%S %p" 
-                         ), 
+                         `Date(America/Los_Angeles)` = col_character(), 
                          `Time(America/Los_Angeles)` = col_time(), 
                          WindDirection = col_double(), 
                          WindSpeed = col_double(), 
@@ -565,7 +573,7 @@ load_psusan <- function() {
            Humidity = `WTX534(Humidity)`, 
            AirPressure = `WTX534(Pressure)`) %>% 
     mutate(Date = as.Date(Date), 
-           DateTime = as.POSIXct(paste0(Date, Time)), 
+           DateTime = as.POSIXct(paste(Date, Time), tz = "Etc/GMT+8"), 
            Month = month(Date), 
            Year = year(Date), 
            FakeDateTime = DateTime) %>% 
@@ -577,12 +585,14 @@ load_psusan <- function() {
 # Take Coupeville raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_coupeville <- function() {
-  fpath <- here("data", "raw", 
-                "Coupeville_Wharf_Mooring_Raw_Data_Output.csv")
-  raw_data <- read_csv(fpath, 
+  fpath <- list.files(
+    path = here("data", "raw"), 
+    pattern = "Coupeville_Wharf"
+  )
+  raw_data <- read_csv(here("data", "raw", fpath), 
                        col_types = cols(
                          UnixTimestamp = col_double(), 
-                         `Date(America/Los_Angeles)` = col_date(), 
+                         `Date(America/Los_Angeles)` = col_character(), 
                          `Time(America/Los_Angeles)` = col_time(), 
                          `HCEP(TEMP)` = col_double(), 
                          `HCEP(COND)` = col_skip(), 
@@ -611,9 +621,12 @@ load_coupeville <- function() {
            OxygenSat = `HCEP(OSAT)`, 
            NO23 = `SUNA(M_Parameter2)`) %>% 
     mutate(Date = as.Date(Date), 
-           DateTime = as.POSIXct(paste0(Date, Time)), 
+           DateTime = paste(Date, Time), 
            Month = month(Date), 
-           Year = year(Date), 
+           Year = year(Date)) %>% 
+    mutate(DateTime = as.POSIXct(DateTime, 
+                                 format = "%Y-%m-%d %H:%M", 
+                                 tz = "Etc/GMT+8"), 
            FakeDateTime = DateTime) %>% 
     arrange(DateTime)
   year(raw_data$FakeDateTime) <- 2020
@@ -623,7 +636,8 @@ load_coupeville <- function() {
 # Download marine phytoplankton data (grouped by size class) from Socrata
 get_phyto <- function() {
   phyto_url <- "https://data.kingcounty.gov/resource/ap4k-tvru.csv"
-  phyto_data <- read.socrata(phyto_url) %>% 
+  phyto_data <- read.socrata(url = phyto_url, 
+                             app_token = "W9415mnsAvoMWDUDhDoxwvrCR") %>% 
     rename(total_abundance = total_abundance_particles, 
            total_biovolume = total_biovolume_mm_3_l) %>% 
     select(locator:total_biovolume)
