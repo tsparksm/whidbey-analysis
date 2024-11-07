@@ -2,7 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(rtide)
 
-yoi <- 2023
+yoi <- 2024
 
 #### Load Socrata data and combine ####
 surf_data <- load_penncovesurf() %>% 
@@ -16,7 +16,7 @@ discrete_data <- load_whidbey_discrete()
 ctd_data <- load_CTD("PENNCOVEENT")
 
 #### Figure: year of DO, top vs bottom ####
-yoi <- 2023
+yoi <- 2024
 data_to_plot <- combo_data %>% 
   select(DateTime, Oxygen_mgL_bottom, Oxygen_surface) %>% 
   rename(Bottom = Oxygen_mgL_bottom, 
@@ -43,7 +43,7 @@ ggsave(here("figs", "penncove",
        height = 6, width = 10)
 
 #### Figure: year of NO23, top vs bottom ####
-yoi <- 2023
+yoi <- 2024
 data_to_plot <- combo_data %>% 
   select(DateTime, NO3_mgNL_bottom, NO23_surface) %>% 
   rename(Bottom = NO3_mgNL_bottom, 
@@ -60,7 +60,7 @@ ggplot(data = data_to_plot,
   theme_bw() + 
   theme(text = element_text(size = 20)) + 
   geom_point() + 
-  # scale_y_continuous(limits = c(0, 15)) + 
+  scale_y_continuous(limits = c(0, 1)) + 
   scale_color_brewer(palette = "Paired") + 
   labs(x = "", 
        y = "Nitrate+nitrite (mg N/L)", 
@@ -71,7 +71,7 @@ ggsave(here("figs", "penncove",
        height = 6, width = 10)
 
 #### Figure: year of chl, top vs bottom ####
-yoi <- 2023
+yoi <- 2024
 data_to_plot <- combo_data %>% 
   select(DateTime, Chlorophyll_ugL_bottom, Chlorophyll_surface) %>% 
   rename(Bottom = Chlorophyll_ugL_bottom, 
@@ -88,7 +88,7 @@ ggplot(data = data_to_plot,
   theme_bw() + 
   theme(text = element_text(size = 20)) + 
   geom_point() + 
-  # scale_y_continuous(limits = c(0, 15)) + 
+  scale_y_continuous(limits = c(0, 15)) + 
   scale_color_brewer(palette = "Paired") + 
   labs(x = "", 
        y = expression(Chlorophyll~(mu*g/L)), 
