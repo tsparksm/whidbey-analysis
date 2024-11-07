@@ -107,7 +107,8 @@ for (station in unique(data_discrete$Locator)) {
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
            filter(Locator == station,  
-                  ParmId == 14), 
+                  ParmId == 14) %>% 
+           arrange(Year), 
          aes(x = FakeDate, 
              y = Value, 
              shape = Detect, 
@@ -147,17 +148,20 @@ ggplot(
   aes(x = FakeDate, 
       y = Value, 
       shape = Detect, 
-      color = as.factor(Year))
+      color = as.factor(Year), 
+      group = as.factor(Year))
 ) + 
+  geom_smooth(se = FALSE) + 
   geom_point(size = 5) + 
   theme_bw() + 
   theme(text = element_text(size = 16)) + 
-  scale_shape_manual(values = c("TRUE" = 16, 
-                                "FALSE" = 1)) + 
+  scale_shape_manual(values = c("TRUE" = 16,
+                                "FALSE" = 1)) +
   labs(x = "", 
        y = "Nitrate + nitrite N (mg/L)", 
        color = "", 
-       title = "Penn Cove - surface") + 
+       title = "Penn Cove - surface", 
+       shape = "Detected?") + 
   scale_x_datetime(date_breaks = "1 month", 
                date_labels = "%b") + 
   scale_color_viridis_d(end = 0.9, direction = -1)
@@ -168,7 +172,7 @@ ggsave(here("figs", "penncovesurfaceN.png"),
 #### Figure - nitrate + chl bottle ####
 station <- "PSUSANBUOY"
 title <- "Pt. Susan buoy - surface"
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_discrete %>% 
   filter(ParmId %in% c(1, 14), 
@@ -188,7 +192,7 @@ ggplot(data = data_to_plot,
   facet_wrap(~ Name, scales = "free_y") + 
   geom_point() + 
   scale_color_manual(values = c("TRUE" = "black", "FALSE" = "gray"), 
-                     labels = c("TRUE" = yoi, "FALSE" = "2022")) + 
+                     labels = c("TRUE" = yoi, "FALSE" = "2022-2023")) + 
   scale_shape_manual(values = c("TRUE" = 16, "FALSE" = 1)) + 
   labs(x = "", y = "", color = "Year", title = title) + 
   scale_x_datetime(date_breaks = "1 month", 
@@ -197,7 +201,7 @@ ggsave(here("figs", station, paste0(yoi, "_chl_NO23.png")),
        dpi = 600, height = 5, width = 8)
 
 #### Figure - N and P bottle for a single deep station, year ####
-yoi <- 2023
+yoi <- 2024
 stations <- c("PENNCOVEENT")
 for (station in stations) {
   ggplot(data = data_discrete %>% 
@@ -290,7 +294,7 @@ for (station in unique(data_discrete$Locator)) {
 
 #### Figure - phosphate bottle highlight year ####
 for (station in unique(data_discrete$Locator)) {
-  ggplot(data = bottle_data %>% 
+  ggplot(data = data_discrete %>% 
            filter(Locator == station,  
                   ParmId == 15), 
          aes(x = FakeDate, 
@@ -304,7 +308,7 @@ for (station in unique(data_discrete$Locator)) {
     scale_color_manual(values = c("TRUE" = "black", 
                                   "FALSE" = "gray"), 
                        labels = c("TRUE" = yoi, 
-                                  "FALSE" = paste(min(bottle_data$Year), 
+                                  "FALSE" = paste(min(data_discrete$Year), 
                                                   yoi-1, 
                                                   sep = "-"))) + 
     scale_shape_manual(values = c("TRUE" = 16, 
@@ -321,7 +325,7 @@ for (station in unique(data_discrete$Locator)) {
          height = 5, width = 8)
 }
 #### Figure - silica bottle highlight year ####
-yoi <- 2023
+yoi <- 2024
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
            filter(Locator == station,  
@@ -377,12 +381,14 @@ for (station in unique(data_discrete$Locator)) {
 }
 
 #### Figure - chl CTD profiles by station, year ####
-yoi <- 2022
+yoi <- 2024
 for (station in unique(data_ctd$Locator)) {
-  ggplot(data = data_ctd %>% 
-           filter(Locator == station, 
-                  Depth <= 50, 
-                  year(Date) == yoi)) + 
+  data_to_plot <- data_ctd %>% 
+    filter(Locator == station, 
+           Depth <= 50, 
+           year(Date) == yoi)
+  if (nrow(data_to_plot) == 0) next
+  ggplot(data = data_to_plot) + 
     theme_bw() + 
     geom_line(aes(x = Depth, y = Chlorophyll)) + 
     coord_flip() + 
@@ -442,7 +448,7 @@ ggsave(here("figs", paste0(yoi, "_50m_int_chl.png")),
        dpi = 600, height = 4, width = 6)
 
 #### Figure - integrated chl by year - deep stations basin comparison ####
-yoi <- 2023
+yoi <- 2024
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2")
 
@@ -474,7 +480,7 @@ ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep.png")),
        dpi = 600, height = 4, width = 6)
 
 
-yoi <- 2023
+yoi <- 2024
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2", 
               "KSBP01", "JSUR01", "NSEX01", "LSEP01", "LSNT01")
@@ -540,7 +546,7 @@ ggsave(here("figs", "whidbey_int_chl.png"),
        dpi = 600, height = 5, width = 8)
   
 #### Figure - minimum DO, single year ####
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_ctd %>% 
   filter(Year == yoi, 
@@ -575,7 +581,7 @@ ggsave(here("figs", paste0(yoi, "_min_DO.png")),
        dpi = 600, height = 6, width = 11)
 
 #### Figure - minimum DO, all years ####
-yoi <- 2023
+yoi <- 2024
 
 data_to_plot <- data_ctd %>% 
   filter(Locator != "PENNCOVEPNN001", 
@@ -591,7 +597,7 @@ ggplot(data = data_to_plot,
            color = year(Date) == yoi)) + 
   theme_bw() + 
   theme(legend.position = "none") + 
-  geom_point() + 
+  geom_point(size = 3) + 
   facet_wrap(~ Locator, 
              ncol = 5) + 
   labs(x = "", 
