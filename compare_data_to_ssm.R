@@ -121,7 +121,7 @@ for (station in unique(locator_info$Locator)) {
   }
 }
 
-#### Figure - CTD vs SSM DO and N; one station, few months ####
+#### Figure - CTD vs SSM DO and N; 1 station, 2 months ####
 station <- "PENNCOVEENT"
 months <- c(3, 9)
 
@@ -188,7 +188,158 @@ ggsave(here("figs", "ssm",
                    ".png")), 
        dpi = 600, height = 6, width = 6)
 
-#### Penn Cove minimum DO by year
+#### Figure - CTD vs SSM DO and N; 1 station, 2 months, 1 year ####
+station <- "PENNCOVEENT"
+months <- c(3, 9)
+yoi <- 2024
+
+p1 <- ggplot(data = data_combined_ctd %>% 
+               filter(Locator == station, 
+                      Month %in% months, 
+                      Year == yoi | Type == "SSM") %>% 
+               mutate(Month = month.name[Month])) + 
+  theme_bw() + 
+  geom_ribbon(aes(x = Depth, 
+                  ymin = DO_min, 
+                  ymax = DO_max, 
+                  group = Type), 
+              fill = "light gray") + 
+  facet_wrap(~ Month) + 
+  geom_line(aes(x = Depth, 
+                y = DO, 
+                color = Type, 
+                group = Date)) + 
+  geom_point(aes(x = Depth, 
+                 y = DO, 
+                 shape = Type), 
+             color = "dark gray") + 
+  scale_shape_manual(values = c(NA, 16)) + 
+  scale_color_manual(values = c("black", "dark gray")) + 
+  coord_flip() + 
+  scale_x_reverse(expand = c(0, 0)) + 
+  labs(x = "Depth (m)", 
+       y = "DO (mg/L)", 
+       color = "", 
+       shape = "")
+
+p2 <- ggplot(data = data_combined_ctd %>% 
+               filter(Locator == station, 
+                      Month %in% months, 
+                      Year == yoi | Type == "SSM") %>% 
+               mutate(Month = month.name[Month])) + 
+  theme_bw() + 
+  geom_ribbon(aes(x = Depth, 
+                  ymin = NO23_min, 
+                  ymax = NO23_max, 
+                  group = Type), 
+              fill = "light gray") + 
+  facet_wrap(~ Month) + 
+  geom_line(aes(x = Depth, 
+                y = NO23, 
+                color = Type, 
+                group = Date)) + 
+  geom_point(aes(x = Depth, 
+                 y = NO23, 
+                 shape = Type), 
+             color = "dark gray") + 
+  scale_shape_manual(values = c(NA, 16)) + 
+  scale_color_manual(values = c("black", "dark gray")) + 
+  coord_flip() + 
+  scale_x_reverse(expand = c(0, 0)) + 
+  labs(x = "Depth (m)", 
+       y = "Nitrate + nitrite (mg N/L)", 
+       color = "", 
+       shape = "")
+
+p1 / p2 + plot_layout(guides = "collect")
+ggsave(here("figs", "ssm", 
+            paste0(station, "_", 
+                   paste(months, collapse = "_"), "_", 
+                   yoi, 
+                   ".png")), 
+       dpi = 600, height = 6, width = 6)
+
+#### Figure - CTD vs SSM DO; 1 station, 2 months ####
+station <- "PENNCOVEENT"
+months <- c(3, 9)
+
+ggplot(data = data_combined_ctd %>% 
+               filter(Locator == station, 
+                      Month %in% months) %>% 
+               mutate(Month = month.name[Month])) + 
+  theme_bw() + 
+  geom_ribbon(aes(x = Depth, 
+                  ymin = DO_min, 
+                  ymax = DO_max, 
+                  group = Type), 
+              fill = "light gray") + 
+  facet_wrap(~ Month) + 
+  geom_line(aes(x = Depth, 
+                y = DO, 
+                color = Type, 
+                group = Date)) + 
+  geom_point(aes(x = Depth, 
+                 y = DO, 
+                 shape = Type), 
+             color = "dark gray") + 
+  scale_shape_manual(values = c(NA, 16)) + 
+  scale_color_manual(values = c("black", "dark gray")) + 
+  coord_flip() + 
+  scale_x_reverse(expand = c(0, 0)) + 
+  labs(x = "Depth (m)", 
+       y = "DO (mg/L)", 
+       color = "", 
+       shape = "")
+
+ggsave(here("figs", "ssm", 
+            paste0(station, "_DO_", 
+                   paste(months, collapse = "_"), 
+                   ".png")), 
+       dpi = 600, height = 4, width = 6)
+
+#### Figure - CTD vs SSM DO; 1 station, 2 months, 1 year ####
+station <- "PENNCOVEENT"
+months <- c(3, 9)
+yoi <- 2024
+
+ggplot(data = data_combined_ctd %>% 
+               filter(Locator == station, 
+                      Month %in% months, 
+                      Year == yoi | Type == "SSM") %>% 
+               mutate(Month = month.name[Month])) + 
+  theme_bw() + 
+  geom_ribbon(aes(x = Depth, 
+                  ymin = DO_min, 
+                  ymax = DO_max, 
+                  group = Type), 
+              fill = "light gray") + 
+  facet_wrap(~ Month) + 
+  geom_line(aes(x = Depth, 
+                y = DO, 
+                color = Type, 
+                group = Date)) + 
+  geom_point(aes(x = Depth, 
+                 y = DO, 
+                 shape = Type), 
+             color = "dark gray") + 
+  scale_shape_manual(values = c(NA, 16)) + 
+  scale_color_manual(values = c("black", "dark gray")) + 
+  coord_flip() + 
+  scale_x_reverse(expand = c(0, 0)) + 
+  labs(x = "Depth (m)", 
+       y = "DO (mg/L)", 
+       color = "", 
+       shape = "")
+
+ggsave(here("figs", "ssm", 
+            paste0(station, "_DO_", 
+                   paste(months, collapse = "_"), "_", 
+                   yoi, 
+                   ".png")), 
+       dpi = 600, height = 4, width = 6)
+
+#### Figure - Penn Cove minimum DO by year #### 
+# TO DO
 data_to_plot <- data_ssm %>% 
   filter(Locator == "PENNCOVEENT") %>% 
   group_by()
