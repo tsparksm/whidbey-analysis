@@ -44,7 +44,9 @@ load_hydrosphere_coupeville <- function(fpath) {
 # Date format should be "YYYY-MM-DD"
 # Time format should be "HH:MM" in 24 hr clock
 process_socrata_coupeville <- function(start_date, 
-                                       start_time) {
+                                       start_time, 
+                                       end_date, 
+                                       end_time) {
   raw_data <- load_hydrosphere_coupeville() %>% 
     mutate(DateTime = as.POSIXct(paste(Date, Time), 
                                  tz = "UTC"), 
@@ -56,8 +58,16 @@ process_socrata_coupeville <- function(start_date,
              Date == start_date & 
              Time >= as_hms(paste0(start_time, ":00")))
   
+  if (!is.na(end_date)) {
+    raw_data <- raw_data %>% 
+      filter(Date < end_date | 
+               Date == end_date & 
+               Time <= as_hms(paste0(end_time, ":00")))
+  }
+  
   fpath <- here("data", "socrata", paste0("coupeville_socrata_", 
-                                          Sys.Date(), 
+                                          start_date, "_",
+                                          end_date,
                                           ".csv"))
   
   write_csv(raw_data, 
@@ -69,7 +79,16 @@ start_dt <- dlg_input("Start datetime? (YYYY-MM-DD HH:MM)")$res
 start_time <- str_sub(start_dt, 12, 16)
 start_date <- str_sub(start_dt, 1, 10)
 
-process_socrata_coupeville(start_date, start_time)
+end_dt <- dlg_input("(Optional) end datetime? (YYYY-MM-DD HH:MM) Cancel if none", default = "")$res
+if (is_empty(end_dt)) {
+  end_time <- NA
+  end_date <- NA
+} else {
+  end_time <- str_sub(end_dt, 12, 16)
+  end_date <- str_sub(end_dt, 1, 10)
+}
+
+process_socrata_coupeville(start_date, start_time, end_date, end_time)
 
 #### Initial Hydrosphere download ####
 fpath <- here("data", "raw", "Initial Hydrosphere download", 
