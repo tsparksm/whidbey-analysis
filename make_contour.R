@@ -233,7 +233,7 @@ if (all_stations_fig) {
                filter(Year %in% years[1]:years[2], 
                       Locator == station)) + 
         theme_classic() + 
-        facet_wrap(~factor(Year, levels = unique(temp$Year)), 
+        facet_wrap(~factor(Year, levels = years[1]:years[2]), 
                    ncol = 1, 
                    scales = "free_y") + 
         metR::geom_contour_fill(aes(x = FakeYearDay, 
@@ -470,7 +470,7 @@ if (all_stations_fig) {
                filter(Year %in% years[1]:years[2], 
                       Locator == station)) + 
         theme_classic() + 
-        facet_wrap(~factor(Year, levels = unique(temp$Year)), 
+        facet_wrap(~factor(Year, levels = years[1]:years[2]), 
                    ncol = 1, 
                    scales = "free_y") + 
         metR::geom_contour_fill(aes(x = FakeYearDay, 
@@ -857,8 +857,9 @@ if (all_stations_fig) {
 }
   
 #### Salinity contour plot ####
-# if (exists("min_lim")) rm(min_lim)
+if (exists("min_lim")) rm(min_lim)
 # min_lim <- 15
+set_min <- exists("min_lim")
 
 data_to_plot <- data_remix %>% 
   filter(Locator %in% stations, 
@@ -869,13 +870,12 @@ data_to_plot <- data_remix %>%
   arrange(desc(Year))
 
 if (all_stations_fig) {
-  if (exists("min_lim")) {
+  if (set_min) {
     data_to_plot <- data_to_plot %>% 
       mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
   } else {
     min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
                          accurac = acc_S, f = floor)
-    set_min <- FALSE
   }
   
   max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
@@ -940,13 +940,12 @@ if (all_stations_fig) {
     temp <- data_to_plot %>% 
       filter(Locator == station)
     
-    if (exists("min_lim")) {
+    if (set_min) {
       temp <- temp %>% 
         mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
     } else {
       min_lim <- round_any(min(temp$Salinity, na.rm = TRUE), 
                            accurac = acc_S, f = floor)
-      set_min <- FALSE
     }
     
     max_lim <- round_any(max(temp$Salinity, na.rm = TRUE), 
@@ -1011,6 +1010,7 @@ if (all_stations_fig) {
 max_depth <- 20
 if (exists("min_lim")) rm(min_lim)
 # min_lim <- 15
+set_min <- exists("min_lim")
 
 data_to_plot <- data_remix %>% 
   filter(Locator %in% stations, 
@@ -1022,13 +1022,12 @@ data_to_plot <- data_remix %>%
   arrange(desc(Year))
 
 if (all_stations_fig) {
-  if (exists("min_lim")) {
+  if (set_min) {
     data_to_plot <- data_to_plot %>% 
       mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
   } else {
     min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
                          accurac = acc_S, f = floor)
-    set_min <- FALSE
   }
   
   max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
@@ -1093,13 +1092,12 @@ if (all_stations_fig) {
     temp <- data_to_plot %>% 
       filter(Locator == station)
     
-    if (exists("min_lim")) {
+    if (set_min) {
       temp <- data_to_plot %>% 
         mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
     } else {
       min_lim <- round_any(min(temp$Salinity, na.rm = TRUE), 
                            accurac = acc_S, f = floor)
-      set_min <- FALSE
     }
     
     max_lim <- round_any(max(temp$Salinity, na.rm = TRUE), 
