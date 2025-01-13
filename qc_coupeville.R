@@ -68,4 +68,18 @@ p <- ggplot(data_to_plot,
   theme_bw()
 ggplotly(p)
 
+#### FIGURE - oxygen ####
+start_date <- as.Date("2024-12-01")
+end_date <- as.Date("2025-01-01")
+
+data_to_plot <- comb_data %>% 
+  filter(between(Date, start_date, end_date))
+
+p <- ggplot(data_to_plot, 
+            aes(x = DateTime, 
+                y = Oxygen)) + 
+  geom_point(aes(), 
+             size = 0.2) + 
+  theme_bw()
+ggplotly(p)
 
