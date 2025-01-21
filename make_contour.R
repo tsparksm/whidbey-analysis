@@ -741,78 +741,22 @@ data_to_plot <- data_remix %>%
   ungroup() %>% 
   arrange(desc(Year))
 
+# Calculate whole dataset limits - will be overwritten as needed later
+min_lim <- round_any(min(data_to_plot$Temperature, na.rm = T),
+                     accuracy = acc_T, f = floor)
+max_lim <- round_any(max(data_to_plot$Temperature, na.rm = T),
+                     accuracy = acc_T, f = ceiling)
+mybreaks <- seq(min_lim, max_lim, by = acc_T)
+mylabels <- mybreaks
+mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
+
 if (all_stations_fig) {
-  
-  min_lim <- round_any(min(data_to_plot$Temperature, na.rm = T),
-                       accuracy = acc_T, f = floor)
-  max_lim <- round_any(max(data_to_plot$Temperature, na.rm = T),
-                       accuracy = acc_T, f = ceiling)
-  mybreaks <- seq(min_lim, max_lim, by = acc_T)
-  mylabels <- mybreaks
-  mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-  
-  ggplot(data = data_to_plot) + 
-    theme_classic() + 
-    facet_wrap(~ Locator, 
-               ncol = 1, 
-               scales = "free_y") + 
-    metR::geom_contour_fill(aes(x = FakeYearDay, 
-                                y = BinDepth, 
-                                z = Temperature), 
-                            na.fill = TRUE, 
-                            breaks = mybreaks) + 
-    scale_fill_cmocean(name = "thermal", 
-                       breaks = mybreaks, 
-                       limits = c(min_lim, max_lim), 
-                       labels = mylabels, 
-                       guide = guide_colorbar(show.limits = T, ticks = F)) + 
-    scale_y_reverse(expand = c(0, 0)) + 
-    coord_cartesian(xlim = c(0, 366)) + 
-    scale_x_continuous(expand = c(0, 0), 
-                       breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                  yday(paste(yoi, "-02-01", sep = "")), 
-                                  yday(paste(yoi, "-03-01", sep = "")), 
-                                  yday(paste(yoi, "-04-01", sep = "")), 
-                                  yday(paste(yoi, "-05-01", sep = "")), 
-                                  yday(paste(yoi, "-06-01", sep = "")), 
-                                  yday(paste(yoi, "-07-01", sep = "")), 
-                                  yday(paste(yoi, "-08-01", sep = "")), 
-                                  yday(paste(yoi, "-09-01", sep = "")), 
-                                  yday(paste(yoi, "-10-01", sep = "")), 
-                                  yday(paste(yoi, "-11-01", sep = "")), 
-                                  yday(paste(yoi, "-12-01", sep = ""))), 
-                       labels = month.abb) + 
-    geom_vline(aes(xintercept = FakeYearDay), 
-               alpha = 0.2) + 
-    labs(x = "", 
-         y = "Depth (m)", 
-         fill = expression( degree*C), 
-         title = ("Temperature")) + 
-    guides(fill = guide_colorbar(ticks.colour = NA))
-  ggsave(here("figs", "contour", "T", 
-              paste0(paste(stations, collapse = "_"), 
-                     "_T_", 
-                     years[1], "_", years[2], 
-                     ".png")), 
-         height = h*length(stations), 
-         width = w, 
-         dpi = 600)
-} else {
-  for (station in stations) {
-    temp <- data_to_plot %>% filter(Locator == station)
-    
-    min_lim <- round_any(min(temp$Temperature, na.rm = T),
-                         accuracy = acc_T, f = floor)
-    max_lim <- round_any(max(temp$Temperature, na.rm = T),
-                         accuracy = acc_T, f = ceiling)
-    mybreaks <- seq(min_lim, max_lim, by = acc_T)
-    mylabels <- mybreaks
-    mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-    
-    ggplot(data = temp) + 
+  if (all_years_fig) { 
+    p <- ggplot(data = data_to_plot) + 
       theme_classic() + 
-      facet_wrap(~factor(Year, levels = unique(temp$Year)), 
-                 ncol = 1) + 
+      facet_grid(rows = vars(Locator), 
+                 cols = vars(Year), 
+                 scales = "free_y") + 
       metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
                                   z = Temperature), 
