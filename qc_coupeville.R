@@ -184,24 +184,33 @@ p <- ggplot(data_to_plot,
 ggplotly(p)
 
 #### FIGURE - temperature ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+start_date <- as.Date("2023-12-01")
+end_date <- as.Date("2024-03-01")
 
 data_to_plot <- comb_data %>% 
   filter(between(Date, start_date, end_date))
 
-p <- ggplot(data_to_plot, 
-            aes(x = DateTime, 
-                y = Temperature, 
-                color = as.factor(Temperature_final))) + 
-  geom_point(size = 0.2) + 
+bottle_data_tp <- bottle_data %>% 
+  filter(between(CollectDate, start_date, end_date), 
+         ParmId == 22)
+
+p <- ggplot(data_to_plot) + 
+  geom_point(size = 0.2, 
+             aes(x = DateTime, 
+                 y = Temperature, 
+                 color = as.factor(Temperature_final))) + 
   scale_color_manual(values = c("1" = "black", 
                                 "2" = "orange", 
                                 "3" = "red")) + 
   labs(x = "", 
        y = "Temperature (\u00B0C)") + 
   theme_bw() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none") + 
+  geom_point(data = bottle_data_tp, 
+             aes(x = CollectDateTime, 
+                 y = Value), 
+             color = "blue", 
+             shape = 8)
 ggplotly(p)
 
 #### FIGURE - salinity ####
