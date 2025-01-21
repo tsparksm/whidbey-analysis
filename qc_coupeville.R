@@ -316,8 +316,13 @@ data_to_plot <- comb_data %>%
 
 p <- ggplot(data_to_plot, 
             aes(x = DateTime, 
-                y = NO23)) + 
-  geom_point(aes(), 
-             size = 0.2) + 
-  theme_bw()
+                y = NO23, 
+                color = as.factor(NO23_final))) + 
+  geom_point(size = 0.2) + 
+  scale_color_manual(values = c("1" = "black", 
+                                "2" = "orange", 
+                                "3" = "red")) + 
+  theme_bw() + 
+  theme(legend.position = "none") + 
+  labs(x = "", y = "NO23 (mg N/L)")
 ggplotly(p)
