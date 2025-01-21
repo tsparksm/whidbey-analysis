@@ -2,6 +2,8 @@
 source(here::here("src", "utility_functions.R"))
 library(rtide)
 library(plotly)
+library(zoo)
+library(readxl)
 
 #### Load data ####
 # Remember to update file via Socrata download first!
