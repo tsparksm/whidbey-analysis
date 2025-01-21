@@ -191,10 +191,16 @@ data_to_plot <- comb_data %>%
 
 p <- ggplot(data_to_plot, 
             aes(x = DateTime, 
-                y = Temperature)) + 
-  geom_point(aes(), 
-             size = 0.2) + 
-  theme_bw()
+                y = Temperature, 
+                color = as.factor(Temperature_final))) + 
+  geom_point(size = 0.2) + 
+  scale_color_manual(values = c("1" = "black", 
+                                "2" = "orange", 
+                                "3" = "red")) + 
+  labs(x = "", 
+       y = "Temperature (\u00B0C)") + 
+  theme_bw() + 
+  theme(legend.position = "none")
 ggplotly(p)
 
 #### FIGURE - salinity ####
