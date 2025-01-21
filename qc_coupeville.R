@@ -188,7 +188,8 @@ start_date <- as.Date("2023-12-01")
 end_date <- as.Date("2024-03-01")
 
 data_to_plot <- comb_data %>% 
-  filter(between(Date, start_date, end_date))
+  filter(between(Date, start_date, end_date)) %>% 
+  mutate(Quality = as.factor(Temperature_final))
 
 bottle_data_tp <- bottle_data %>% 
   filter(between(CollectDate, start_date, end_date), 
@@ -198,7 +199,7 @@ p <- ggplot(data_to_plot) +
   geom_point(size = 0.2, 
              aes(x = DateTime, 
                  y = Temperature, 
-                 color = as.factor(Temperature_final))) + 
+                 color = Quality)) + 
   scale_color_manual(values = c("1" = "black", 
                                 "2" = "orange", 
                                 "3" = "red")) + 
