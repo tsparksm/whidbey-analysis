@@ -248,7 +248,13 @@ download_whidbey_discrete <- function() {
                                  "SecchiTrans", 
                                  "Silica", 
                                  "TotalN", 
-                                 "TSS"), 
+                                 "TSS", 
+                                 "ChlorophyllField", 
+                                 "DOField", 
+                                 "SalinityField", 
+                                 "Temperature", 
+                                 "DO", 
+                                 "Salinity"), 
                     fname = fpath)
 }
 
