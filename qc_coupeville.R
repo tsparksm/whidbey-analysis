@@ -171,9 +171,15 @@ p <- ggplot(data_to_plot,
        aes(x = DateTime)) + 
   geom_line(aes(y = TideHeight), 
             color = "gray") + 
-  geom_point(aes(y = Pressure), 
+  geom_point(aes(y = Pressure, 
+                 color = as.factor(Pressure_final)), 
              size = 0.2) + 
-  theme_bw()
+  scale_color_manual(values = c("1" = "black", 
+                                "2" = "orange", 
+                                "3" = "red")) + 
+  theme_bw() + 
+  theme(legend.position = "none") + 
+  labs(x = "", y = "Pressure (db) / Tide height (m)")
 ggplotly(p)
 
 #### FIGURE - temperature ####
