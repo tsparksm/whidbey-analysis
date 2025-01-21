@@ -1415,15 +1415,83 @@ if (all_stations_fig) {
       labs(x = "", 
            y = "Depth (m)", 
            fill = "mg/L", 
-           title = paste(station, "NO23"))
-    ggsave(here("figs", "contour", "NO23", station, 
-                paste0(station, 
+           title = "NO2+3")
+    ggsave(here("figs", "contour", "NO23", 
+                paste0(paste(stations, collapse = "_"), 
                        "_NO23_", 
                        years[1], "_", years[2], 
                        ".png")), 
-           height = 2*n, 
-           width = 8, 
-           dpi = 600) 
+           height = h*length(stations), 
+           width = w*n, 
+           dpi = 600)
   }
 }
-
+# 
+# } else {
+#   for (station in stations) {
+#     temp <- data_to_plot %>% filter(Locator == station)
+#     
+#     min_lim <- round_any(min(temp$NO23, na.rm = T),
+#                          accuracy = acc_NO23, f = floor)
+#     max_lim <- round_any(max(temp$NO23, na.rm = T),
+#                          accuracy = acc_NO23, f = ceiling)
+#     mybreaks <- seq(min_lim, max_lim, by = acc_NO23)
+#     mylabels <- mybreaks
+#     mylabels[!(round(mylabels, 2) == round(round(mylabels, 1), 2))] <- ""
+#     
+#     ggplot(data = temp) + 
+#       theme_classic() + 
+#       facet_wrap(~ Year, 
+#                  ncol = 1) + 
+#       metR::geom_contour2(aes(x = FakeYearDay, y = BinDepth, z = NO23), 
+#                           na.fill = T, breaks = 0.034, color = "red") + 
+#       metR::geom_contour_fill(aes(x = FakeYearDay, 
+#                                   y = BinDepth, 
+#                                   z = NO23), 
+#                               na.fill = TRUE, 
+#                               breaks = mybreaks) + 
+#       # scale_fill_cmocean(name = "solar", 
+#       #                    breaks = mybreaks, 
+#       #                    limits = c(min_lim, max_lim), 
+#       #                    labels = mylabels, 
+#       #                    guide = guide_colorbar(show.limits = T, ticks = F), 
+#       #                    direction = -1) +
+#       scale_fill_craftfermenter(
+#         breaks = mybreaks, 
+#         palette = "YlOrRd", 
+#         direction = 1, 
+#         limits = c(min_lim, max_lim), 
+#         labels = mylabels, 
+#         guide = guide_colorbar(show.limits = T, ticks = F)) + 
+#       scale_y_reverse(expand = c(0, 0)) + 
+#       coord_cartesian(xlim = c(0, 366)) + 
+#       scale_x_continuous(expand = c(0, 0), 
+#                          breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+#                                     yday(paste(yoi, "-02-01", sep = "")), 
+#                                     yday(paste(yoi, "-03-01", sep = "")), 
+#                                     yday(paste(yoi, "-04-01", sep = "")), 
+#                                     yday(paste(yoi, "-05-01", sep = "")), 
+#                                     yday(paste(yoi, "-06-01", sep = "")), 
+#                                     yday(paste(yoi, "-07-01", sep = "")), 
+#                                     yday(paste(yoi, "-08-01", sep = "")), 
+#                                     yday(paste(yoi, "-09-01", sep = "")), 
+#                                     yday(paste(yoi, "-10-01", sep = "")), 
+#                                     yday(paste(yoi, "-11-01", sep = "")), 
+#                                     yday(paste(yoi, "-12-01", sep = ""))), 
+#                          labels = month.abb) + 
+#       geom_vline(aes(xintercept = FakeYearDay), 
+#                  alpha = 0.2) + 
+#       labs(x = "", 
+#            y = "Depth (m)", 
+#            fill = "mg/L", 
+#            title = paste(station, "NO23"))
+#     ggsave(here("figs", "contour", "NO23", station, 
+#                 paste0(station, 
+#                        "_NO23_", 
+#                        years[1], "_", years[2], 
+#                        ".png")), 
+#            height = 2*n, 
+#            width = 8, 
+#            dpi = 600) 
+#   }
+# }
