@@ -51,7 +51,7 @@ acc_S <- 0.1  # salinity; 0.1
 acc_T_anom <- 0.05  # temperature anomaly; 0.05
 acc_T <- 0.2  # temperature; 0.2
 acc_sigmaT <- 0.2  # sigma-theta density; 0.2
-acc_NO23 <- 0.05
+acc_NO23 <- 0.01
 
 # Set figure sizes
 h <- 2.5
