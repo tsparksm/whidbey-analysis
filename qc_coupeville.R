@@ -12,7 +12,8 @@ raw_data <- load_coupeville()
 # Remember to update discrete data first!
 # download_whidbey_discrete()
 bottle_data <- load_whidbey_discrete() %>% 
-  filter(Locator == "PENNCOVECW")
+  filter(Locator == "PENNCOVECW", 
+         Depth > 1.1)
 
 ctd_data <- load_CTD("PENNCOVECW")
 
