@@ -22,7 +22,6 @@ tide_data <- tide_height(stations = "Seattle",
                          from = min(raw_data$Date) - 1, 
                          to = max(raw_data$Date) + 1, 
                          tz = "Etc/GMT-8")
-comb_data <- left_join(raw_data, tide_data %>% select(-Station))
 
 #### QC auto - gross + site range ####
 qc_data <- raw_data %>% 
@@ -158,6 +157,8 @@ qc_final <- qc_data %>%
 
 write_csv(qc_final, 
           here("data", "coupeville_qc.csv"))
+
+comb_data <- left_join(qc_final, tide_data %>% select(-Station))
 
 #### FIGURE - pressure ####
 start_date <- as.Date("2023-12-01")
