@@ -358,21 +358,31 @@ ggplotly(p)
 
 
 #### FIGURE - NO23 ####
-start_date <- as.Date("2023-11-01")
-end_date <- as.Date("2023-12-01")
+start_date <- as.Date("2023-12-01")
+end_date <- as.Date("2024-03-01")
 
 data_to_plot <- comb_data %>% 
-  filter(between(Date, start_date, end_date))
+  filter(between(Date, start_date, end_date)) %>% 
+  mutate(Quality = as.factor(NO23_final))
 
-p <- ggplot(data_to_plot, 
-            aes(x = DateTime, 
-                y = NO23, 
-                color = as.factor(NO23_final))) + 
-  geom_point(size = 0.2) + 
+bottle_data_tp <- bottle_data %>% 
+  filter(between(CollectDate, start_date, end_date), 
+         ParmId == 14) 
+
+p <- ggplot(data_to_plot) + 
+  geom_point(size = 0.2, 
+             aes(x = DateTime, 
+                 y = NO23, 
+                 color = Quality)) + 
   scale_color_manual(values = c("1" = "black", 
                                 "2" = "orange", 
                                 "3" = "red")) + 
   theme_bw() + 
   theme(legend.position = "none") + 
-  labs(x = "", y = "NO23 (mg N/L)")
+  labs(x = "", y = "NO23 (mg N/L)") + 
+  geom_point(data = bottle_data_tp, 
+             aes(x = CollectDateTime, 
+                 y = Value), 
+             color = "blue", 
+             shape = 8)
 ggplotly(p)
