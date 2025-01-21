@@ -984,22 +984,160 @@ if (all_stations_fig) {
       labs(x = "", 
            y = "Depth (m)", 
            fill = "PSU", 
-           title = paste(station, "salinity")) + 
+           title = "Salinity") + 
       guides(fill = guide_colorbar(ticks.colour = NA))
-    ggsave(here("figs", "contour", "S", station, 
-                paste0(station, "_S_", 
+    ggsave(here("figs", "contour", "S", 
+                paste0(paste(stations, collapse = "_"), 
+                       "_S_", 
                        years[1], "_", years[2], 
                        ".png")), 
-           height = h*n, 
-           width = w, 
+           height = h*length(stations), 
+           width = w*n, 
            dpi = 600)
   }
 }
+  
+  
+#   if (set_min) {
+#     data_to_plot <- data_to_plot %>% 
+#       mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+#   } else {
+#     min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
+#                          accurac = acc_S, f = floor)
+#   }
+#   
+#   max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
+#                        accuracy = acc_S, f = ceiling)
+#   mybreaks <- seq(min_lim, max_lim, by = acc_S)
+#   mylabels <- mybreaks
+#   mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+#   if (set_min) {
+#     mylabels[1] <- paste0("<", min_lim)
+#   }
+#   
+#   ggplot(data = data_to_plot) + 
+#     theme_classic() + 
+#     facet_wrap(~ Locator, 
+#                ncol = 1, 
+#                scales = "free_y") + 
+#     metR::geom_contour_fill(aes(x = FakeYearDay, 
+#                                 y = BinDepth, 
+#                                 z = Salinity), 
+#                             na.fill = TRUE, 
+#                             breaks = mybreaks) + 
+#     scale_fill_cmocean(name = "haline", 
+#                        breaks = mybreaks, 
+#                        limits = c(min_lim, max_lim), 
+#                        labels = mylabels, 
+#                        guide = guide_colorbar(show.limits = T, 
+#                                               ticks = F, 
+#                                               reverse = T)) + 
+#     scale_y_reverse(expand = c(0, 0)) + 
+#     coord_cartesian(xlim = c(0, 366)) + 
+#     scale_x_continuous(expand = c(0, 0), 
+#                        breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+#                                   yday(paste(yoi, "-02-01", sep = "")), 
+#                                   yday(paste(yoi, "-03-01", sep = "")), 
+#                                   yday(paste(yoi, "-04-01", sep = "")), 
+#                                   yday(paste(yoi, "-05-01", sep = "")), 
+#                                   yday(paste(yoi, "-06-01", sep = "")), 
+#                                   yday(paste(yoi, "-07-01", sep = "")), 
+#                                   yday(paste(yoi, "-08-01", sep = "")), 
+#                                   yday(paste(yoi, "-09-01", sep = "")), 
+#                                   yday(paste(yoi, "-10-01", sep = "")), 
+#                                   yday(paste(yoi, "-11-01", sep = "")), 
+#                                   yday(paste(yoi, "-12-01", sep = ""))), 
+#                        labels = month.abb) + 
+#     geom_vline(aes(xintercept = FakeYearDay), 
+#                alpha = 0.2) + 
+#     labs(x = "", 
+#          y = "Depth (m)", 
+#          fill = "PSU", 
+#          title = "Salinity") + 
+#     guides(fill = guide_colorbar(ticks.colour = NA))
+#   ggsave(here("figs", "contour", "S", 
+#               paste0(paste(stations, collapse = "_"), 
+#                      "_S_", 
+#                      years[1], "_", years[2], 
+#                      ".png")), 
+#          height = h*length(stations), 
+#          width = w, 
+#          dpi = 600)
+# } else {
+#   for (station in stations) {
+#     temp <- data_to_plot %>% 
+#       filter(Locator == station)
+#     
+#     if (set_min) {
+#       temp <- temp %>% 
+#         mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+#     } else {
+#       min_lim <- round_any(min(temp$Salinity, na.rm = TRUE), 
+#                            accurac = acc_S, f = floor)
+#     }
+#     
+#     max_lim <- round_any(max(temp$Salinity, na.rm = TRUE), 
+#                          accuracy = acc_S, f = ceiling)
+#     mybreaks <- seq(min_lim, max_lim, by = acc_S)
+#     mylabels <- mybreaks
+#     mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+#     if (set_min) {
+#       mylabels[1] <- paste0("<", min_lim)
+#     }
+#     
+#     ggplot(data = temp) + 
+#       theme_classic() + 
+#       facet_wrap(~factor(Year, levels = unique(temp$Year)), 
+#                  ncol = 1) + 
+#       metR::geom_contour_fill(aes(x = FakeYearDay, 
+#                                   y = BinDepth, 
+#                                   z = Salinity), 
+#                               na.fill = TRUE, 
+#                               breaks = mybreaks) + 
+#       scale_fill_cmocean(name = "haline", 
+#                          breaks = mybreaks, 
+#                          limits = c(min_lim, max_lim), 
+#                          labels = mylabels, 
+#                          guide = guide_colorbar(show.limits = T, 
+#                                                 ticks = F, 
+#                                                 reverse = T)) + 
+#       scale_y_reverse(expand = c(0, 0)) + 
+#       coord_cartesian(xlim = c(0, 366)) + 
+#       scale_x_continuous(expand = c(0, 0), 
+#                          breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+#                                     yday(paste(yoi, "-02-01", sep = "")), 
+#                                     yday(paste(yoi, "-03-01", sep = "")), 
+#                                     yday(paste(yoi, "-04-01", sep = "")), 
+#                                     yday(paste(yoi, "-05-01", sep = "")), 
+#                                     yday(paste(yoi, "-06-01", sep = "")), 
+#                                     yday(paste(yoi, "-07-01", sep = "")), 
+#                                     yday(paste(yoi, "-08-01", sep = "")), 
+#                                     yday(paste(yoi, "-09-01", sep = "")), 
+#                                     yday(paste(yoi, "-10-01", sep = "")), 
+#                                     yday(paste(yoi, "-11-01", sep = "")), 
+#                                     yday(paste(yoi, "-12-01", sep = ""))), 
+#                          labels = month.abb) + 
+#       geom_vline(aes(xintercept = FakeYearDay), 
+#                  alpha = 0.2) + 
+#       labs(x = "", 
+#            y = "Depth (m)", 
+#            fill = "PSU", 
+#            title = paste(station, "salinity")) + 
+#       guides(fill = guide_colorbar(ticks.colour = NA))
+#     ggsave(here("figs", "contour", "S", station, 
+#                 paste0(station, "_S_", 
+#                        years[1], "_", years[2], 
+#                        ".png")), 
+#            height = h*n, 
+#            width = w, 
+#            dpi = 600)
+#   }
+# }
 
 #### Salinity contour plot - surface ####
 max_depth <- 20
 if (exists("min_lim")) rm(min_lim)
-# min_lim <- 15
+min_lim <- 16  # works best with even values
 set_min <- exists("min_lim")
 
 data_to_plot <- data_remix %>% 
@@ -1011,98 +1149,27 @@ data_to_plot <- data_remix %>%
   ungroup() %>% 
   arrange(desc(Year))
 
+# Calculate whole dataset limits - will be overwritten as needed later
+if (!set_min) {
+  min_lim <- round_any(min(data_to_plot$Salinity, na.rm = T),
+                       accuracy = acc_S, f = floor)
+}
+max_lim <- round_any(max(data_to_plot$Salinity, na.rm = T),
+                     accuracy = acc_S, f = ceiling)
+mybreaks <- seq(min_lim, max_lim, by = acc_S)
+mylabels <- mybreaks
+mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
+if (set_min) {
+  mylabels[1] <- paste0("<", min_lim)
+}
+
 if (all_stations_fig) {
-  if (set_min) {
-    data_to_plot <- data_to_plot %>% 
-      mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
-  } else {
-    min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
-                         accurac = acc_S, f = floor)
-  }
-  
-  max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
-                       accuracy = acc_S, f = ceiling)
-  mybreaks <- seq(min_lim, max_lim, by = acc_S)
-  mylabels <- mybreaks
-  mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-  if (set_min) {
-    mylabels[1] <- paste0("<", min_lim)
-  }
-  
-  ggplot(data = data_to_plot) + 
-    theme_classic() + 
-    facet_wrap(~ Locator, 
-               ncol = 1, 
-               scales = "free_y") + 
-    metR::geom_contour_fill(aes(x = FakeYearDay, 
-                                y = BinDepth, 
-                                z = Salinity), 
-                            na.fill = TRUE, 
-                            breaks = mybreaks) + 
-    scale_fill_cmocean(name = "haline", 
-                       breaks = mybreaks, 
-                       limits = c(min_lim, max_lim), 
-                       labels = mylabels, 
-                       guide = guide_colorbar(show.limits = T, 
-                                              ticks = F, 
-                                              reverse = T)) + 
-    scale_y_reverse(expand = c(0, 0)) + 
-    coord_cartesian(xlim = c(0, 366)) + 
-    scale_x_continuous(expand = c(0, 0), 
-                       breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                  yday(paste(yoi, "-02-01", sep = "")), 
-                                  yday(paste(yoi, "-03-01", sep = "")), 
-                                  yday(paste(yoi, "-04-01", sep = "")), 
-                                  yday(paste(yoi, "-05-01", sep = "")), 
-                                  yday(paste(yoi, "-06-01", sep = "")), 
-                                  yday(paste(yoi, "-07-01", sep = "")), 
-                                  yday(paste(yoi, "-08-01", sep = "")), 
-                                  yday(paste(yoi, "-09-01", sep = "")), 
-                                  yday(paste(yoi, "-10-01", sep = "")), 
-                                  yday(paste(yoi, "-11-01", sep = "")), 
-                                  yday(paste(yoi, "-12-01", sep = ""))), 
-                       labels = month.abb) + 
-    geom_vline(aes(xintercept = FakeYearDay), 
-               alpha = 0.2) + 
-    labs(x = "", 
-         y = "Depth (m)", 
-         fill = "PSU", 
-         title = "Surface salinity") + 
-    guides(fill = guide_colorbar(ticks.colour = NA))
-  ggsave(here("figs", "contour", "S", 
-              paste0(paste(stations, collapse = "_"), 
-                     "_surface_S_", 
-                     years[1], "_", years[2], 
-                     ".png")), 
-         height = h*length(stations), 
-         width = w, 
-         dpi = 600)
-} else {
-  for (station in stations) {
-    temp <- data_to_plot %>% 
-      filter(Locator == station)
-    
-    if (set_min) {
-      temp <- data_to_plot %>% 
-        mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
-    } else {
-      min_lim <- round_any(min(temp$Salinity, na.rm = TRUE), 
-                           accurac = acc_S, f = floor)
-    }
-    
-    max_lim <- round_any(max(temp$Salinity, na.rm = TRUE), 
-                         accuracy = acc_S, f = ceiling)
-    mybreaks <- seq(min_lim, max_lim, by = acc_S)
-    mylabels <- mybreaks
-    mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-    if (set_min) {
-      mylabels[1] <- paste0("<", min_lim)
-    }
-      
-    ggplot(data = temp) + 
+  if (all_years_fig) {
+    ggplot(data = data_to_plot) + 
       theme_classic() + 
-      facet_wrap(~factor(Year, levels = unique(temp$Year)), 
-                 ncol = 1) + 
+      facet_grid(rows = vars(Locator), 
+                 cols = vars(Year), 
+                 scales = "free_y") + 
       metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
                                   z = Salinity), 
@@ -1136,17 +1203,156 @@ if (all_stations_fig) {
       labs(x = "", 
            y = "Depth (m)", 
            fill = "PSU", 
-           title = paste(station, "surface salinity")) + 
+           title = "Surface salinity") + 
       guides(fill = guide_colorbar(ticks.colour = NA))
-    ggsave(here("figs", "contour", "S", station, 
-                paste0(station, "_surface_S_", 
+    ggsave(here("figs", "contour", "S", 
+                paste0(paste(stations, collapse = "_"), 
+                       "_surface_S_", 
                        years[1], "_", years[2], 
                        ".png")), 
-           height = h*n, 
-           width = w, 
+           height = h*length(stations), 
+           width = w*n, 
            dpi = 600)
   }
 }
+
+
+# if (all_stations_fig) {
+#   if (set_min) {
+#     data_to_plot <- data_to_plot %>% 
+#       mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+#   } else {
+#     min_lim <- round_any(min(data_to_plot$Salinity, na.rm = TRUE), 
+#                          accurac = acc_S, f = floor)
+#   }
+#   
+#   max_lim <- round_any(max(data_to_plot$Salinity, na.rm = TRUE), 
+#                        accuracy = acc_S, f = ceiling)
+#   mybreaks <- seq(min_lim, max_lim, by = acc_S)
+#   mylabels <- mybreaks
+#   mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+#   if (set_min) {
+#     mylabels[1] <- paste0("<", min_lim)
+#   }
+#   
+#   ggplot(data = data_to_plot) + 
+#     theme_classic() + 
+#     facet_wrap(~ Locator, 
+#                ncol = 1, 
+#                scales = "free_y") + 
+#     metR::geom_contour_fill(aes(x = FakeYearDay, 
+#                                 y = BinDepth, 
+#                                 z = Salinity), 
+#                             na.fill = TRUE, 
+#                             breaks = mybreaks) + 
+#     scale_fill_cmocean(name = "haline", 
+#                        breaks = mybreaks, 
+#                        limits = c(min_lim, max_lim), 
+#                        labels = mylabels, 
+#                        guide = guide_colorbar(show.limits = T, 
+#                                               ticks = F, 
+#                                               reverse = T)) + 
+#     scale_y_reverse(expand = c(0, 0)) + 
+#     coord_cartesian(xlim = c(0, 366)) + 
+#     scale_x_continuous(expand = c(0, 0), 
+#                        breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+#                                   yday(paste(yoi, "-02-01", sep = "")), 
+#                                   yday(paste(yoi, "-03-01", sep = "")), 
+#                                   yday(paste(yoi, "-04-01", sep = "")), 
+#                                   yday(paste(yoi, "-05-01", sep = "")), 
+#                                   yday(paste(yoi, "-06-01", sep = "")), 
+#                                   yday(paste(yoi, "-07-01", sep = "")), 
+#                                   yday(paste(yoi, "-08-01", sep = "")), 
+#                                   yday(paste(yoi, "-09-01", sep = "")), 
+#                                   yday(paste(yoi, "-10-01", sep = "")), 
+#                                   yday(paste(yoi, "-11-01", sep = "")), 
+#                                   yday(paste(yoi, "-12-01", sep = ""))), 
+#                        labels = month.abb) + 
+#     geom_vline(aes(xintercept = FakeYearDay), 
+#                alpha = 0.2) + 
+#     labs(x = "", 
+#          y = "Depth (m)", 
+#          fill = "PSU", 
+#          title = "Surface salinity") + 
+#     guides(fill = guide_colorbar(ticks.colour = NA))
+#   ggsave(here("figs", "contour", "S", 
+#               paste0(paste(stations, collapse = "_"), 
+#                      "_surface_S_", 
+#                      years[1], "_", years[2], 
+#                      ".png")), 
+#          height = h*length(stations), 
+#          width = w, 
+#          dpi = 600)
+# } else {
+#   for (station in stations) {
+#     temp <- data_to_plot %>% 
+#       filter(Locator == station)
+#     
+#     if (set_min) {
+#       temp <- data_to_plot %>% 
+#         mutate(Salinity = ifelse(Salinity < min_lim, min_lim, Salinity))
+#     } else {
+#       min_lim <- round_any(min(temp$Salinity, na.rm = TRUE), 
+#                            accurac = acc_S, f = floor)
+#     }
+#     
+#     max_lim <- round_any(max(temp$Salinity, na.rm = TRUE), 
+#                          accuracy = acc_S, f = ceiling)
+#     mybreaks <- seq(min_lim, max_lim, by = acc_S)
+#     mylabels <- mybreaks
+#     mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
+#     if (set_min) {
+#       mylabels[1] <- paste0("<", min_lim)
+#     }
+#       
+#     ggplot(data = temp) + 
+#       theme_classic() + 
+#       facet_wrap(~factor(Year, levels = unique(temp$Year)), 
+#                  ncol = 1) + 
+#       metR::geom_contour_fill(aes(x = FakeYearDay, 
+#                                   y = BinDepth, 
+#                                   z = Salinity), 
+#                               na.fill = TRUE, 
+#                               breaks = mybreaks) + 
+#       scale_fill_cmocean(name = "haline", 
+#                          breaks = mybreaks, 
+#                          limits = c(min_lim, max_lim), 
+#                          labels = mylabels, 
+#                          guide = guide_colorbar(show.limits = T, 
+#                                                 ticks = F, 
+#                                                 reverse = T)) + 
+#       scale_y_reverse(expand = c(0, 0)) + 
+#       coord_cartesian(xlim = c(0, 366)) + 
+#       scale_x_continuous(expand = c(0, 0), 
+#                          breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
+#                                     yday(paste(yoi, "-02-01", sep = "")), 
+#                                     yday(paste(yoi, "-03-01", sep = "")), 
+#                                     yday(paste(yoi, "-04-01", sep = "")), 
+#                                     yday(paste(yoi, "-05-01", sep = "")), 
+#                                     yday(paste(yoi, "-06-01", sep = "")), 
+#                                     yday(paste(yoi, "-07-01", sep = "")), 
+#                                     yday(paste(yoi, "-08-01", sep = "")), 
+#                                     yday(paste(yoi, "-09-01", sep = "")), 
+#                                     yday(paste(yoi, "-10-01", sep = "")), 
+#                                     yday(paste(yoi, "-11-01", sep = "")), 
+#                                     yday(paste(yoi, "-12-01", sep = ""))), 
+#                          labels = month.abb) + 
+#       geom_vline(aes(xintercept = FakeYearDay), 
+#                  alpha = 0.2) + 
+#       labs(x = "", 
+#            y = "Depth (m)", 
+#            fill = "PSU", 
+#            title = paste(station, "surface salinity")) + 
+#       guides(fill = guide_colorbar(ticks.colour = NA))
+#     ggsave(here("figs", "contour", "S", station, 
+#                 paste0(station, "_surface_S_", 
+#                        years[1], "_", years[2], 
+#                        ".png")), 
+#            height = h*n, 
+#            width = w, 
+#            dpi = 600)
+#   }
+# }
 
 
 #### NO23 contour plot ####
@@ -1157,78 +1363,25 @@ data_to_plot <- data_remix %>%
   summarize(NO23 = mean(NO23, na.rm = TRUE)) %>% 
   ungroup()
 
+# Calculate whole dataset limits - will be overwritten as needed later
+min_lim <- round_any(min(data_to_plot$NO23, na.rm = T),
+                     accuracy = acc_NO23, f = floor)
+max_lim <- round_any(max(data_to_plot$NO23, na.rm = T),
+                     accuracy = acc_NO23, f = ceiling)
+mybreaks <- seq(min_lim, max_lim, by = acc_NO23)
+mylabels <- mybreaks
+mylabels[!(round(mylabels, 2) == round(round(mylabels, 1), 2))] <- ""
+
+
 if (all_stations_fig) {
-  min_lim <- round_any(min(data_to_plot$NO23, na.rm = T),
-                       accuracy = acc_NO23, f = floor)
-  max_lim <- round_any(max(data_to_plot$NO23, na.rm = T),
-                       accuracy = acc_NO23, f = ceiling)
-  mybreaks <- seq(min_lim, max_lim, by = acc_NO23)
-  mylabels <- mybreaks
-  mylabels[!(round(mylabels, 2) == round(round(mylabels, 1), 2))] <- ""
-  
-  ggplot(data = data_to_plot) + 
-    theme_classic() + 
-    facet_wrap(~ Locator, 
-               ncol = 1, 
-               scales = "free_y") + 
-    metR::geom_contour2(aes(x = FakeYearDay, y = BinDepth, z = NO23), 
-                        na.fill = T, breaks = 0.034, color = "red") + 
-    metR::geom_contour_fill(aes(x = FakeYearDay, 
-                                y = BinDepth, 
-                                z = NO23), 
-                            na.fill = TRUE, 
-                            breaks = mybreaks) + 
-    scale_fill_cmocean(name = "solar", 
-                       breaks = mybreaks, 
-                       limits = c(min_lim, max_lim), 
-                       labels = mylabels, 
-                       guide = guide_colorbar(show.limits = T, ticks = F)) + 
-    scale_y_reverse(expand = c(0, 0)) + 
-    coord_cartesian(xlim = c(0, 366)) + 
-    scale_x_continuous(expand = c(0, 0), 
-                       breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                  yday(paste(yoi, "-02-01", sep = "")), 
-                                  yday(paste(yoi, "-03-01", sep = "")), 
-                                  yday(paste(yoi, "-04-01", sep = "")), 
-                                  yday(paste(yoi, "-05-01", sep = "")), 
-                                  yday(paste(yoi, "-06-01", sep = "")), 
-                                  yday(paste(yoi, "-07-01", sep = "")), 
-                                  yday(paste(yoi, "-08-01", sep = "")), 
-                                  yday(paste(yoi, "-09-01", sep = "")), 
-                                  yday(paste(yoi, "-10-01", sep = "")), 
-                                  yday(paste(yoi, "-11-01", sep = "")), 
-                                  yday(paste(yoi, "-12-01", sep = ""))), 
-                       labels = month.abb) + 
-    geom_vline(aes(xintercept = FakeYearDay), 
-               alpha = 0.2) + 
-    labs(x = "", 
-         y = "Depth (m)", 
-         fill = "mg/L", 
-         title = "NO2+3")
-  ggsave(here("figs", "contour", "NO23", 
-              paste0(paste(stations, collapse = "_"), 
-                     "_NO23_", 
-                     years[1], "_", years[2], 
-                     ".png")), 
-         height = 2*length(stations), 
-         width = 8, 
-         dpi = 600)
-} else {
-  for (station in stations) {
-    temp <- data_to_plot %>% filter(Locator == station)
+  if (all_years_fig) {
     
-    min_lim <- round_any(min(temp$NO23, na.rm = T),
-                         accuracy = acc_NO23, f = floor)
-    max_lim <- round_any(max(temp$NO23, na.rm = T),
-                         accuracy = acc_NO23, f = ceiling)
-    mybreaks <- seq(min_lim, max_lim, by = acc_NO23)
-    mylabels <- mybreaks
-    mylabels[!(round(mylabels, 2) == round(round(mylabels, 1), 2))] <- ""
-    
-    ggplot(data = temp) + 
+    ggplot(data = data_to_plot) + 
       theme_classic() + 
-      facet_wrap(~ Year, 
-                 ncol = 1) + 
+      facet_grid(rows = vars(Locator), 
+                 cols = vars(Year), 
+                 scales = "free_y") + 
+      guides(fill = guide_colorbar(ticks.colour = NA)) + 
       metR::geom_contour2(aes(x = FakeYearDay, y = BinDepth, z = NO23), 
                           na.fill = T, breaks = 0.034, color = "red") + 
       metR::geom_contour_fill(aes(x = FakeYearDay, 
@@ -1236,19 +1389,11 @@ if (all_stations_fig) {
                                   z = NO23), 
                               na.fill = TRUE, 
                               breaks = mybreaks) + 
-      # scale_fill_cmocean(name = "solar", 
-      #                    breaks = mybreaks, 
-      #                    limits = c(min_lim, max_lim), 
-      #                    labels = mylabels, 
-      #                    guide = guide_colorbar(show.limits = T, ticks = F), 
-      #                    direction = -1) +
-      scale_fill_craftfermenter(
-        breaks = mybreaks, 
-        palette = "YlOrRd", 
-        direction = 1, 
-        limits = c(min_lim, max_lim), 
-        labels = mylabels, 
-        guide = guide_colorbar(show.limits = T, ticks = F)) + 
+      scale_fill_cmocean(name = "solar", 
+                         breaks = mybreaks, 
+                         limits = c(min_lim, max_lim), 
+                         labels = mylabels, 
+                         guide = guide_colorbar(show.limits = T, ticks = F)) + 
       scale_y_reverse(expand = c(0, 0)) + 
       coord_cartesian(xlim = c(0, 366)) + 
       scale_x_continuous(expand = c(0, 0), 
