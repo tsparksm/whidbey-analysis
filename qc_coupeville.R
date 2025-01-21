@@ -214,24 +214,38 @@ p <- ggplot(data_to_plot) +
 ggplotly(p)
 
 #### FIGURE - salinity ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+start_date <- as.Date("2023-12-01")
+end_date <- as.Date("2024-03-01")
 
 data_to_plot <- comb_data %>% 
-  filter(between(Date, start_date, end_date))
+  filter(between(Date, start_date, end_date)) %>% 
+  mutate(Quality = as.factor(Salinity_final))
 
-p <- ggplot(data_to_plot, 
-            aes(x = DateTime, 
-                y = Salinity, 
-                color = as.factor(Salinity_final))) + 
-  geom_point(size = 0.2) + 
+bottle_data_tp <- bottle_data %>% 
+  filter(between(CollectDate, start_date, end_date), 
+         ParmId %in% 18:19) %>% 
+  mutate(Type = ifelse(ParmId == 18, "Lab", "Field"))
+
+p <- ggplot(data_to_plot) + 
+  geom_point(aes(x = DateTime, 
+                 y = Salinity, 
+                 color = Quality), 
+             size = 0.2) + 
   scale_color_manual(values = c("1" = "black", 
                                 "2" = "orange", 
                                 "3" = "red")) + 
   theme_bw() + 
-  theme(legend.position = "none") + 
-  labs(x = "", y = "Salinity (PSU)")
-ggplotly(p)
+  labs(x = "", 
+       y = "Salinity (PSU)", 
+       shape = "") + 
+  geom_point(data = bottle_data_tp, 
+             aes(x = CollectDateTime, 
+                 y = Value, 
+                 shape = Type), 
+             color = "blue") + 
+  scale_shape_manual(values = c("Lab" = 2, "Field" = 8)) + 
+  guides(color = "none")
+ggplotly(p) %>% layout(legend = list(orientation = "h"))
 
 #### FIGURE - oxygen ####
 start_date <- as.Date("2024-12-01")
