@@ -217,3 +217,65 @@ p <- ggplot(data_to_plot,
   theme_bw()
 ggplotly(p)
 
+
+#### FIGURE - pH ####
+start_date <- as.Date("2024-12-01")
+end_date <- as.Date("2025-01-01")
+
+data_to_plot <- comb_data %>% 
+  filter(between(Date, start_date, end_date))
+
+p <- ggplot(data_to_plot, 
+            aes(x = DateTime, 
+                y = pH)) + 
+  geom_point(aes(), 
+             size = 0.2) + 
+  theme_bw()
+ggplotly(p)
+
+
+#### FIGURE - chlorophyll ####
+start_date <- as.Date("2024-12-01")
+end_date <- as.Date("2025-01-01")
+
+data_to_plot <- comb_data %>% 
+  filter(between(Date, start_date, end_date))
+
+p <- ggplot(data_to_plot, 
+            aes(x = DateTime, 
+                y = Chlorophyll)) + 
+  geom_point(aes(), 
+             size = 0.2) + 
+  theme_bw()
+ggplotly(p)
+
+#### FIGURE - turbidity ####
+start_date <- as.Date("2023-02-01")
+end_date <- as.Date("2023-03-01")
+
+data_to_plot <- comb_data %>% 
+  filter(between(Date, start_date, end_date))
+
+p <- ggplot(data_to_plot, 
+            aes(x = DateTime, 
+                y = Turbidity)) + 
+  geom_point(aes(), 
+             size = 0.2) + 
+  theme_bw()
+ggplotly(p)
+
+
+#### FIGURE - NO23 ####
+start_date <- as.Date("2023-11-01")
+end_date <- as.Date("2023-12-01")
+
+data_to_plot <- comb_data %>% 
+  filter(between(Date, start_date, end_date))
+
+p <- ggplot(data_to_plot, 
+            aes(x = DateTime, 
+                y = NO23)) + 
+  geom_point(aes(), 
+             size = 0.2) + 
+  theme_bw()
+ggplotly(p)
