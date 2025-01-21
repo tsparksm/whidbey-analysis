@@ -156,6 +156,9 @@ qc_final <- qc_data %>%
     )
   )
 
+write_csv(qc_final, 
+          here("data", "coupeville_qc.csv"))
+
 #### FIGURE - pressure ####
 start_date <- as.Date("2023-12-01")
 end_date <- as.Date("2024-01-01")
