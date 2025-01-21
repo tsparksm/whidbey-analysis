@@ -280,7 +280,7 @@ p <- ggplot(data_to_plot) +
   scale_shape_manual(values = c("Lab" = 2, "Field" = 8)) + 
   guides(color = "none")
 ggplotly(p) %>% layout(legend = list(orientation = "h"))
-
+  
 #### FIGURE - pH ####
 start_date <- as.Date("2024-12-01")
 end_date <- as.Date("2025-01-01")
@@ -302,25 +302,38 @@ p <- ggplot(data_to_plot,
 ggplotly(p)
 
 #### FIGURE - chlorophyll ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+start_date <- as.Date("2023-12-01")
+end_date <- as.Date("2024-03-01")
 
 data_to_plot <- comb_data %>% 
-  filter(between(Date, start_date, end_date))
+  filter(between(Date, start_date, end_date)) %>% 
+  mutate(Quality = as.factor(Chlorophyll_final))
 
-p <- ggplot(data_to_plot, 
-            aes(x = DateTime, 
-                y = Chlorophyll, 
-                color = as.factor(Chlorophyll_final))) + 
-  geom_point(size = 0.2) + 
+bottle_data_tp <- bottle_data %>% 
+  filter(between(CollectDate, start_date, end_date), 
+         ParmId %in% 1:2) %>% 
+  mutate(Type = ifelse(ParmId == 1, "Lab", "Field"))
+
+p <- ggplot(data_to_plot) + 
+  geom_point(size = 0.2, 
+             aes(x = DateTime, 
+                 y = Chlorophyll, 
+                 color = Quality)) + 
   scale_color_manual(values = c("1" = "black", 
                                 "2" = "orange", 
                                 "3" = "red")) + 
   theme_bw() + 
-  theme(legend.position = "none") + 
   labs(x = "", 
-       y = "Chlorophyll (ug/L)")
-ggplotly(p)
+       y = "Chlorophyll (ug/L)", 
+       shape = "") + 
+  geom_point(data = bottle_data_tp, 
+             aes(x = CollectDateTime, 
+                 y = Value, 
+                 shape = Type), 
+             color = "blue") + 
+  scale_shape_manual(values = c("Lab" = 2, "Field" = 8)) + 
+  guides(color = "none")
+ggplotly(p) %>% layout(legend = list(orientation = "h"))
 
 #### FIGURE - turbidity ####
 start_date <- as.Date("2023-02-01")
