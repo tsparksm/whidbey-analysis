@@ -63,8 +63,8 @@ qc_data <- raw_data %>%
       TRUE ~ NA
     ), 
     NO23_auto = case_when(
-      !between(NO23, 0.007, 56) ~ "g", 
-      NO23 > 0.5 ~ "r", 
+      !between(NO23, 0, 56) ~ "g", 
+      (NO23 > 0.5 | NO23 < 0.007) ~ "r", 
       TRUE ~ NA
     )
   )
