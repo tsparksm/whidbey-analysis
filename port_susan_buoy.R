@@ -2,6 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(waterData)
 library(rtide)
+library(zoo)
 
 #### Load and combine old (pre-Dec 2023) buoy data #### 
 data_buoy <- load_PS_buoy_old() %>% 
@@ -366,3 +367,133 @@ ggplot(data = data_to_plot %>%
 
 
 
+
+#### Figure - salinity + river flow ####
+# Summarize salinity - daily
+data_subset <- data_buoy_qc %>% 
+  filter(Type == "KC", 
+         Parameter == "Salinity", 
+         Flag != 4) %>% 
+  mutate(Date = as.Date(
+    str_sub(as.character(DateTime), start = 1, end = 10))) %>% 
+  group_by(Date) %>% 
+  summarize(Mean = mean(Value), 
+            Max = max(Value), 
+            Min = min(Value)) %>% 
+  mutate(Range = Max - Min)
+
+# Summarize rivers 
+data_river_subset <- data_river %>% 
+  rename(RealDate = Date, 
+         Flow24 = Flow) %>% 
+  arrange(RealDate) %>% 
+  mutate(Date = RealDate + 1, 
+         Flow48 = rollsumr(Flow24, k = 2, fill = NA), 
+         Flow72 = rollsumr(Flow24, k = 3, fill = NA), 
+         Flowweek = rollsumr(Flow24, k = 7, fill = NA)) %>% 
+  select(-RealDate)
+
+# Combine datasets 
+data_subset <- full_join(data_subset, data_river_subset) %>% 
+  filter(Date >= as.Date("2022-02-03"))
+  
+# Make a figure
+ggplot(data = data_subset, 
+       aes(x = Date)) + 
+  theme_bw() + 
+  geom_line(aes(y = Mean, 
+                color = Flow72)) + 
+  scale_color_distiller(palette = "YlGnBu", transform = "log10", direction = 1)
+
+#### Figure - NNN + chl + river flow ####
+# Summarize - daily
+data_subset <- data_buoy_new %>% 
+  mutate(
+    NO23 = ifelse(
+      between(NO23, 0, 0.6), NO23, NA
+    ), 
+    Chlorophyll = ifelse(
+      between(Chlorophyll, 0, 100), Chlorophyll, NA)
+    ) %>% 
+  group_by(Date) %>% 
+  summarize(MeanN = mean(NO23, na.rm = TRUE), 
+            MaxN = max(NO23, na.rm = TRUE), 
+            MinN = min(NO23, na.rm = TRUE), 
+            MeanChl = mean(Chlorophyll, na.rm = TRUE), 
+            MaxChl = max(Chlorophyll, na.rm = TRUE), 
+            MinChl = min(Chlorophyll, na.rm = TRUE), 
+            N = n()) %>% 
+  filter(N >= 48) %>% 
+  mutate(RangeN = MaxN - MinN, 
+         RangeChl = MaxChl - MinChl)
+
+# Summarize rivers 
+data_river_subset <- data_river %>% 
+  rename(RealDate = Date, 
+         Flow24 = Flow) %>% 
+  arrange(RealDate) %>% 
+  mutate(Date = RealDate + 1, 
+         Flow48 = rollsumr(Flow24, k = 2, fill = NA), 
+         Flow72 = rollsumr(Flow24, k = 3, fill = NA), 
+         Flowweek = rollsumr(Flow24, k = 7, fill = NA)) %>% 
+  select(-RealDate)
+
+# Combine datasets 
+data_subset <- full_join(data_subset, data_river_subset) %>% 
+  filter(Date >= as.Date("2023-12-20"), 
+         Date < as.Date("2025-01-01")) %>% 
+  mutate(Hilite = Date %in% as.Date(
+    c("2024-02-25", "2024-03-28", "2024-04-07", "2024-08-05", "2024-08-14", "2024-09-08")))
+
+# Make a figure
+ggplot(data = data_subset, 
+             aes(x = Date)) + 
+  theme_bw() + 
+  geom_ribbon(aes(ymin = 0, ymax = Flow72/40000), fill = "grey") + 
+  geom_line(aes(y = MeanN, 
+                color = MeanChl), 
+            size = 1) + 
+  scale_color_distiller(trans = "log10", 
+                        palette = "Greens", 
+                        direction = 1) + 
+  geom_segment(aes(xend = Date, 
+                   y = MeanN - 0.03,
+                   yend = MeanN - 0.01, 
+                   linetype = Hilite), 
+               arrow = arrow(length = unit(0.1, "cm"))) + 
+  scale_linetype_manual(values = c(NA, "solid"), 
+                        guide = "none") + 
+  scale_x_date(expand = c(0, 0), 
+               date_breaks = "3 months", 
+               date_minor_breaks = "1 month", 
+               date_labels = "%b %Y") + 
+  scale_y_continuous(expand = c(0, 0), 
+                     sec.axis = sec_axis(trans=~.*40000, 
+                                         name="Stillaguamish River discharge (cfs)")) + 
+  labs(x = "", 
+       y = "Nitrate + nitrite N (mg/L)", 
+       color = "log(Chl)")
+ggsave(here("figs", "psusanbuoy", "N_chl_river.png"), 
+       dpi = 600, height = 3, width = 6)
+
+p1 <- ggplot(data = data_subset, 
+             aes(x = Date)) + 
+  theme_bw() + 
+  geom_ribbon(aes(ymin = 0, ymax = Flow72/40000), fill = "grey") + 
+  geom_line(aes(y = MeanN)) + 
+  labs(x = "", y = "", title = "Nitrate + nitrite N (mg/L)") + 
+  scale_x_date(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))
+p2 <- ggplot(data = data_subset, 
+             aes(x = Date)) + 
+  theme_bw() + 
+  geom_ribbon(aes(ymin = 0, ymax = Flow72/1000), fill = "grey") + 
+  geom_line(aes(y = MeanChl)) + 
+  labs(x = "", y = "", title = "Chlorophyll fluorescence (ug/L)") + 
+  scale_x_date(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))
+
+library(patchwork)
+p1/p2
+ggsave(here("figs", "psusanbuoy", "N_chl_river_multipanel.png"), 
+       dpi = 600, height = 6, width = 6)
