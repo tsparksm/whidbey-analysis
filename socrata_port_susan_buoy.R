@@ -66,6 +66,8 @@ process_socrata_psusan <- function(start_date, start_time,
       filter(Date < end_date | 
                Date == end_date & 
                Time <= as_hms(paste0(end_time, ":00")))
+  } else {
+    end_date = max(raw_data$Date)
   }
   
   fpath <- here("data", "socrata", paste0("psusan_socrata_", 

@@ -63,6 +63,8 @@ process_socrata_coupeville <- function(start_date,
       filter(Date < end_date | 
                Date == end_date & 
                Time <= as_hms(paste0(end_time, ":00")))
+  } else {
+    end_date = max(raw_data$Date)
   }
   
   fpath <- here("data", "socrata", paste0("coupeville_socrata_", 
