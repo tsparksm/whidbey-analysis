@@ -368,9 +368,8 @@ scale_fill_craftfermenter <- function(..., type = "seq",
                na.value = na.value, guide = guide, ...)
 }
 
-# Load climate data from NOAA
+# Load climate data from NOAA - USW00024222
 # Daily summaries downloaded here: https://www.ncei.noaa.gov/cdo-web/search
-# Click on Everett for best Whidbey options
 load_climate <- function() {
   fname <- here("data", "raw", "everett_climate_data.csv")
   read_csv(fname, 
@@ -381,47 +380,19 @@ load_climate <- function() {
                             ELEVATION = col_double(), 
                             DATE = col_date(), 
                             AWND = col_double(), 
-                            AWND_ATTRIBUTES = col_character(), 
-                            DAPR = col_integer(), 
-                            DAPR_ATTRIBUTES = col_character(), 
-                            MDPR = col_double(), 
-                            MDPR_ATTRIBUTES = col_character(), 
                             PGTM = col_integer(), 
-                            PGTM_ATTRIBUTES = col_character(), 
                             PRCP = col_double(), 
-                            PRCP_ATTRIBUTES = col_character(), 
-                            SNOW = col_double(), 
-                            SNOW_ATTRIBUTES = col_character(), 
-                            SNWD = col_double(), 
-                            SNWD_ATTRIBUTES = col_character(), 
                             TAVG = col_double(), 
-                            TAVG_ATTRIBUTES = col_character(), 
                             TMAX = col_integer(), 
-                            TMAX_ATTRIBUTES = col_character(), 
                             TMIN = col_integer(), 
-                            TMIN_ATTRIBUTES = col_character(), 
-                            TOBS = col_integer(), 
-                            TOBS_ATTRIBUTES = col_character(), 
                             WDF2 = col_integer(), 
-                            WDF2_ATTRIBUTES = col_character(), 
                             WDF5 = col_integer(), 
-                            WDF5_ATTRIBUTES = col_character(), 
-                            WESD = col_double(), 
-                            WESD_ATTRIBUTES = col_character(), 
-                            WESF = col_double(), 
-                            WESF_ATTRIBUTES = col_character(), 
-                            WDF2 = col_double(), 
-                            WDF2_ATTRIBUTES = col_character(), 
-                            WDF5 = col_double(), 
-                            WDF5_ATTRIBUTES = col_character(), 
+                            WSF2 = col_double(), 
+                            WSF5 = col_double(), 
                             WT01 = col_skip(), 
-                            WT01_ATTRIBUTES = col_skip(), 
                             WT02 = col_skip(), 
-                            WT02_ATTRIBUTES = col_skip(), 
                             WT03 = col_skip(), 
-                            WT03_ATTRIBUTES = col_skip(), 
-                            WT08 = col_skip(), 
-                            WT08_ATTRIBUTES = col_skip()))
+                            WT08 = col_skip()))
 }
 
 # Take Penn Cove surface raw Socrata data and set it up for clean use in R

@@ -1,9 +1,7 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
 
-station <- "USW00024222"  # Everett airport
 data_climate <- load_climate() %>% 
-  filter(STATION == station) %>% 
   rename(Date = DATE) %>% 
   mutate(Year = year(Date))
 
