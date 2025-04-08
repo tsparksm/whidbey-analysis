@@ -1,5 +1,6 @@
 #### Setup ####
 source(here::here("src", "utility_functions.R"))
+library(pracma)
 
 data_ctd <- load_composite(0.5, monthly = FALSE) %>% 
   mutate(Basin = "Whidbey")
@@ -179,7 +180,8 @@ data_to_plot <- data_discrete %>%
          Locator == station, 
          Depth < 1.6) %>% 
   mutate(Name = ifelse(ParmId == 1, "Chlorophyll", "Nitrate+nitrite"), 
-         FakeDate = CollectDate)
+         FakeDate = CollectDate) %>% 
+  arrange(CollectDate)
 year(data_to_plot$FakeDate) <- yoi
 
 ggplot(data = data_to_plot, 
@@ -403,8 +405,9 @@ for (station in unique(data_ctd$Locator)) {
 }
 
 #### Figure - surface density CTD profiles by station, year ####
-yoi <- 2022
+yoi <- 2024
 for (station in unique(data_ctd$Locator)) {
+  if (station == "PENNCOVEPNN001") next
   ggplot(data = data_ctd %>% 
            filter(Locator == station, 
                   Depth <= 50, 
@@ -424,7 +427,7 @@ for (station in unique(data_ctd$Locator)) {
 
 
 #### Figure - integrated chl by station, year ####
-yoi <- 2022
+yoi <- 2024
 
 totalchl <- data_ctd %>% 
   filter(Depth >= 1, 
@@ -538,10 +541,12 @@ ggplot(data = totalchl %>%
        y = expression(Chlorophyll~fluorescence~(mg/m^2)), 
        color = "", 
        title = "1-50 m integrated chlorophyll") + 
-  scale_color_viridis_d(end = 0.9, direction = -1)
-lims(y = c(0, NA)) + 
-  scale_x_date(date_breaks = "1 month", 
-               date_labels = "%b")
+  scale_color_viridis_d(end = 0.9, direction = -1) + 
+  lims(y = c(0, NA)) +
+  scale_x_date(date_breaks = "1 year",
+               date_minor_breaks = "3 months", 
+               date_labels = "%Y") + 
+  theme(legend.position = "none")
 ggsave(here("figs", "whidbey_int_chl.png"), 
        dpi = 600, height = 5, width = 8)
   
