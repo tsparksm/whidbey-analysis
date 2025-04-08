@@ -83,6 +83,26 @@ ggplot(data = raw_data %>%
 ggsave(here("figs", "coupeville", paste0("S_", yoi, ".png")), 
        height = 4, width = 6)
 
+#### Mooring - salinity short period ####
+beg_date <- as.Date("2024-11-01")
+end_date <- as.Date("2024-11-30")
+ggplot(data = raw_data %>% 
+         filter(between(Date, beg_date, end_date)), 
+       aes(x = DateTime, 
+           y = Salinity)) + 
+  theme_bw() + 
+  theme(legend.position = "none") + 
+  geom_point(alpha = 0.5, size = 1) + 
+  labs(y = "Salinity (PSU)", 
+       x = "", 
+       color = "", 
+       title = "Coupeville") + 
+  scale_x_datetime(date_breaks = "1 week", 
+                   date_labels = "%m-%d-%y")
+ggsave(here("figs", "coupeville", 
+            paste0("S_", beg_date, "_", end_date, ".png")), 
+       height = 4, width = 6)
+
 #### Mooring - nitrate over time ####
 ggplot(data = raw_data %>% 
          filter(Year <= yoi), 
@@ -125,6 +145,27 @@ ggplot(data = raw_data %>%
 ggsave(here("figs", "coupeville", paste0("DO_", yoi, ".png")), 
        height = 4, width = 6)
 
+#### Mooring - DO short period ####
+beg_date <- as.Date("2024-11-01")
+end_date <- as.Date("2024-11-30")
+ggplot(data = raw_data %>% 
+         filter(between(Date, beg_date, end_date)), 
+       aes(x = DateTime, 
+           y = Oxygen)) + 
+  theme_bw() + 
+  theme(legend.position = "none") + 
+  geom_point(alpha = 0.5, size = 1) + 
+  labs(y = "DO (mg/L)", 
+       x = "", 
+       color = "", 
+       title = "Coupeville") + 
+  scale_x_datetime(date_breaks = "1 week", 
+                   date_labels = "%m-%d-%y") + 
+  lims(y = c(0, NA))
+ggsave(here("figs", "coupeville", 
+            paste0("DO_", beg_date, "_", end_date, ".png")), 
+       height = 4, width = 6)
+
 #### Mooring - chl over time ####
 ggplot(data = raw_data %>% 
          filter(Year <= yoi), 
@@ -158,6 +199,7 @@ ggplot(data = raw_data %>%
   labs(x = "", 
        y = "Turbidity (NTU)", 
        color = "") + 
+  scale_y_continuous(limits = c(0, NA)) + 
   scale_color_manual(values = c("TRUE" = "black", 
                                 "FALSE" = "gray"))
 ggsave(here("figs", "coupeville", paste0("turb_", yoi, ".png")), 
@@ -202,7 +244,10 @@ ggplot(data = raw_data %>%
 #### Bottle - nitrate over time ####
 ggplot(data = bottle_data %>% 
          filter(Locator == "PENNCOVECW", 
-                ParmId == 14), 
+                ParmId == 14, 
+                Year <= yoi, 
+                DepthBin != "7-10 m") %>% 
+         arrange(Year), 
        aes(x = FakeDate, 
            y = Value, 
            shape = Detect, 
@@ -229,7 +274,9 @@ ggsave(here("figs", "coupeville", paste0("bottle_N03_", yoi, ".png")),
 #### Bottle - ammonia over time ####
 ggplot(data = bottle_data %>% 
          filter(Locator == "PENNCOVECW", 
-                ParmId == 13), 
+                ParmId == 13, 
+                Year <= yoi) %>% 
+         arrange(Year), 
        aes(x = FakeDate, 
            y = Value, 
            shape = Detect, 
@@ -256,7 +303,9 @@ ggsave(here("figs", "coupeville", paste0("bottle_NH3_", yoi, ".png")),
 #### Bottle - phosphate over time ####
 ggplot(data = bottle_data %>% 
          filter(Locator == "PENNCOVECW", 
-                ParmId == 15), 
+                ParmId == 15, 
+                Year <= yoi) %>% 
+         arrange(Year),
        aes(x = FakeDate, 
            y = Value, 
            shape = Detect, 
