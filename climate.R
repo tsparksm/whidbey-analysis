@@ -26,7 +26,7 @@ ggsave(here("figs", paste0("Everett_winds_", yoi, ".png")),
        width = 6, height = 4, dpi = 600)
 
 #### Short period strat & wind ####
-poi <- as.Date(c("2022-09-01", "2022-10-31"))
+poi <- as.Date(c("2024-09-01", "2024-12-31"))
 station <- "SARATOGACH"
 data_to_plot <- data_climate %>% 
   select(Date, AWND) %>% 
@@ -36,9 +36,9 @@ ggplot(data = data_to_plot,
        aes(x = Date)) + 
   theme_bw() + 
   geom_line(aes(y = AWND)) + 
-  geom_point(aes(y = Max_buoyfreq)) + 
+  geom_point(aes(y = Max_buoyfreq/2), ) + 
   scale_x_date(limits = poi) + 
-  scale_y_continuous(limits = c(0, 50)) + 
+  scale_y_continuous(limits = c(0, NA)) + 
   labs(x = "", 
        y = "Daily avg. wind speed (mph)", 
        title = paste(poi[1], "to", poi[2], station))
