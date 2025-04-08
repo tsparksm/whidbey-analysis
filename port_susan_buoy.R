@@ -177,8 +177,45 @@ ggsave(here("figs", "psusanbuoy",
             paste0(yoi, "_chlorophyll_comparison.png")), 
        dpi = 600, height = 4, width = 6)
 
+#### Figure - chlorophyll, all years, short period ####
+beg <- as.Date("2024-11-01")
+end <- as.Date("2024-11-30")
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Chlorophyll", 
+         !(Flag %in% 3:4), 
+         !is.na(Date)) %>% 
+  mutate(PeriodGroup = between(Date, beg, end), 
+         FakeDate = Date, 
+         FakeDateTime = DateTime) %>% 
+  arrange(PeriodGroup)
+year(data_to_plot$FakeDate) <- 2024
+year(data_to_plot$FakeDateTime) <- 2024
+data_to_plot <- data_to_plot %>% 
+  filter(between(FakeDate, beg, end))
+
+ggplot(data_to_plot, 
+       aes(x = FakeDateTime, 
+           y = Value, 
+           color = PeriodGroup, 
+           shape = Type)) + 
+  theme_bw() + 
+  geom_point() + 
+  scale_color_manual(values = c("FALSE" = "gray", 
+                                "TRUE" = "black")) + 
+  labs(x = "", 
+       y = expression(Chlorophyll~fluorescence~(mu*g/L)), 
+       color = "", 
+       shape = "", 
+       title = "Port Susan buoy") + 
+  scale_x_datetime(date_breaks = "1 week", 
+                   date_labels = "%m-%d")
+ggsave(here("figs", "psusanbuoy", 
+            paste0(beg, "_", end, "_chlorophyll_comparison.png")), 
+       dpi = 600, height = 4, width = 6)
+
 #### Figure - chlorophyll, single year ####
-yoi <- 2024
+yoi <- 2025
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
