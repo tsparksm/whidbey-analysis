@@ -33,7 +33,7 @@ load_hydrosphere_penncovesurf <- function(fpath) {
                              `HCEP(VOLT)` = col_double(), 
                              `HCEP(NUM)` = col_double(), 
                              `SUNA(M_Parameter1)` = col_double(), 
-                             `SUNA(M_Parameter2)` = col_double(), 
+                             `SUNA(NO3-)` = col_double(), 
                              `SUNA(M_Parameter3)` = col_double(), 
                              `SUNA(M_Parameter4)` = col_double(), 
                              `HCEP(ERR)` = col_double(), 
@@ -64,7 +64,8 @@ process_socrata_penncovesurf <- function(start_date,
     select(-DateTime, -NewDateTime) %>% 
     filter(Date > start_date | 
              Date == start_date & 
-             Time >= as_hms(paste0(start_time, ":00")))
+             Time >= as_hms(paste0(start_time, ":00"))) %>% 
+    rename(`SUNA(M_Parameter2)` = `SUNA(NO3-)`)
   
   if (!is.na(end_date)) {
     raw_data <- raw_data %>% 
