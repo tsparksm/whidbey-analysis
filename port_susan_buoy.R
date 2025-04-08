@@ -361,11 +361,89 @@ ggsave(here("figs", "psusanbuoy",
             paste0(yoi, "_no23.png")), 
        dpi = 600, height = 6, width = 4)
 
+#### Figure - salinity, single year ####
+yoi <- 2025
+
+data_to_plot <- data_buoy_new %>% 
+  filter(year(DateTime) == yoi, 
+         Salinity < 40)
+
+ggplot(data_to_plot, 
+       aes(x = DateTime, 
+           y = Salinity)) + 
+  geom_point() + 
+  theme_bw() + 
+  labs(x = "", 
+       y = "Salinity (PSU)") + 
+  scale_y_continuous(limits = c(0, NA))
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_s.png")), 
+       dpi = 600, height = 6, width = 4)
+
+#### Figure - salinity, all years, short period ####
+beg <- as.Date("2024-11-01")
+end <- as.Date("2024-11-30")
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Salinity", 
+         !(Flag %in% 3:4), 
+         !is.na(Date), 
+         Value > 0) %>% 
+  mutate(PeriodGroup = between(Date, beg, end), 
+         FakeDate = Date, 
+         FakeDateTime = DateTime) %>% 
+  arrange(PeriodGroup)
+year(data_to_plot$FakeDate) <- 2024
+year(data_to_plot$FakeDateTime) <- 2024
+data_to_plot <- data_to_plot %>% 
+  filter(between(FakeDate, beg, end))
+
+ggplot(data_to_plot, 
+       aes(x = FakeDateTime, 
+           y = Value, 
+           color = PeriodGroup, 
+           shape = Type)) + 
+  theme_bw() + 
+  geom_point() + 
+  scale_color_manual(values = c("FALSE" = "gray", 
+                                "TRUE" = "black")) + 
+  labs(x = "", 
+       y = "Salinity (PSU)", 
+       color = "", 
+       shape = "", 
+       title = "Port Susan buoy") + 
+  scale_x_datetime(date_breaks = "1 week", 
+                   date_labels = "%m-%d")
+ggsave(here("figs", "psusanbuoy", 
+            paste0(beg, "_", end, "_s_comparison.png")), 
+       dpi = 600, height = 4, width = 6)
+
+
+#### Figure - temperature, single year ####
+yoi <- 2025
+
+data_to_plot <- data_buoy_new %>% 
+  filter(year(DateTime) == yoi, 
+         between(Temperature, 0, 50))
+
+ggplot(data_to_plot, 
+       aes(x = DateTime, 
+           y = Temperature)) + 
+  geom_point() + 
+  theme_bw() + 
+  labs(x = "", 
+       y = expression("Temperature " ( degree*C)))
+
+ggsave(here("figs", "psusanbuoy", 
+            paste0(yoi, "_t.png")), 
+       dpi = 600, height = 6, width = 4)
+
 #### Figure - daily mean temperature ####
 yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Temperature", 
+         Value > 0, 
          year(DateTime) <= yoi, 
          !(Flag %in% 3:4)) %>% 
   mutate(Date = as.Date(DateTime)) %>% 
@@ -444,10 +522,6 @@ ggplot(data = data_to_plot %>%
            y = Mean)) + 
   theme_bw() + 
   geom_point()
-
-
-
-
 
 #### Figure - salinity + river flow ####
 # Summarize salinity - daily
