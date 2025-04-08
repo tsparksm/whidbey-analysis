@@ -246,10 +246,11 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 4, width = 6)
 
 #### Figure - oxygen, all years ####
-yoi <- 2024
+yoi <- 2025
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
+         Value < 23, 
          year(DateTime) <= yoi, 
          !(Flag %in% 3:4)) %>% 
   mutate(YearGroup = ifelse(year(DateTime) == yoi, 
@@ -266,19 +267,62 @@ ggplot(data_to_plot,
            y = Value, 
            color = YearGroup, 
            shape = Type)) + 
+  theme_bw() + 
+  labs(x = "", y = "DO (mg/L)", color = "", shape = "Group") + 
   geom_point() + 
+  scale_color_manual(values = c("gray", "black")) + 
   scale_y_continuous(limits = c(0, NA))
 ggsave(here("figs", "psusanbuoy", 
             paste0(yoi, "_DO_comparison.png")), 
        dpi = 600, height = 4, width = 6)
 
+#### Figure - oxygen, all years, short period ####
+beg <- as.Date("2024-11-01")
+end <- as.Date("2024-11-30")
+
+data_to_plot <- data_buoy_qc %>% 
+  filter(Parameter == "Oxygen", 
+         !(Flag %in% 3:4), 
+         !is.na(Date), 
+         Value > 0) %>% 
+  mutate(PeriodGroup = between(Date, beg, end), 
+         FakeDate = Date, 
+         FakeDateTime = DateTime) %>% 
+  arrange(PeriodGroup)
+year(data_to_plot$FakeDate) <- 2024
+year(data_to_plot$FakeDateTime) <- 2024
+data_to_plot <- data_to_plot %>% 
+  filter(between(FakeDate, beg, end))
+
+ggplot(data_to_plot, 
+       aes(x = FakeDateTime, 
+           y = Value, 
+           color = PeriodGroup, 
+           shape = Type)) + 
+  theme_bw() + 
+  geom_point() + 
+  scale_color_manual(values = c("FALSE" = "gray", 
+                                "TRUE" = "black")) + 
+  labs(x = "", 
+       y = "Oxygen (mg/L)", 
+       color = "", 
+       shape = "", 
+       title = "Port Susan buoy") + 
+  scale_x_datetime(date_breaks = "1 week", 
+                   date_labels = "%m-%d")
+ggsave(here("figs", "psusanbuoy", 
+            paste0(beg, "_", end, "_do_comparison.png")), 
+       dpi = 600, height = 4, width = 6)
+
+
 #### Figure - oxygen, single year ####
-yoi <- 2023
+yoi <- 2025
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
          year(DateTime) == yoi, 
-         Type == "KC")
+         Type == "KC", 
+         between(Value, 0, 23))
 
 data_to_plot2 <- data_discrete %>% 
   filter(ParmId %in% 5:6, 
