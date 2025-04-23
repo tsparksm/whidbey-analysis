@@ -292,7 +292,8 @@ ggsave(here("figs", "coupeville", paste0("bottle_N03_", yoi, ".png")),
 ggplot(data = bottle_data %>% 
          filter(Locator == "PENNCOVECW", 
                 ParmId == 13, 
-                Year <= yoi) %>% 
+                Year <= yoi, 
+                DepthBin != "7-10 m") %>% 
          arrange(Year), 
        aes(x = FakeDate, 
            y = Value, 
@@ -321,7 +322,8 @@ ggsave(here("figs", "coupeville", paste0("bottle_NH3_", yoi, ".png")),
 ggplot(data = bottle_data %>% 
          filter(Locator == "PENNCOVECW", 
                 ParmId == 15, 
-                Year <= yoi) %>% 
+                Year <= yoi, 
+                DepthBin != "7-10 m") %>% 
          arrange(Year),
        aes(x = FakeDate, 
            y = Value, 
