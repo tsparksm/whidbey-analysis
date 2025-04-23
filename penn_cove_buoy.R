@@ -4,11 +4,11 @@ library(rtide)
 
 yoi <- 2024
 
-#### Load Socrata data and combine ####
-surf_data <- load_penncovesurf() %>% 
-  rename_with(~str_c(., "_surface"), .cols = Temperature:NO23)
-bottom_data <- load_penncovebottom() %>% 
-  rename_with(~str_c(., "_bottom"), .cols = HCEP_id:NO3_n)
+#### Load QC'd data and combine ####
+surf_data <- load_qc_penncovesurf() %>% 
+  rename_with(~str_c(., "_surface"), .cols = Temperature:OxygenSat_final)
+bottom_data <- load_qc_penncovebottom() %>% 
+  rename_with(~str_c(., "_bottom"), .cols = HCEP_id:OxygenSat_final)
 combo_data <- full_join(surf_data, bottom_data)
 
 #### Load CTD and discrete data ####
@@ -18,8 +18,10 @@ ctd_data <- load_CTD("PENNCOVEENT")
 #### Figure: year of DO, top vs bottom ####
 yoi <- 2024
 data_to_plot <- combo_data %>% 
-  select(DateTime, Oxygen_mgL_bottom, Oxygen_surface) %>% 
-  rename(Bottom = Oxygen_mgL_bottom, 
+  mutate(Oxygen_bottom = ifelse(Oxygen_final_bottom == 1, Oxygen_bottom, NA), 
+         Oxygen_surface = ifelse(Oxygen_final_surface == 1, Oxygen_surface, NA)) %>% 
+  select(DateTime, Oxygen_bottom, Oxygen_surface) %>% 
+  rename(Bottom = Oxygen_bottom, 
          Surface = Oxygen_surface) %>% 
   pivot_longer(cols = !DateTime, 
                names_to = "Location", 
@@ -45,8 +47,10 @@ ggsave(here("figs", "penncove",
 #### Figure: year of NO23, top vs bottom ####
 yoi <- 2024
 data_to_plot <- combo_data %>% 
-  select(DateTime, NO3_mgNL_bottom, NO23_surface) %>% 
-  rename(Bottom = NO3_mgNL_bottom, 
+  mutate(NO23_bottom = ifelse(NO23_final_bottom == 1, NO23_bottom, NA), 
+         NO23_surface = ifelse(NO23_final_surface == 1, NO23_surface, NA)) %>% 
+  select(DateTime, NO23_bottom, NO23_surface) %>% 
+  rename(Bottom = NO23_bottom, 
          Surface = NO23_surface) %>% 
   pivot_longer(cols = !DateTime, 
                names_to = "Location", 
@@ -73,8 +77,12 @@ ggsave(here("figs", "penncove",
 #### Figure: year of chl, top vs bottom ####
 yoi <- 2024
 data_to_plot <- combo_data %>% 
-  select(DateTime, Chlorophyll_ugL_bottom, Chlorophyll_surface) %>% 
-  rename(Bottom = Chlorophyll_ugL_bottom, 
+  mutate(Chlorophyll_bottom = ifelse(Chlorophyll_final_bottom == 1, 
+                                     Oxygen_bottom, NA), 
+         Chlorophyll_surface = ifelse(Chlorophyll_final_surface == 1, 
+                                 Chlorophyll_surface, NA)) %>% 
+  select(DateTime, Chlorophyll_bottom, Chlorophyll_surface) %>% 
+  rename(Bottom = Chlorophyll_bottom, 
          Surface = Chlorophyll_surface) %>% 
   pivot_longer(cols = !DateTime, 
                names_to = "Location", 
