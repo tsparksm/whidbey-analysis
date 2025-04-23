@@ -15,7 +15,7 @@ data_buoy <- load_PS_buoy_old() %>%
          -Pressure) 
 data_buoy_ST <- load_PS_buoy_ST() %>% 
   mutate(Type = "ST")
-data_buoy_new <- load_psusan() %>% 
+data_buoy_new <- load_qc_psusan() %>% 
   mutate(Type = "KC")
 data_buoy_comb <- full_join(data_buoy, data_buoy_ST)
 data_buoy_comb <- full_join(data_buoy_comb, data_buoy_new) %>% 
@@ -58,25 +58,12 @@ data_tide <- tide_height(stations = "Seattle",
                          tz = "Etc/GMT+8")
 
 #### QC ####
-# To do: put this somewhere else, save output
+# To do: put old buoy data QC somewhere else
 data_buoy_long <- data_buoy_comb %>% 
   pivot_longer(cols = Temperature:OxygenSat, 
                names_to = "Parameter", 
                values_to = "Value") %>% 
   add_column(Flag = 0)
-
-# ggplotly time!
-# yoi <- 2013
-# parm <- "Temperature"
-# g <- ggplot(data = data_buoy_long %>% 
-#          filter(Parameter == parm, 
-#                 year(DateTime) == yoi), 
-#        aes(x = DateTime, 
-#            y = Value, 
-#            color = Type)) + 
-#   geom_point() + 
-#   labs(title = paste(parm, yoi))
-# ggplotly(g)
 
 # Add flags
 data_buoy_qc <- data_buoy_long %>% 
@@ -139,16 +126,14 @@ data_buoy_qc <- data_buoy_long %>%
                          (Value >= 100 | Value < 0), 
                        4, Flag))
 
-write_csv(data_buoy_qc, 
-          here("data", "port_susan_buoy_qc.csv"))
-
 #### Figure - chlorophyll, all years ####
 yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
          year(DateTime) <= yoi, 
-         !(Flag %in% 3:4)) %>% 
+         !(Flag %in% 3:4), 
+         !(Chlorophyll_final %in% 2:3)) %>% 
   mutate(YearGroup = ifelse(year(DateTime) == yoi, 
                             yoi, 
                             paste(min(year(DateTime)), 
@@ -184,10 +169,11 @@ end <- as.Date("2024-11-30")
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
          !(Flag %in% 3:4), 
-         !is.na(Date)) %>% 
-  mutate(PeriodGroup = between(Date, beg, end), 
-         FakeDate = Date, 
-         FakeDateTime = DateTime) %>% 
+         !(Chlorophyll_final %in% 2:3)) %>% 
+  mutate(Date = as.Date(DateTime), 
+         PeriodGroup = between(Date, beg, end), 
+         FakeDateTime = DateTime, 
+         FakeDate = as.Date(FakeDateTime)) %>% 
   arrange(PeriodGroup)
 year(data_to_plot$FakeDate) <- 2024
 year(data_to_plot$FakeDateTime) <- 2024
@@ -215,11 +201,12 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 4, width = 6)
 
 #### Figure - chlorophyll, single year ####
-yoi <- 2025
+yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
-         year(DateTime) == yoi)
+         year(DateTime) == yoi, 
+         Chlorophyll_final == 1)
 
 data_to_plot2 <- data_discrete %>% 
   filter(ParmId == 1, 
@@ -246,13 +233,14 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 4, width = 6)
 
 #### Figure - oxygen, all years ####
-yoi <- 2025
+yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
          Value < 23, 
          year(DateTime) <= yoi, 
-         !(Flag %in% 3:4)) %>% 
+         !(Flag %in% 3:4), 
+         !(Oxygen_final %in% 2:3)) %>% 
   mutate(YearGroup = ifelse(year(DateTime) == yoi, 
                             yoi, 
                             paste(min(year(DateTime)), 
@@ -283,11 +271,12 @@ end <- as.Date("2024-11-30")
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
          !(Flag %in% 3:4), 
-         !is.na(Date), 
+         !(Oxygen_final %in% 2:3), 
          Value > 0) %>% 
-  mutate(PeriodGroup = between(Date, beg, end), 
-         FakeDate = Date, 
-         FakeDateTime = DateTime) %>% 
+  mutate(Date = as.Date(DateTime), 
+         PeriodGroup = between(Date, beg, end), 
+         FakeDateTime = DateTime, 
+         FakeDate = as.Date(FakeDateTime)) %>% 
   arrange(PeriodGroup)
 year(data_to_plot$FakeDate) <- 2024
 year(data_to_plot$FakeDateTime) <- 2024
@@ -316,17 +305,18 @@ ggsave(here("figs", "psusanbuoy",
 
 
 #### Figure - oxygen, single year ####
-yoi <- 2025
+yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
          year(DateTime) == yoi, 
          Type == "KC", 
-         between(Value, 0, 23))
+         Oxygen_final == 1)
 
 data_to_plot2 <- data_discrete %>% 
   filter(ParmId %in% 5:6, 
-         year(CollectDate) == yoi)
+         year(CollectDate) == yoi, 
+         Depth < 2)
 
 ggplot() + 
   geom_point(data = data_to_plot, 
@@ -347,7 +337,8 @@ ggsave(here("figs", "psusanbuoy",
 yoi <- 2024
 
 data_to_plot <- data_buoy_new %>% 
-  filter(year(DateTime) == yoi)
+  filter(year(DateTime) == yoi, 
+         NO23_final == 1)
 
 ggplot(data_to_plot, 
        aes(x = DateTime, 
@@ -362,11 +353,11 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 6, width = 4)
 
 #### Figure - salinity, single year ####
-yoi <- 2025
+yoi <- 2024
 
 data_to_plot <- data_buoy_new %>% 
   filter(year(DateTime) == yoi, 
-         Salinity < 40)
+         Salinity_final == 1)
 
 ggplot(data_to_plot, 
        aes(x = DateTime, 
@@ -374,8 +365,7 @@ ggplot(data_to_plot,
   geom_point() + 
   theme_bw() + 
   labs(x = "", 
-       y = "Salinity (PSU)") + 
-  scale_y_continuous(limits = c(0, NA))
+       y = "Salinity (PSU)")
 ggsave(here("figs", "psusanbuoy", 
             paste0(yoi, "_s.png")), 
        dpi = 600, height = 6, width = 4)
@@ -387,11 +377,12 @@ end <- as.Date("2024-11-30")
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Salinity", 
          !(Flag %in% 3:4), 
-         !is.na(Date), 
+         !(Salinity_final %in% 2:3), 
          Value > 0) %>% 
-  mutate(PeriodGroup = between(Date, beg, end), 
-         FakeDate = Date, 
-         FakeDateTime = DateTime) %>% 
+  mutate(Date = as.Date(DateTime), 
+         PeriodGroup = between(Date, beg, end), 
+         FakeDateTime = DateTime, 
+         FakeDate = as.Date(FakeDateTime)) %>% 
   arrange(PeriodGroup)
 year(data_to_plot$FakeDate) <- 2024
 year(data_to_plot$FakeDateTime) <- 2024
@@ -420,11 +411,11 @@ ggsave(here("figs", "psusanbuoy",
 
 
 #### Figure - temperature, single year ####
-yoi <- 2025
+yoi <- 2024
 
 data_to_plot <- data_buoy_new %>% 
   filter(year(DateTime) == yoi, 
-         between(Temperature, 0, 50))
+         Temperature_final == 1)
 
 ggplot(data_to_plot, 
        aes(x = DateTime, 
@@ -443,7 +434,7 @@ yoi <- 2024
 
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Temperature", 
-         Value > 0, 
+         !(Temperature_final %in% 2:3), 
          year(DateTime) <= yoi, 
          !(Flag %in% 3:4)) %>% 
   mutate(Date = as.Date(DateTime)) %>% 
@@ -506,7 +497,8 @@ data_to_plot <- data_buoy_qc %>%
   mutate(Date = as.Date.POSIXct(DateTime, 
                                 tz = "Etc/GMT+8")) %>% 
   filter(!(Flag %in% 3:4), 
-         !is.na(Value)) %>% 
+         !is.na(Value), 
+         !(Salinity_final %in% 2:3)) %>% 
   group_by(Date, Parameter) %>% 
   summarize(Mean = mean(Value), 
             Median = median(Value), 
@@ -528,7 +520,8 @@ ggplot(data = data_to_plot %>%
 data_subset <- data_buoy_qc %>% 
   filter(Type == "KC", 
          Parameter == "Salinity", 
-         Flag != 4) %>% 
+         Flag != 4, 
+         !(Salinity_final %in% 2:3)) %>% 
   mutate(Date = as.Date(
     str_sub(as.character(DateTime), start = 1, end = 10))) %>% 
   group_by(Date) %>% 
@@ -565,11 +558,12 @@ ggplot(data = data_subset,
 data_subset <- data_buoy_new %>% 
   mutate(
     NO23 = ifelse(
-      between(NO23, 0, 0.6), NO23, NA
+      NO23_final == 1, NO23, NA
     ), 
     Chlorophyll = ifelse(
-      between(Chlorophyll, 0, 100), Chlorophyll, NA)
+      Chlorophyll_final == 1, Chlorophyll, NA)
     ) %>% 
+  filter(!(is.na(Chlorophyll) & is.na(NO23))) %>% 
   group_by(Date) %>% 
   summarize(MeanN = mean(NO23, na.rm = TRUE), 
             MaxN = max(NO23, na.rm = TRUE), 
