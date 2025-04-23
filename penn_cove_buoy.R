@@ -34,8 +34,9 @@ ggplot(data = data_to_plot,
   theme_bw() + 
   theme(text = element_text(size = 20)) + 
   geom_point() + 
-  scale_y_continuous(limits = c(0, 15)) + 
   scale_color_brewer(palette = "Paired") + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
   labs(x = "", 
        y = "Oxygen (mg/L)", 
        title = paste(yoi, "Penn Cove"),  
@@ -64,8 +65,9 @@ ggplot(data = data_to_plot,
   theme_bw() + 
   theme(text = element_text(size = 20)) + 
   geom_point() + 
-  scale_y_continuous(limits = c(0, 1)) + 
   scale_color_brewer(palette = "Paired") + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
   labs(x = "", 
        y = "Nitrate+nitrite (mg N/L)", 
        title = paste(yoi, "Penn Cove"),  
@@ -96,7 +98,8 @@ ggplot(data = data_to_plot,
   theme_bw() + 
   theme(text = element_text(size = 20)) + 
   geom_point() + 
-  scale_y_continuous(limits = c(0, 15)) + 
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%b") + 
   scale_color_brewer(palette = "Paired") + 
   labs(x = "", 
        y = expression(Chlorophyll~(mu*g/L)), 
@@ -106,3 +109,4 @@ ggsave(here("figs", "penncove",
             paste(yoi, "_surface_vs_bottom_chl.png")), 
        height = 6, width = 10)
 
+#### Figure: short period DO ####
