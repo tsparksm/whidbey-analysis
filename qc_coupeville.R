@@ -157,8 +157,10 @@ qc_final <- qc_data %>%
         TRUE ~ 1
       ), 
       .names = "{.col}_final"
-    )
+    ), 
+    OxygenSat_final = pmax(Oxygen_final, Temperature_final)
   )
+year(qc_final$FakeDateTime) <- 2024
 
 write_csv(qc_final, 
           here("data", "coupeville_qc.csv"))
@@ -166,8 +168,8 @@ write_csv(qc_final,
 comb_data <- left_join(qc_final, tide_data %>% select(-Station))
 
 #### FIGURE - pressure ####
-start_date <- as.Date("2023-12-01")
-end_date <- as.Date("2024-01-01")
+start_date <- as.Date("2024-01-01")
+end_date <- as.Date("2024-12-31")
 
 data_to_plot <- comb_data %>% 
   filter(between(Date, start_date, end_date))
