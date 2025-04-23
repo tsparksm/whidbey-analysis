@@ -392,6 +392,87 @@ load_climate <- function() {
                             WT08 = col_skip()))
 }
 
+# Load QC'd Penn Cove buoy surface data - static file location
+load_qc_penncovesurf <- function() {
+  fpath <- here("data", "penncovesurf_qc.csv")
+  
+  qc_data <- read_csv(
+    fpath, 
+    col_types = cols(
+      UnixTimestamp = col_double(), 
+      Date = col_date(), 
+      Time = col_time(), 
+      Temperature = col_double(), 
+      Pressure = col_double(), 
+      Oxygen = col_double(), 
+      pH = col_double(), 
+      Chlorophyll = col_double(), 
+      Turbidity = col_double(), 
+      Salinity = col_double(), 
+      NO23 = col_double(), 
+      PAR = col_double(), 
+      AirTemperature = col_double(), 
+      Humidity = col_double(), 
+      AirPressure = col_double(), 
+      WindDirection = col_double(), 
+      WindSpeed = col_double(), 
+      OxygenSat = col_double(), 
+      DateTime = col_datetime(), 
+      Month = col_integer(), 
+      Year = col_integer(), 
+      FakeDateTime = col_datetime(), 
+      Temperature_auto = col_skip(), 
+      Pressure_auto = col_skip(), 
+      Oxygen_auto = col_skip(), 
+      pH_auto = col_skip(), 
+      Chlorophyll_auto = col_skip(), 
+      Turbidity_auto = col_skip(), 
+      Salinity_auto = col_skip(), 
+      NO23_auto = col_skip(), 
+      PAR_auto = col_skip(), 
+      AirTemperature_auto = col_skip(), 
+      Humidity_auto = col_skip(), 
+      AirPressure_auto = col_skip(), 
+      WindDirection_auto = col_skip(), 
+      WindSpeed_auto = col_skip(), 
+      Pressure_manual = col_skip(), 
+      Temperature_manual = col_skip(), 
+      Salinity_manual = col_skip(), 
+      Oxygen_manual = col_skip(), 
+      pH_manual = col_skip(), 
+      Chlorophyll_manual = col_skip(), 
+      Turbidity_manual = col_skip(), 
+      NO23_manual = col_skip(), 
+      WindSpeed_manual = col_skip(), 
+      WindDirection_manual = col_skip(), 
+      PAR_manual = col_skip(), 
+      AirTemperature_manual = col_skip(), 
+      Humidity_manual = col_skip(), 
+      AirPressure_manual = col_skip(), 
+      Temperature_final = col_integer(), 
+      Pressure_final = col_integer(), 
+      Oxygen_final = col_integer(), 
+      pH_final = col_integer(), 
+      Chlorophyll_final = col_integer(), 
+      Turbidity_final = col_integer(), 
+      Salinity_final = col_integer(), 
+      NO23_final = col_integer(), 
+      PAR_final = col_integer(), 
+      AirTemperature_final = col_integer(), 
+      Humidity_final = col_integer(), 
+      AirPressure_final = col_integer(), 
+      WindDirection_final = col_integer(), 
+      WindSpeed_final = col_integer(), 
+      OxygenSat_final = col_integer()
+    )) %>% 
+    mutate(DateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
+           FakeDateTime = with_tz(DateTime, tzone = "Etc/GMT+8")) %>% 
+    arrange(DateTime) %>% 
+    relocate(DateTime:FakeDateTime, .after = Time)
+  year(qc_data$FakeDateTime) <- 2024
+  return(qc_data)
+}
+
 # Take Penn Cove surface raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_penncovesurf <- function() {
@@ -452,6 +533,63 @@ load_penncovesurf <- function() {
   return(raw_data)
 }
 
+# Load QC'd Penn Cove buoy bottom data - static file location
+load_qc_penncovebottom <- function() {
+  fpath <- here("data", "penncovebottom_qc.csv")
+  
+  qc_data <- read_csv(fpath, 
+                       col_types = cols(
+                         DateTime = col_datetime(), 
+                         HCEP_id = col_character(), 
+                         Event_Flags = col_skip(), 
+                         SUNA_id = col_character(), 
+                         Temperature = col_double(), 
+                         Pressure = col_double(), 
+                         Oxygen = col_double(), 
+                         pH = col_double(), 
+                         Chlorophyll = col_double(), 
+                         Turbidity = col_double(), 
+                         Salinity = col_double(), 
+                         NO23 = col_double(), 
+                         OxygenSat = col_double(), 
+                         Month = col_integer(), 
+                         Year = col_integer(), 
+                         FakeDateTime = col_datetime(), 
+                         Date = col_date(), 
+                         Temperature_auto = col_skip(), 
+                         Pressure_auto = col_skip(), 
+                         Oxygen_auto = col_skip(), 
+                         pH_auto = col_skip(), 
+                         Chlorophyll_auto = col_skip(), 
+                         Turbidity_auto = col_skip(), 
+                         Salinity_auto = col_skip(), 
+                         NO23_auto = col_skip(), 
+                         Pressure_manual = col_skip(), 
+                         Temperature_manual = col_skip(), 
+                         Salinity_manual = col_skip(), 
+                         Oxygen_manual = col_skip(), 
+                         pH_manual = col_skip(), 
+                         Chlorophyll_manual = col_skip(), 
+                         Turbidity_manual = col_skip(), 
+                         NO23_manual = col_skip(), 
+                         Temperature_final = col_integer(), 
+                         Pressure_final = col_integer(), 
+                         Oxygen_final = col_integer(), 
+                         pH_final = col_integer(), 
+                         Chlorophyll_final = col_integer(), 
+                         Turbidity_final = col_integer(), 
+                         Salinity_final = col_integer(), 
+                         NO23_final = col_integer(), 
+                         OxygenSat_final = col_integer()
+                       )) %>% 
+    mutate(DateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
+           FakeDateTime = with_tz(DateTime, tzone = "Etc/GMT+8")) %>% 
+    arrange(DateTime) %>% 
+    relocate(Month:Date, .after = DateTime)
+  year(qc_data$FakeDateTime) <- 2024
+  return(qc_data)
+}
+
 # Take Penn Cove bottom raw Socrata data and set it up for clean use in R
 # Uses static file location, downloaded from Socrata
 load_penncovebottom <- function() {
@@ -491,6 +629,87 @@ load_penncovebottom <- function() {
     arrange(DateTime)
   year(raw_data$FakeDateTime) <- 2020
   return(raw_data)
+}
+
+# Load QC'd Port Susan buoy data - static file location
+load_qc_psusan <- function() {
+  fpath <- here("data", "psusanbuoy_qc.csv")
+  
+  qc_data <- read_csv(
+    fpath, 
+    col_types = cols(
+      UnixTimestamp = col_double(), 
+      Date = col_date(), 
+      Time = col_time(), 
+      Temperature = col_double(), 
+      Pressure = col_double(), 
+      Oxygen = col_double(), 
+      pH = col_double(), 
+      Chlorophyll = col_double(), 
+      Turbidity = col_double(), 
+      Salinity = col_double(), 
+      NO23 = col_double(), 
+      PAR = col_double(), 
+      AirTemperature = col_double(), 
+      Humidity = col_double(), 
+      AirPressure = col_double(), 
+      WindDirection = col_double(), 
+      WindSpeed = col_double(), 
+      OxygenSat = col_double(), 
+      SystemBattery = col_double(), 
+      DateTime = col_datetime(), 
+      Month = col_integer(), 
+      Year = col_integer(), 
+      FakeDateTime = col_datetime(), 
+      Temperature_auto = col_skip(), 
+      Pressure_auto = col_skip(), 
+      Oxygen_auto = col_skip(), 
+      pH_auto = col_skip(), 
+      Chlorophyll_auto = col_skip(), 
+      Turbidity_auto = col_skip(), 
+      Salinity_auto = col_skip(), 
+      NO23_auto = col_skip(), 
+      PAR_auto = col_skip(), 
+      AirTemperature_auto = col_skip(), 
+      Humidity_auto = col_skip(), 
+      AirPressure_auto = col_skip(), 
+      WindDirection_auto = col_skip(), 
+      WindSpeed_auto = col_skip(), 
+      Pressure_manual = col_skip(), 
+      Temperature_manual = col_skip(), 
+      Salinity_manual = col_skip(), 
+      Oxygen_manual = col_skip(), 
+      pH_manual = col_skip(), 
+      Chlorophyll_manual = col_skip(), 
+      Turbidity_manual = col_skip(), 
+      NO23_manual = col_skip(), 
+      WindSpeed_manual = col_skip(), 
+      WindDirection_manual = col_skip(), 
+      PAR_manual = col_skip(), 
+      AirTemperature_manual = col_skip(), 
+      Humidity_manual = col_skip(), 
+      AirPressure_manual = col_skip(), 
+      Temperature_final = col_integer(), 
+      Pressure_final = col_integer(), 
+      Oxygen_final = col_integer(), 
+      pH_final = col_integer(), 
+      Chlorophyll_final = col_integer(), 
+      Turbidity_final = col_integer(), 
+      Salinity_final = col_integer(), 
+      NO23_final = col_integer(), 
+      PAR_final = col_integer(), 
+      AirTemperature_final = col_integer(), 
+      Humidity_final = col_integer(), 
+      AirPressure_final = col_integer(), 
+      WindDirection_final = col_integer(), 
+      WindSpeed_final = col_integer(), 
+      OxygenSat_final = col_integer()
+    )) %>% 
+    mutate(DateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
+           FakeDateTime = with_tz(DateTime, tzone = "Etc/GMT+8")) %>% 
+    arrange(DateTime) %>% 
+    relocate(SystemBattery:FakeDateTime, .after = Time)
+  return(qc_data)
 }
 
 # Take Port Susan buoy raw Socrata data and set it up for clean use in R
@@ -556,6 +775,62 @@ load_psusan <- function() {
     arrange(DateTime)
   year(raw_data$FakeDateTime) <- 2020
   return(raw_data)
+}
+
+# Load QC'd Coupeville data - static file location
+load_qc_coupeville <- function() {
+  fpath <- here("data", "coupeville_qc.csv")
+  
+  qc_data <- read_csv(
+    fpath, 
+    col_types = cols(
+      UnixTimestamp = col_double(), 
+      Date = col_date(), 
+      Time = col_time(), 
+      Temperature = col_double(), 
+      Pressure = col_double(), 
+      Oxygen = col_double(), 
+      pH = col_double(), 
+      Chlorophyll = col_double(), 
+      Turbidity = col_double(), 
+      Salinity = col_double(), 
+      NO23 = col_double(), 
+      OxygenSat = col_double(), 
+      DateTime = col_datetime(), 
+      Month = col_integer(), 
+      Year = col_integer(), 
+      FakeDateTime = col_datetime(), 
+      Temperature_auto = col_skip(), 
+      Pressure_auto = col_skip(), 
+      Oxygen_auto = col_skip(), 
+      pH_auto = col_skip(), 
+      Chlorophyll_auto = col_skip(), 
+      Turbidity_auto = col_skip(), 
+      Salinity_auto = col_skip(), 
+      NO23_auto = col_skip(), 
+      Pressure_manual = col_skip(), 
+      Temperature_manual = col_skip(), 
+      Salinity_manual = col_skip(), 
+      Oxygen_manual = col_skip(), 
+      pH_manual = col_skip(), 
+      Chlorophyll_manual = col_skip(), 
+      Turbidity_manual = col_skip(), 
+      NO23_manual = col_skip(), 
+      Temperature_final = col_integer(), 
+      Pressure_final = col_integer(), 
+      Oxygen_final = col_integer(), 
+      pH_final = col_integer(), 
+      Chlorophyll_final = col_integer(), 
+      Turbidity_final = col_integer(), 
+      Salinity_final = col_integer(), 
+      NO23_final = col_integer(), 
+      OxygenSat_final = col_integer()
+    )) %>% 
+    mutate(DateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
+           FakeDateTime = with_tz(FakeDateTime, tzone = "Etc/GMT+8")) %>% 
+    arrange(DateTime) %>% 
+    relocate(DateTime:FakeDateTime, .after = Time)
+  return(qc_data)
 }
 
 # Take Coupeville raw Socrata data and set it up for clean use in R
