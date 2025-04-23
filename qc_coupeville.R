@@ -133,7 +133,11 @@ all_manual <- full_join(manual_qc, all_dts) %>%
       )
     )
   ) %>% 
+  group_by(DateTime) %>% 
+  mutate(across(Pressure:NO23, ~ replace_na(as.character(.x), ""))) %>% 
+  summarize(across(Pressure:NO23, ~ paste(.x, sep = ",", collapse = ""))) %>% 
   rename_with(~str_c(., "_manual"), .cols = Pressure:NO23)
+
 
 qc_data <- left_join(qc_data, all_manual)
 
