@@ -110,3 +110,59 @@ ggsave(here("figs", "penncove",
        height = 6, width = 10)
 
 #### Figure: short period DO ####
+
+
+#### Hypoxic time ####
+library(DescTools)
+temp <- bottom_data %>% 
+  filter(Year == yoi, 
+         Oxygen_final_bottom == 1, 
+         !is.na(Oxygen_bottom)) %>% 
+  mutate(Span_start = NA, 
+         Span_end = NA)
+
+f_hypoxic <- temp %>% 
+  summarize(sum(Oxygen_bottom < 2, na.rm = TRUE) / n()) %>% 
+  pull()
+
+current_span <- FALSE
+for (i in 1:nrow(temp)) {
+  value <- temp$Oxygen_bottom[i]
+  if (value >= 2 & !(current_span)) {
+    current_span <- FALSE
+    temp$Span_start[i] <- NA
+    temp$Span_end[i] <- NA
+  } else if (value >= 2 & current_span) {
+    current_span <- FALSE
+    temp$Span_end[i-1] <- temp$DateTime[i-1]
+    temp$Span_start[i] <- NA
+    temp$Span_end[i] <- NA
+  } else if (value < 2 & !(current_span)) {
+    current_span <- TRUE
+    span_start <- temp$DateTime[i]
+    temp$Span_start[i] <- span_start
+  } else {
+    temp$Span_start[i] <- span_start
+  }
+}
+
+# To do in future: check for consecutivity
+
+span_temp <- temp %>% 
+  group_by(Span_start) %>% 
+  summarize(Span_start = as.POSIXct(mean(Span_start), 
+                                    origin = "1970-01-01"), 
+            Span_end = as.POSIXct(mean(Span_end, na.rm = TRUE), 
+                                  origin = "1970-01-01"), 
+            Length_m = as.numeric(difftime(Span_end, 
+                                           Span_start, 
+                                           units = "mins")) + 15, 
+            Length_h = Length_m / 60, 
+            Length_d = Length_h / 24)
+
+summ_temp <- span_temp %>%
+  ungroup() %>% 
+  summarize(Mean = mean(Length_d, na.rm = TRUE), 
+           Max = max(Length_d, na.rm = TRUE), 
+           Median = median(Length_d, na.rm = TRUE), 
+           Mode = Mode(Length_d, na.rm = TRUE))
