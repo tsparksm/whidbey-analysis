@@ -583,6 +583,14 @@ data_to_plot <- data_remix %>%
   ungroup() %>% 
   arrange(desc(Year))
 
+if (all(stations == c("PSUSANENT", "PSUSANKP", "PSUSANBUOY"))) {
+  data_to_plot <- data_to_plot %>% 
+    mutate(Locator = factor(Locator, 
+                            levels = c("PSUSANENT", 
+                                       "PSUSANKP", 
+                                       "PSUSANBUOY")))
+}
+
 # Calculate whole dataset limits - will be overwritten as needed later
 min_lim <- round_any(min(data_to_plot$DO, na.rm = T),
                      accuracy = acc_DO, f = floor)
@@ -752,11 +760,16 @@ mylabels[!(round(mylabels/2, 2) == round(round(mylabels/2, 2)))] <- ""
 
 if (all_stations_fig) {
   if (all_years_fig) { 
-    p <- ggplot(data = data_to_plot) + 
+    p <- ggplot(data = data_to_plot %>% 
+                  mutate(Year = factor(Year, 
+                                       levels = years[2]:years[1]))) + 
       theme_classic() + 
-      facet_grid(rows = vars(Locator), 
-                 cols = vars(Year), 
-                 scales = "free_y") + 
+      # facet_grid(rows = vars(Locator), 
+      #            cols = vars(Year), 
+      #            scales = "free_y") + 
+      facet_grid(rows = vars(Year),
+                 cols = vars(Locator),
+                 scales = "free_y") +
       metR::geom_contour_fill(aes(x = FakeYearDay, 
                                   y = BinDepth, 
                                   z = Temperature), 
@@ -797,8 +810,10 @@ if (all_stations_fig) {
                        years[1], "-", years[2], 
                        ".png")), 
            p, 
-           height = h*length(stations), 
-           width = w*n, 
+           # height = h*length(stations), 
+           # width = w*n, 
+           height = h*n, 
+           width = w*length(stations), 
            dpi = 600)
   }
 }
