@@ -106,10 +106,14 @@ for (station in unique(data_discrete$Locator)) {
 
 #### Figure - nitrate bottle highlight year ####
 for (station in unique(data_discrete$Locator)) {
-  ggplot(data = data_discrete %>% 
-           filter(Locator == station,  
-                  ParmId == 14) %>% 
-           arrange(Year), 
+  temp <- data_discrete %>% 
+    filter(Locator == station,  
+           ParmId == 14) %>% 
+    arrange(Year)
+  if (station == "PENNCOVECW") {
+    temp <- temp %>% filter(DepthBin != "7-10 m")
+  }
+  ggplot(data = temp, 
          aes(x = FakeDate, 
              y = Value, 
              shape = Detect, 
@@ -117,7 +121,7 @@ for (station in unique(data_discrete$Locator)) {
     theme_bw() + 
     facet_wrap(~ DepthBin, 
                ncol = 1) + 
-    geom_point(size = 3) + 
+    geom_point(size = 5) + 
     scale_color_manual(values = c("TRUE" = "black", 
                                   "FALSE" = "gray"), 
                        labels = c("TRUE" = yoi, 
@@ -192,7 +196,7 @@ ggplot(data = data_to_plot,
   theme_bw() + 
   theme(legend.position = "bottom") + 
   facet_wrap(~ Name, scales = "free_y") + 
-  geom_point() + 
+  geom_point(size = 4) + 
   scale_color_manual(values = c("TRUE" = "black", "FALSE" = "gray"), 
                      labels = c("TRUE" = yoi, "FALSE" = "2022-2023")) + 
   scale_shape_manual(values = c("TRUE" = 16, "FALSE" = 1)) + 
