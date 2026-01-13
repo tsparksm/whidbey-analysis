@@ -104,7 +104,7 @@ process_socrata_penncovesurf(start_date, start_time, end_date, end_time)
 
 #### Initial Hydrosphere download ####
 fpath <- here("data", "raw", "Initial Hydrosphere download", 
-              "Penn Cove Surface.csv")
+              "Penn Cove Surface - combined.csv")
 mooring_data <- mooring_data <- read_csv(
   fpath, 
   col_types = cols(
@@ -158,6 +158,6 @@ processed_data <- mooring_data %>%
   filter(rn >= 34) %>% 
   select(-NewTime, -DateTime, -rn)
 
-fpath <- here("data", "socrata", "penncovesurf_socrata_initial.csv")
+fpath <- here("data", "socrata", "penncovesurf_socrata_new.csv")
 
 write_csv(processed_data, file = fpath)
