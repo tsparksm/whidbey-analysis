@@ -54,11 +54,11 @@ process_socrata_penncovesurf <- function(start_date,
                                          end_time) {
   raw_data <- load_hydrosphere_penncovesurf() %>% 
     mutate(DateTime = as.POSIXct(UnixTimestamp/1000, 
-                                    origin="1970-01-01", 
-                                    tz = "UTC"), 
+                                 origin="1970-01-01", 
+                                 tz = "UTC"), 
            NewDateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
            Date = as.Date(str_sub(NewDateTime, 1, 10)), 
-           Time = parse_time(str_sub(NewDateTime, 12, 16)), 
+           Time = parse_time(str_sub(NewDateTime, 12, 19)), 
            `SDI-12Sensor(M_Parameter1)(Inactive-1)` = NA, 
            `SDI-12Sensor(M_Parameter2)(Inactive-2)` = NA, 
            `SDI-12Sensor(M_Parameter3)(Inactive-3)` = NA) %>% 
@@ -153,7 +153,7 @@ processed_data <- mooring_data %>%
            between(rn, 3657, 15749) ~ DateTime + 1*60*60, 
            TRUE ~ DateTime), 
          Date = str_sub(as.character(NewTime), 1, 10), 
-         Time = str_sub(as.character(NewTime), 12, 16)
+         Time = str_sub(as.character(NewTime), 12, 19)
   ) %>% 
   filter(rn >= 34) %>% 
   select(-NewTime, -DateTime, -rn)
