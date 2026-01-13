@@ -51,11 +51,12 @@ load_hydrosphere_psusan <- function(fpath) {
 process_socrata_psusan <- function(start_date, start_time, 
                                    end_date, end_time) {
   raw_data <- load_hydrosphere_psusan() %>% 
-    mutate(DateTime = as.POSIXct(paste(Date, Time), 
+    mutate(DateTime = as.POSIXct(UnixTimestamp/1000, 
+                                 origin="1970-01-01", 
                                  tz = "UTC"), 
            NewDateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
            Date = as.Date(str_sub(NewDateTime, 1, 10)), 
-           Time = parse_time(str_sub(NewDateTime, 12, 16))) %>% 
+           Time = parse_time(str_sub(NewDateTime, 12, 19))) %>% 
     select(-DateTime, -NewDateTime) %>% 
     filter(Date > start_date | 
              Date == start_date & 
