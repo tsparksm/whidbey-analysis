@@ -97,7 +97,7 @@ process_socrata_psusan(start_date, start_time, end_date, end_time)
 
 #### Initial Hydrosphere download #### 
 fpath <- here("data", "raw", "Initial Hydrosphere download", 
-              "Port Susan Buoy.csv")
+              "Port Susan Buoy - combined.csv")
 
 mooring_data <- read_csv(fpath, 
                          col_types = cols(
@@ -142,7 +142,7 @@ processed_data <- mooring_data %>%
            between(rn, 1452, 9197) ~ DateTime + 1*60*60, 
            TRUE ~ DateTime), 
          Date = str_sub(as.character(NewTime), 1, 10), 
-         Time = str_sub(as.character(NewTime), 12, 16)
+         Time = str_sub(as.character(NewTime), 12, 19)
   ) %>% 
   filter(rn >= 1452) %>% 
   select(-NewTime, -DateTime, -rn)
@@ -150,6 +150,6 @@ processed_data <- mooring_data %>%
 # rename(DateTime = NewTime) %>% 
 # mutate(DateTime = force_tz(DateTime, tzone = "Etc/GMT-8"))
 
-fpath <- here("data", "socrata", "portsusan_socrata_initial.csv")
+fpath <- here("data", "socrata", "portsusan_socrata_initial_new.csv")
 
 write_csv(processed_data, file = fpath)
