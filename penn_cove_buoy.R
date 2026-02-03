@@ -40,10 +40,13 @@ ggplot(data = data_to_plot,
   labs(x = "", 
        y = "Oxygen (mg/L)", 
        title = paste(yoi, "Penn Cove"),  
-       color = "")
+       color = "") + 
+  geom_hline(color = "red", 
+             linetype = "dashed", 
+             yintercept = 2)
 ggsave(here("figs", "penncove", 
             paste(yoi, "_surface_vs_bottom_do.png")), 
-       height = 6, width = 10)
+       height = 6, width = 12)
 
 #### Figure: year of NO23, top vs bottom ####
 yoi <- 2024
