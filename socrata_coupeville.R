@@ -48,11 +48,12 @@ process_socrata_coupeville <- function(start_date,
                                        end_date, 
                                        end_time) {
   raw_data <- load_hydrosphere_coupeville() %>% 
-    mutate(DateTime = as.POSIXct(paste(Date, Time), 
+    mutate(DateTime = as.POSIXct(UnixTimestamp/1000, 
+                                 origin="1970-01-01", 
                                  tz = "UTC"), 
            NewDateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
            Date = as.Date(str_sub(NewDateTime, 1, 10)), 
-           Time = parse_time(str_sub(NewDateTime, 12, 16))) %>% 
+           Time = parse_time(str_sub(NewDateTime, 12, 19))) %>% 
     select(-DateTime, -NewDateTime) %>% 
     filter(Date > start_date | 
              Date == start_date & 
@@ -98,8 +99,7 @@ fpath <- here("data", "raw", "Initial Hydrosphere download",
 mooring_data <- read_csv(fpath, 
                          col_types = cols(
                            UnixTimestamp = col_double(), 
-                           `Date(America/Los_Angeles)` = col_date(
-                             format = "%m/%d/%Y"), 
+                           `Date(America/Los_Angeles)` = col_date(format = "%m/%d/%Y"), 
                            `Time(America/Los_Angeles)` = col_time(), 
                            SystemBattery = col_double(), 
                            `HCEP(TEMP)` = col_double(), 
@@ -135,7 +135,7 @@ processed_data <- mooring_data %>%
            between(rn, 34940, 40077) ~ DateTime + 1*60*60, 
            TRUE ~ DateTime), 
          Date = str_sub(as.character(NewTime), 1, 10), 
-         Time = str_sub(as.character(NewTime), 12, 16)
+         Time = str_sub(as.character(NewTime), 12, 19)
   ) %>% 
   select(-NewTime, -DateTime, -rn)
   # select(-DateTime) %>% 
