@@ -1,6 +1,106 @@
 #### SETUP ####
 source(here::here("src", "utility_functions.R"))
 
+#### 2025-07 to 2025-10 ####
+fpath_HCEP <- here("data", "raw", "Penn Cove near-bottom", 
+                   "Penn Cove NB HCEP 2025-07 to 2025-10.xlsx")
+data_HCEP <- read_xlsx(
+  fpath_HCEP, 
+  sheet = "Data", 
+  col_types = c(
+    "text", 
+    "date", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "numeric", 
+    "text", 
+    "text", 
+    "numeric"
+  )
+) %>% 
+  rename(
+    HCEP_id = FrameSync, 
+    DateTime = `DateTime (UTC)`, 
+    Temperature_C = `Temperature (Celsius)`, 
+    Conductivity_Sm = `Conductivity (S/m)`, 
+    Pressure_dbar = `Pressure (Decibar)`, 
+    Oxygen_mgL = `Oxygen (ml/L)`, 
+    pH = `pH (pH)`, 
+    Chlorophyll_ugL = `Chlorophyll (ug/l)`, 
+    Turbidity_NTU = `Turbidity (NTU)`, 
+    Chlorophyll_SD_ugL = `Chlorophyll StdDev (ug/l)`, 
+    Turbidity_SD_ugL = `Turbidity StdDev (NTU)`, 
+    Salinity_PSU = `Salinity (psu)`, 
+    Spec_Conductivity_Sm = `Spec Conductivity (S/m)`, 
+    Oxygen_sat = `Oxygen Sat (%)`, 
+    Date = PSTTimeDate, 
+    Time = `Time (PST)`, 
+    Event_Flags = `Event Flags`
+  ) %>% 
+  mutate(
+    DateTime = as.POSIXct(
+      DateTime, format = "%m/%d/%Y %H:%M:%S", tz = "UTC") - 8*60*60
+  ) %>% 
+  select(-Date, -Time)
+
+fpath_SUNA <- here("data", "raw", "Penn Cove near-bottom", 
+                   "Penn Cove NB SUNA 2025-07 to 2025-10.xlsx")
+data_SUNA <- read_xlsx(
+  fpath_SUNA, 
+  sheet = "SUNA1964_BATCH_pro", 
+  col_types = c(
+    "text", 
+    "skip", 
+    "skip", 
+    "date", 
+    "skip", 
+    "skip", 
+    "numeric", 
+    "numeric", 
+    "skip", 
+    "skip", 
+    "skip", 
+    "skip", 
+    "skip", 
+    "skip", 
+    "skip"
+  ), 
+  skip = 7
+) %>% 
+  rename(
+    SUNA_id = `Frame Header`, 
+    NO3_umol = `Processed NO3(uMol)`, 
+    NO3_mgNL = `Processed NO3(mg N/L)`, 
+    DateTime = `UTC DateTime`
+  ) %>% 
+  mutate(across(NO3_umol:NO3_mgNL, 
+                ~replace(., . == "NaN", NA)), 
+         DateTime = round_date(DateTime, "15 mins")) %>% 
+  group_by(SUNA_id, DateTime) %>% 
+  summarize(NO3_umol = mean(NO3_umol, na.rm = T), 
+            NO3_mgNL = mean(NO3_mgNL, na.rm = T), 
+            NO3_n = n()) %>% 
+  mutate(DateTime = DateTime - 8*60*60)
+
+data_combined <- full_join(data_HCEP, data_SUNA) %>% 
+  arrange(DateTime) %>% 
+  filter(row_number() >= 8, 
+         row_number() <= n() - 11) %>% 
+  mutate(DateTime = as.character(DateTime))
+
+fpath <- here("data", "socrata", 
+              "penncovebottom_socrata_2025-07_2025-10.csv")
+write_csv(data_combined, fpath)
+
 #### 2025-01 to 2025-04 ####
 fpath_HCEP <- here("data", "raw", "Penn Cove near-bottom", 
                    "Penn Cove NB HCEP 2025-01 to 2025-04.xlsx")
