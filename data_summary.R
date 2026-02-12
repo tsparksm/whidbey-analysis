@@ -175,9 +175,9 @@ ggsave(here("figs", "penncovesurfaceN.png"),
        height = 5, width = 8)
 
 #### Figure - nitrate + chl bottle ####
-station <- "PSUSANBUOY"
-title <- "Pt. Susan buoy - surface"
-yoi <- 2024
+station <- if (!exists("station")) {station <- readline("Station of interest: ")}
+title <- if (!exists("title")) {title <- readline("Figure title: ")}
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 data_to_plot <- data_discrete %>% 
   filter(ParmId %in% c(1, 14), 
@@ -207,7 +207,8 @@ ggsave(here("figs", station, paste0(yoi, "_chl_NO23.png")),
        dpi = 600, height = 5, width = 8)
 
 #### Figure - N and P bottle for a single deep station, year ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+
 stations <- c("PENNCOVEENT")
 for (station in stations) {
   ggplot(data = data_discrete %>% 
@@ -299,6 +300,8 @@ for (station in unique(data_discrete$Locator)) {
 }
 
 #### Figure - phosphate bottle highlight year ####
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
            filter(Locator == station,  
@@ -331,7 +334,8 @@ for (station in unique(data_discrete$Locator)) {
          height = 5, width = 8)
 }
 #### Figure - silica bottle highlight year ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
            filter(Locator == station,  
@@ -387,7 +391,8 @@ for (station in unique(data_discrete$Locator)) {
 }
 
 #### Figure - chl CTD profiles by station, year ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+
 for (station in unique(data_ctd$Locator)) {
   data_to_plot <- data_ctd %>% 
     filter(Locator == station, 
@@ -409,7 +414,8 @@ for (station in unique(data_ctd$Locator)) {
 }
 
 #### Figure - surface density CTD profiles by station, year ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+
 for (station in unique(data_ctd$Locator)) {
   if (station == "PENNCOVEPNN001") next
   ggplot(data = data_ctd %>% 
@@ -431,7 +437,7 @@ for (station in unique(data_ctd$Locator)) {
 
 
 #### Figure - integrated chl by station, year ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 totalchl <- data_ctd %>% 
   filter(Depth >= 1, 
@@ -455,7 +461,8 @@ ggsave(here("figs", paste0(yoi, "_50m_int_chl.png")),
        dpi = 600, height = 4, width = 6)
 
 #### Figure - integrated chl by year - deep stations basin comparison ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2")
 
@@ -486,8 +493,8 @@ ggplot(data = totalchl,
 ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep.png")), 
        dpi = 600, height = 4, width = 6)
 
+yoi <- if (!exists("yoi")) {yoi <- readline("Year of interest?: ")}
 
-yoi <- 2024
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2", 
               "KSBP01", "JSUR01", "NSEX01", "LSEP01", "LSNT01")
@@ -555,7 +562,7 @@ ggsave(here("figs", "whidbey_int_chl.png"),
        dpi = 600, height = 5, width = 8)
   
 #### Figure - minimum DO, single year ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 data_to_plot <- data_ctd %>% 
   filter(Year == yoi, 
@@ -590,7 +597,7 @@ ggsave(here("figs", paste0(yoi, "_min_DO.png")),
        dpi = 600, height = 6, width = 11)
 
 #### Figure - minimum DO, all years ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 data_to_plot <- data_ctd %>% 
   filter(Locator != "PENNCOVEPNN001", 
@@ -630,7 +637,7 @@ ggsave(here("figs", paste0(yoi, "_min_DO.png")),
 
 
 #### Figure - minimum DO, all years single station ####
-station <- "Poss DO-2"
+station <- if (!exists("station")) {station <- readline("Station of interest: ")}
 
 data_to_plot <- data_ctd %>% 
   filter(Locator == station) %>% 
@@ -667,8 +674,8 @@ ggsave(here("figs", paste0(station, "_minDO.png")),
        dpi = 600, height = 5, width = 8)
 
 #### Figure - top and bottom DO by year, station ####
-yoi <- 2024
-station <- "PENNCOVEENT"
+station <- if (!exists("station")) {station <- readline("Station of interest: ")}
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 data_to_plot <- data_ctd %>% 
   filter(Year == yoi, 
