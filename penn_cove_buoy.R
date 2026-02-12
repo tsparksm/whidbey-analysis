@@ -2,7 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(rtide)
 
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 #### Load QC'd data and combine ####
 surf_data <- load_qc_penncovesurf() %>% 
@@ -16,7 +16,6 @@ discrete_data <- load_whidbey_discrete()
 ctd_data <- load_CTD("PENNCOVEENT")
 
 #### Figure: year of DO, top vs bottom ####
-yoi <- 2024
 data_to_plot <- combo_data %>% 
   mutate(Oxygen_bottom = ifelse(Oxygen_final_bottom == 1, Oxygen_bottom, NA), 
          Oxygen_surface = ifelse(Oxygen_final_surface == 1, Oxygen_surface, NA)) %>% 
@@ -49,7 +48,6 @@ ggsave(here("figs", "penncove",
        height = 6, width = 12)
 
 #### Figure: year of NO23, top vs bottom ####
-yoi <- 2024
 data_to_plot <- combo_data %>% 
   mutate(NO23_bottom = ifelse(NO23_final_bottom == 1, NO23_bottom, NA), 
          NO23_surface = ifelse(NO23_final_surface == 1, NO23_surface, NA)) %>% 
@@ -80,7 +78,6 @@ ggsave(here("figs", "penncove",
        height = 6, width = 10)
 
 #### Figure: year of chl, top vs bottom ####
-yoi <- 2024
 data_to_plot <- combo_data %>% 
   mutate(Chlorophyll_bottom = ifelse(Chlorophyll_final_bottom == 1, 
                                      Oxygen_bottom, NA), 
