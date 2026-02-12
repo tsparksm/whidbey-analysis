@@ -115,6 +115,41 @@ ggsave(here("figs", "penncove",
 #### Figure: short period DO ####
 
 
+#### Figure: wind arrows - 1 year ####
+data_to_plot <- surf_data %>% 
+  filter(Year == yoi) %>% 
+  mutate(x = WindSpeed_surface*cos((-WindDirection_surface+270)*pi/180), 
+         y = WindSpeed_surface*sin((-WindDirection_surface+270)*pi/180)) %>% 
+  group_by(Date) %>% 
+  summarize(xavg = mean(x, na.rm = TRUE), 
+            yavg = mean(y, na.rm = TRUE))
+
+n <- nrow(data_to_plot)
+
+df.sliced <- data_to_plot %>%
+  mutate(rown = row_number(), 
+         datelabel = paste(month.abb[month(Date)], day(Date))) %>% 
+  slice(round(seq(1, n(), by = 7)))
+
+ggplot(data_to_plot, 
+            aes(x = 1:n, 
+                y = 0,
+                xend = 1:n + xavg,
+                yend = yavg)) +
+  theme_bw() +
+  geom_segment(arrow = arrow(angle = 20, length = unit(.03, "npc"), type = "closed")) +
+  labs(x = "", 
+       y = "Wind velocity (m/s)", 
+       title = paste("Penn Cove daily winds -", yoi)) + 
+  scale_x_continuous(breaks = df.sliced$rown, 
+                     labels = df.sliced$datelabel) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.4))
+
+ggsave(here("figs", "penncove", paste0(yoi, "_penncove_wind.png")), 
+       dpi = 600, 
+       height = 2, 
+       width = 12)
+
 #### Hypoxic time ####
 library(DescTools)
 temp <- bottom_data %>% 
