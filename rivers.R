@@ -23,7 +23,7 @@ wide_data <- pivot_wider(long_data,
                          values_from = val)
 
 #### Plot year of river flows - single figure ####
-yoi <- 2023
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 ggplot(data = long_data %>% 
          filter(Year == yoi), 
@@ -38,8 +38,8 @@ ggplot(data = long_data %>%
                date_labels = "%b") + 
   scale_color_brewer(palette = "Dark2") + 
   labs(x = "", 
-       y = expression(Daily~mean~flow~(ft^3/s)), 
-       title = paste(yoi, "River Flows"), 
+       y = expression(Daily~mean~flow~(ft^3/s)),
+       title = paste(yoi, "River Flows"),
        color = "")
 ggsave(here("figs", 
             paste0("river_flow_combined_", yoi, ".png")), 
@@ -47,7 +47,7 @@ ggsave(here("figs",
        height = 4, width = 8)
 
 #### Plot year of river flows - multipanel ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 ggplot(data = long_data %>% 
          filter(Year == yoi), 
