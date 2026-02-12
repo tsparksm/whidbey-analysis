@@ -802,3 +802,24 @@ fpath <- here("data", "socrata",
               "penncovebottom_socrata_2024-02-01.csv")
 write_csv(data_combined, fpath)
 
+
+#### O2sat test ####
+# What units is DO actually in?
+longitude <- -122.65
+latitude <- 48.2369
+o2testdata <- data_combined %>% 
+  select(DateTime, 
+         Temperature_C, 
+         Salinity_PSU, 
+         Pressure_dbar, 
+         Oxygen_mgL, 
+         Oxygen_sat) %>% 
+  mutate(SA = gsw_SA_from_SP(Salinity_PSU, Pressure_dbar, longitude, latitude), 
+         CT = gsw_CT_from_t(SA, Temperature_C, Pressure_dbar), 
+         rho = gsw_rho(SA, CT, Pressure_dbar), 
+         O2sol_umolkg = gsw_O2sol(SA, CT, Pressure_dbar, longitude, latitude), 
+         O2sol_umolL = O2sol_umolkg * rho / 1000, 
+         O2sol_mL = O2sol_umolL / 44.661, 
+         O2sol_mg = O2sol_mL / 0.7, 
+         value1_o2sat = Oxygen_mgL / O2sol_mg)
+write_csv(head(o2testdata), here("data", "o2sattest.csv"))
