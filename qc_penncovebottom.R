@@ -145,8 +145,8 @@ write_csv(qc_sw,
           here("data", "penncovebottom_sw_qc.csv"))
 
 #### FIGURE - pressure ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date))
@@ -165,8 +165,8 @@ p <- ggplot(data_to_plot,
 ggplotly(p)
 
 #### FIGURE - temperature ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
@@ -196,8 +196,8 @@ p <- ggplot(data_to_plot) +
 ggplotly(p)
 
 #### FIGURE - salinity ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
@@ -230,8 +230,8 @@ p <- ggplot(data_to_plot) +
 ggplotly(p) %>% layout(legend = list(orientation = "h"))
 
 #### FIGURE - oxygen ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
@@ -263,8 +263,8 @@ p <- ggplot(data_to_plot) +
 ggplotly(p) %>% layout(legend = list(orientation = "h"))
 
 #### FIGURE - pH ####
-start_date <- as.Date("2024-12-01")
-end_date <- as.Date("2025-01-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date))
@@ -283,8 +283,8 @@ p <- ggplot(data_to_plot,
 ggplotly(p)
 
 #### FIGURE - chlorophyll ####
-start_date <- as.Date("2024-05-01")
-end_date <- as.Date("2024-07-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
@@ -317,8 +317,8 @@ p <- ggplot(data_to_plot) +
 ggplotly(p) %>% layout(legend = list(orientation = "h"))
 
 #### FIGURE - turbidity ####
-start_date <- as.Date("2024-04-01")
-end_date <- as.Date("2024-09-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date))
@@ -339,8 +339,8 @@ p <- ggplot(data_to_plot,
 ggplotly(p)
 
 #### FIGURE - NO23 ####
-start_date <- as.Date("2024-04-01")
-end_date <- as.Date("2024-05-01")
+if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
+if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
