@@ -8,7 +8,7 @@ data_climate <- load_climate() %>%
 data_strat <- load_strat()
 
 #### Single year wind ####
-yoi <- 2024
+yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 data_to_plot <- data_climate %>% 
   filter(Year == yoi)
@@ -26,8 +26,10 @@ ggsave(here("figs", paste0("Everett_winds_", yoi, ".png")),
        width = 6, height = 4, dpi = 600)
 
 #### Short period strat & wind ####
-poi <- as.Date(c("2024-09-01", "2024-12-31"))
-station <- "SARATOGACH"
+start_date <- if (!exists("start_date")) {start_date <- readline("Start date: ")}
+end_date <- if (!exists("end_date")) {end_date <- readline("End date: ")}
+poi <- as.Date(c(start_date, end_date))
+station <- if (!exists("station")) {station <- readline("Station of interest: ")}
 data_to_plot <- data_climate %>% 
   select(Date, AWND) %>% 
   full_join(filter(data_strat, Locator == station))
