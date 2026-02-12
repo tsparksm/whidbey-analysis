@@ -1,46 +1,34 @@
-#### Setup ####
-source(here::here("src", "utility_functions.R"))
-source(here::here("src", "contour_functions.R"))
-library(metR)
-library(cmocean)
-library(scales)
-
-# What stations to plot?
-# stations <- c("SARATOGACH", "SARATOGAOP", "SARATOGARP")
-# stations <- c("PSUSANENT", "PSUSANKP", "PSUSANBUOY")
-# stations <- c("PENNCOVECW", "PENNCOVEENT", "PENNCOVEWEST")
-stations <- c("SARATOGACH", "SARATOGAOP", "SARATOGARP",
-              "Poss DO-2", "PSUSANENT", "PSUSANKP", "PSUSANBUOY",
-              "PENNCOVECW", "PENNCOVEENT", "PENNCOVEWEST")
-# stations <- c("Poss DO-2", "PSUSANENT", "PSUSANKP", 
-#               "SARATOGACH", "SARATOGAOP", "SARATOGARP")
-
-# All stations on one figure? TRUE or FALSE
-all_stations_fig <- FALSE
-
-# If all_stations_fig == FALSE, same limits across stations? TRUE or FALSE
-all_stations_lims <- FALSE
-
-# What years to plot? c(min_year, max_year)
-years <- c(2022, 2024)
+#### SETUP - LINE BY LINE ####
+# Select stations, years, figure settings
+stations <- select.list(
+  c("SARATOGACH", "SARATOGAOP", "SARATOGARP",
+    "Poss DO-2", "PSUSANENT", "PSUSANKP", "PSUSANBUOY",
+    "PENNCOVECW", "PENNCOVEENT", "PENNCOVEWEST"), 
+  multiple = TRUE
+)
+all_stations_fig <- as.logical(
+  select.list(c("TRUE", "FALSE"), title = "All stations on one fig?")
+)
+all_stations_lims <- as.logical(
+  select.list(c("TRUE", "FALSE"), title = "Same limits for all stations (if not all on one fig)?")
+)
+all_years_fig <- as.logical(
+  select.list(c("TRUE", "FALSE"), title = "All years on one fig?")
+)
+all_years_lims <- as.logical(
+  select.list(c("TRUE", "FALSE"), title = "Same limits for all years (if not all on one fig)?")
+)
+min_year <- as.numeric(readline("Minimum year: "))
+max_year <- as.numeric(readline("Maximum year: "))
+years <- c(min_year, max_year)
 n <- length(unique(years))
 
-# All years on one figure? TRUE or FALSE
-all_years_fig <- TRUE
-
-# If all_years_fig == FALSE, same limits across years? TRUE or FALSE
-all_years_lims <- TRUE
-
+# Mostly unchanging figure parameters
 # Do you want contour lines on your sigma-theta plots?
 sigmat_contour_alpha <- 0.1  # if you want contour lines, use 0.1; else use 0
 
 # How wide do you want your depth bins (0.5, 1, 2, 5 probably best)
 bin_width <- 0.5
-
-# Load composite data
-data_ctd <- load_composite(bin_width, 
-                           monthly = FALSE) %>% 
-  mutate(YearDay = yday(Date))
 
 # How narrowly spaced do you want the color bins in each of these plots?
 # Original values are in comments following semi-colon
@@ -56,6 +44,18 @@ acc_NO23 <- 0.01
 # Set figure sizes
 h <- 2.5
 w <- 6.5
+
+#### Load libraries ####
+source(here::here("src", "utility_functions.R"))
+source(here::here("src", "contour_functions.R"))
+library(metR)
+library(cmocean)
+library(scales)
+
+#### Load composite data ####
+data_ctd <- load_composite(bin_width, 
+                           monthly = FALSE) %>% 
+  mutate(YearDay = yday(Date))
 
 #### Calculate max_depth for each station ####
 max_depth <- data_ctd %>% 
@@ -1510,3 +1510,4 @@ if (all_stations_fig) {
 #            dpi = 600) 
 #   }
 # }
+# 
