@@ -10,13 +10,13 @@ library(readxl)
 raw_data <- load_penncovesurf() %>% 
   mutate(
     AirTemperature = ifelse(
-      is.na(AirTemperature), `WTX534(Temp)`, AirTemperature
+      is.na(AirTemperature), WTX534_Temp, AirTemperature
     ), 
     Humidity = ifelse(
-      is.na(Humidity), `WTX(Humidity)`, Humidity
+      is.na(Humidity), WTX534_Humidity, Humidity
     ), 
     AirPressure = ifelse(
-      is.na(AirPressure), `WTX(Pressure)`, AirPressure
+      is.na(AirPressure), WTX534_Pressure, AirPressure
     )
   ) %>% 
   select(!contains("WTX")) %>% 
