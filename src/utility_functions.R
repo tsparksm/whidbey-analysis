@@ -601,7 +601,7 @@ load_penncovebottom <- function() {
                        col_types = cols(
                          HCEP_id = col_character(), 
                          DateTime = col_datetime(
-                           format = "%m/%d/%Y %I:%M:%S %p"
+                           format = "%Y-%m-%d %H:%M:%S"
                          ), 
                          Temperature_C = col_double(), 
                          Conductivity_Sm = col_double(), 
