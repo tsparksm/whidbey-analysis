@@ -6,37 +6,38 @@ source(here::here("src", "utility_functions.R"))
 # fpath is an optional filepath specification; if blank will pop up file selection
 load_hydrosphere_coupeville <- function(fpath) {
   if (missing(fpath)) {
-    fpath <- choose.files(caption = "Select file to load", 
-                          multi = FALSE)
+    fpath <- choose.files(caption = "Select file to load", multi = FALSE)
   }
   
-  mooring_data <- read_csv(fpath, 
-                           col_types = cols(
-                             UnixTimestamp = col_double(), 
-                             Date = col_date(), 
-                             Time = col_time(), 
-                             SystemBattery = col_double(), 
-                             `HCEP(TEMP)` = col_double(), 
-                             `HCEP(COND)` = col_double(), 
-                             `HCEP(PRES)` = col_double(), 
-                             `HCEP(OXY)` = col_double(), 
-                             `HCEP(PH)` = col_double(), 
-                             `HCEP(FL)` = col_double(), 
-                             `HCEP(TURB)` = col_double(), 
-                             `HCEP(FSD)` = col_double(), 
-                             `HCEP(TSD)` = col_double(), 
-                             `HCEP(SAL)` = col_double(), 
-                             `HCEP(SNDV)` = col_double(), 
-                             `HCEP(SPC)` = col_double(), 
-                             `HCEP(OSAT)` = col_double(), 
-                             `HCEP(VOLT)` = col_double(), 
-                             `HCEP(NUM)` = col_double(), 
-                             `SUNA(M_Parameter1)` = col_double(), 
-                             `SUNA(M_Parameter2)` = col_double(), 
-                             `SUNA(M_Parameter3)` = col_double(), 
-                             `SUNA(M_Parameter4)` = col_double(), 
-                             `HCEP(ERR)` = col_double()
-                           ))
+  mooring_data <- read_csv(
+    fpath, 
+    col_types = cols(
+      UnixTimestamp = col_double(), 
+      Date = col_date(), 
+      Time = col_time(), 
+      SystemBattery = col_double(), 
+      `HCEP(TEMP)` = col_double(), 
+      `HCEP(COND)` = col_double(), 
+      `HCEP(PRES)` = col_double(), 
+      `HCEP(OXY)` = col_double(), 
+      `HCEP(PH)` = col_double(), 
+      `HCEP(FL)` = col_double(), 
+      `HCEP(TURB)` = col_double(), 
+      `HCEP(FSD)` = col_double(), 
+      `HCEP(TSD)` = col_double(), 
+      `HCEP(SAL)` = col_double(), 
+      `HCEP(SNDV)` = col_double(), 
+      `HCEP(SPC)` = col_double(), 
+      `HCEP(OSAT)` = col_double(), 
+      `HCEP(VOLT)` = col_double(), 
+      `HCEP(NUM)` = col_double(), 
+      `SUNA(M_Parameter1)` = col_double(), 
+      `SUNA(M_Parameter2)` = col_double(), 
+      `SUNA(M_Parameter3)` = col_double(), 
+      `SUNA(M_Parameter4)` = col_double(), 
+      `HCEP(ERR)` = col_double()
+    )
+  )
 }
 
 # Take raw hydrosphere output from Coupeville, filter by datetime, and save .csv
@@ -47,13 +48,15 @@ process_socrata_coupeville <- function(start_date,
                                        start_time, 
                                        end_date, 
                                        end_time) {
-  raw_data <- load_hydrosphere_coupeville() %>% 
-    mutate(DateTime = as.POSIXct(UnixTimestamp/1000, 
-                                 origin="1970-01-01", 
-                                 tz = "UTC"), 
-           NewDateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
-           Date = as.Date(str_sub(NewDateTime, 1, 10)), 
-           Time = parse_time(str_sub(NewDateTime, 12, 19))) %>% 
+  raw_data <- load_hydrosphere_coupeville() |> 
+    mutate(
+      DateTime = as.POSIXct(
+        UnixTimestamp/1000, 
+        origin = "1970-01-01", 
+        tz = "UTC"
+      ), 
+      NewDateTime = with_tz(DateTime, tzone = "Etc/GMT+8"), 
+      Date = as.Date(str_sub(NewDateTime, 1, 10)), 
       Time = parse_time(
         if_else(
           str_sub(NewDateTime, 12, 19) == "", 
@@ -76,13 +79,13 @@ process_socrata_coupeville <- function(start_date,
     end_date = max(raw_data$Date)
   }
   
-  fpath <- here("data", "socrata", paste0("coupeville_socrata_", 
-                                          start_date, "_",
-                                          end_date,
-                                          ".csv"))
+  fpath <- here(
+    "data", 
+    "socrata", 
+    paste0("coupeville_socrata_", start_date, "_", end_date, ".csv")
+  )
   
-  write_csv(raw_data, 
-            file = fpath)
+  write_csv(raw_data, file = fpath)
 }
 
 #### Routine Socrata fill ####
