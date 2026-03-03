@@ -2,7 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(rtide)
 
-yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 #### Load QC'd data and combine ####
 surf_data <- load_qc_penncovesurf() %>% 
