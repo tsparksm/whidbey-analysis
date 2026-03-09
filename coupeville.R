@@ -16,12 +16,14 @@ bottle_data <- load_whidbey_discrete()
 ctd_data <- load_CTD("PENNCOVECW")
 
 #### Load/generate tide data ####
-tide_data <- tide_height(stations = "Seattle", 
-                         minutes = 15, 
-                         from = min(qc_data$Date) - 1, 
-                         to = max(qc_data$Date) + 1, 
-                         tz = "Etc/GMT-8")
-comb_data <- left_join(qc_data, tide_data %>% select(-Station))
+tide_data <- tide_height(
+  stations = "Seattle", 
+  minutes = 15, 
+  from = min(qc_data$Date) - 1, 
+  to = max(qc_data$Date) + 1, 
+  tz = "Etc/GMT-8"
+)
+comb_data <- left_join(qc_data, tide_data |> select(-Station))
 
 #### Mooring - temperature salinity plot ####
 data_to_plot <- qc_data %>%  
