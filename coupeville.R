@@ -2,7 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(rtide)
 
-yoi <- 2024
+if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 #### Load data ####
 # Remember to update file via Socrata download first!
