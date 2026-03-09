@@ -4,6 +4,8 @@ library(waterData)
 library(rtide)
 library(zoo)
 
+if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+
 #### Load and combine old (pre-Dec 2023) buoy data #### 
 data_buoy <- load_PS_buoy_old() %>% 
   mutate(Type = "KC") %>% 
@@ -127,8 +129,6 @@ data_buoy_qc <- data_buoy_long %>%
                        4, Flag))
 
 #### Figure - chlorophyll, all years ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
          year(DateTime) <= yoi, 
@@ -201,8 +201,6 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 4, width = 6)
 
 #### Figure - chlorophyll, single year ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Chlorophyll", 
          year(DateTime) == yoi, 
@@ -233,8 +231,6 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 4, width = 6)
 
 #### Figure - oxygen, all years ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
          Value < 23, 
@@ -305,8 +301,6 @@ ggsave(here("figs", "psusanbuoy",
 
 
 #### Figure - oxygen, single year ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Oxygen", 
          year(DateTime) == yoi, 
@@ -334,8 +328,6 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 6, width = 4)
 
 #### Figure - nitrate, single year ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_new %>% 
   filter(year(DateTime) == yoi, 
          NO23_final == 1)
@@ -353,8 +345,6 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 6, width = 4)
 
 #### Figure - salinity, single year ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_new %>% 
   filter(year(DateTime) == yoi, 
          Salinity_final == 1)
@@ -411,8 +401,6 @@ ggsave(here("figs", "psusanbuoy",
 
 
 #### Figure - temperature, single year ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_new %>% 
   filter(year(DateTime) == yoi, 
          Temperature_final == 1)
@@ -430,8 +418,6 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 6, width = 4)
 
 #### Figure - daily mean temperature ####
-yoi <- 2024
-
 data_to_plot <- data_buoy_qc %>% 
   filter(Parameter == "Temperature", 
          !(Temperature_final %in% 2:3), 
