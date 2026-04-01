@@ -400,6 +400,55 @@ ggsave(here("figs", "psusanbuoy",
        dpi = 600, height = 4, width = 6)
 
 
+#### Figure - temperature, all years ####
+data_to_plot <- data_buoy_qc |>
+  filter(
+    Parameter == "Temperature", 
+    Year <= yoi, 
+    !(Flag %in% 3:4), 
+    !(Temperature_final %in% 2:3)
+  ) |>
+  mutate(
+    YearGroup = ifelse(
+      Year == yoi, 
+      yoi, 
+      paste(min(year(DateTime)), yoi - 1, sep = "-")
+    ), 
+    FakeDate = DateTime) %>% 
+  arrange(YearGroup)
+year(data_to_plot$FakeDate) <- yoi
+
+ggplot(
+  data_to_plot, 
+  aes(
+    x = FakeDate, 
+    y = Value, 
+    color = YearGroup, 
+    shape = Type
+  )
+) + 
+  theme_bw() + 
+  labs(
+    x = "", 
+    y = expression("Temperature "( degree*C)), 
+    color = "", 
+    shape = "Group"
+  ) + 
+  geom_point() + 
+  scale_x_datetime(
+    date_minor_breaks = "1 month", 
+    date_labels = "%b"
+  ) + 
+  scale_color_manual(values = c("gray", "black")) + 
+  scale_y_continuous(limits = c(0, NA))
+
+ggsave(
+  here("figs", "psusanbuoy", paste0(yoi, "_T_comparison.png")), 
+  dpi = 600, 
+  height = 4, 
+  width = 6
+)
+
 #### Figure - temperature, single year ####
 data_to_plot <- data_buoy_new %>% 
   filter(year(DateTime) == yoi, 
