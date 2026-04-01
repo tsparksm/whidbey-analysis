@@ -335,7 +335,7 @@ p <- ggplot(data_to_plot) +
              color = "blue") + 
   scale_shape_manual(values = c("Lab" = 2, "Field" = 8)) + 
   guides(color = "none") + 
-  lims(y = c(0, 1000))
+  scale_y_continuous(limits = c(0, 400), expand = c(0, 0))
 ggplotly(p) %>% layout(legend = list(orientation = "h"))
 
 #### FIGURE - turbidity ####
