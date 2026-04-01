@@ -143,8 +143,7 @@ if (all_stations_fig) {
                          breaks = mybreaks, 
                          limits = lims, 
                          labels = mylabels, 
-                         guide = guide_colorbar(show.limits = TRUE, 
-                                                ticks = FALSE, 
+                         guide = guide_colorbar(ticks = FALSE, 
                                                 reverse = TRUE)) + 
       scale_y_reverse(expand = c(0, 0)) + 
       coord_cartesian(xlim = c(0, 366)) + 
@@ -195,8 +194,7 @@ if (all_stations_fig) {
                            breaks = mybreaks, 
                            limits = lims, 
                            labels = mylabels, 
-                           guide = guide_colorbar(show.limits = TRUE, 
-                                                  ticks = FALSE, 
+                           guide = guide_colorbar(ticks = FALSE, 
                                                   reverse = TRUE)) + 
         scale_y_reverse(expand = c(0, 0)) + 
         coord_cartesian(xlim = c(0, 366)) + 
@@ -251,8 +249,7 @@ if (all_stations_fig) {
                            breaks = mybreaks, 
                            limits = lims, 
                            labels = mylabels, 
-                           guide = guide_colorbar(show.limits = TRUE, 
-                                                  ticks = FALSE, 
+                           guide = guide_colorbar(ticks = FALSE, 
                                                   reverse = TRUE)) + 
         scale_y_reverse(expand = c(0, 0)) + 
         coord_cartesian(xlim = c(0, 366)) + 
@@ -303,8 +300,7 @@ if (all_stations_fig) {
                              breaks = mybreaks, 
                              limits = lims, 
                              labels = mylabels, 
-                             guide = guide_colorbar(show.limits = TRUE, 
-                                                    ticks = FALSE, 
+                             guide = guide_colorbar(ticks = FALSE, 
                                                     reverse = TRUE)) + 
           scale_y_reverse(expand = c(0, 0)) + 
           coord_cartesian(xlim = c(0, 366)) + 
