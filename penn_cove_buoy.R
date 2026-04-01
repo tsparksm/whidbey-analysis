@@ -113,39 +113,87 @@ ggsave(here("figs", "penncove",
 
 
 #### Figure: wind arrows - 1 year ####
-data_to_plot <- surf_data %>% 
-  filter(Year == yoi) %>% 
-  mutate(x = WindSpeed_surface*cos((-WindDirection_surface+270)*pi/180), 
-         y = WindSpeed_surface*sin((-WindDirection_surface+270)*pi/180)) %>% 
-  group_by(Date) %>% 
-  summarize(xavg = mean(x, na.rm = TRUE), 
-            yavg = mean(y, na.rm = TRUE))
+data_to_plot <- surf_data |>
+  filter(Year == yoi) |>
+  mutate(
+    x = WindSpeed_surface * cos((-WindDirection_surface + 270) * pi / 180), 
+    y = WindSpeed_surface * sin((-WindDirection_surface + 270) * pi / 180)
+  ) |> 
+  group_by(Date) |> 
+  summarize(
+    xavg = mean(x, na.rm = TRUE), 
+    yavg = mean(y, na.rm = TRUE)
+  )
 
 n <- nrow(data_to_plot)
+fig_width <- n * 0.1
 
-df.sliced <- data_to_plot %>%
-  mutate(rown = row_number(), 
-         datelabel = paste(month.abb[month(Date)], day(Date))) %>% 
+df.sliced <- data_to_plot |>
+  mutate(
+    rown = row_number(), 
+    datelabel = paste(month.abb[month(Date)], day(Date))
+  ) |> 
   slice(round(seq(1, n(), by = 7)))
 
-ggplot(data_to_plot, 
-            aes(x = 1:n, 
-                y = 0,
-                xend = 1:n + xavg,
-                yend = yavg)) +
+ggplot(
+  data_to_plot, 
+  aes(
+    x = 1:n, 
+    y = 0,
+    xend = 1:n + xavg,
+    yend = yavg
+  )
+) +
   theme_bw() +
-  geom_segment(arrow = arrow(angle = 20, length = unit(.03, "npc"), type = "closed")) +
-  labs(x = "", 
-       y = "Wind velocity (m/s)", 
-       title = paste("Penn Cove daily winds -", yoi)) + 
-  scale_x_continuous(breaks = df.sliced$rown, 
-                     labels = df.sliced$datelabel) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.4))
+  geom_segment(
+    arrow = arrow(
+      angle = 20, 
+      length = unit(.03, "npc"), 
+      type = "closed"
+    )
+  ) +
+  labs(
+    x = "", 
+    y = "Wind velocity (m/s)", 
+    title = paste("Penn Cove daily winds -", yoi)
+  ) + 
+  scale_x_continuous(
+    breaks = df.sliced$rown, 
+    labels = df.sliced$datelabel, 
+    expand = c(0, 0)
+  ) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.4)) + 
+  coord_fixed(ratio = 1)
 
-ggsave(here("figs", "penncove", paste0(yoi, "_penncove_wind.png")), 
-       dpi = 600, 
-       height = 2, 
-       width = 12)
+ggsave(
+  here("figs", "penncove", paste0(yoi, "_penncove_wind.png")), 
+  dpi = 600, 
+  height = 4, 
+  width = fig_width
+)
+
+#### Figure: wind + N + chl - 1 year ####
+data_to_plot <- combo_data |>
+  filter(Year == yoi) |> 
+  mutate(
+    NO23 = ifelse(NO23_final_surface %in% 2:3, NA, NO23_surface), 
+    Chl = case_when(
+      Chlorophyll_final_surface %in% 2:3 ~ NA, 
+      Chlorophyll_surface > 100 ~ NA, 
+      TRUE ~ Chlorophyll_surface
+    ), 
+    Wind = ifelse(WindSpeed_final_surface %in% 2:3, NA, WindSpeed_surface)
+  )
+
+ggplot(
+  data_to_plot, 
+  aes(x = DateTime)
+) + 
+  geom_area(aes(y = Wind^3 / 2000), fill = "gray") + 
+  geom_point(aes(y = NO23), color = "black", shape = ".", alpha = 0.5) + 
+  geom_point(aes(y = Chl / 100), color = "seagreen4", shape = ".", alpha = 0.5)
+  
+
 
 #### Hypoxic time ####
 library(DescTools)
