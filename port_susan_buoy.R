@@ -666,7 +666,7 @@ p1 <- ggplot(data = data_subset,
   geom_ribbon(aes(ymin = 0, ymax = Flow72/40000), fill = "grey") + 
   geom_line(aes(y = MeanN)) + 
   labs(x = "", y = "", title = "Nitrate + nitrite N (mg/L)") + 
-  scale_x_date(expand = c(0, 0)) + 
+  scale_x_date(expand = c(0, 0), date_minor_breaks = "1 month") + 
   scale_y_continuous(expand = c(0, 0))
 p2 <- ggplot(data = data_subset, 
              aes(x = Date)) + 
@@ -674,10 +674,10 @@ p2 <- ggplot(data = data_subset,
   geom_ribbon(aes(ymin = 0, ymax = Flow72/1000), fill = "grey") + 
   geom_line(aes(y = MeanChl)) + 
   labs(x = "", y = "", title = "Chlorophyll fluorescence (ug/L)") + 
-  scale_x_date(expand = c(0, 0)) + 
+  scale_x_date(expand = c(0, 0), date_minor_breaks = "1 month") + 
   scale_y_continuous(expand = c(0, 0))
 
 library(patchwork)
 p1/p2
-ggsave(here("figs", "psusanbuoy", "N_chl_river_multipanel.png"), 
+ggsave(here("figs", "psusanbuoy", "N_chl_river_multipanel_2025.png"), 
        dpi = 600, height = 6, width = 6)
