@@ -265,7 +265,7 @@ ggplot(data = data_to_plot,
              linetype = "dashed", 
              color = "red")
 
-ggsave(here("figs", "tech_memo_min_DO.png"), 
+ggsave(here("figs", paste0(yoi, "_tech_memo_min_DO.png")), 
        dpi = 600, height = 4, width = 7)
 
 #### Figure - Port Susan weird bottom DO/T/S ####
