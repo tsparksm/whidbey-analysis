@@ -239,6 +239,102 @@ ggplot(
   geom_point(aes(y = Chl / 100), color = "seagreen4", shape = ".", alpha = 0.5)
   
 
+#### Figure: chl-a week avg threshold test ####
+data_to_plot <- combo_data |>
+  mutate(
+    chla = ifelse(
+      Chlorophyll_final_surface %in% 2:3,
+      NA,
+      Chlorophyll_surface
+    ), 
+    week = week(Date)
+  ) |> 
+  group_by(Year, week) |> 
+  summarize(chla_mean = mean(chla, na.rm = TRUE)) |> 
+  ungroup() |> 
+  filter_out(Year == 2023, week == 1) |> 
+  filter_out(Year == 2026, week == 5) |> 
+  mutate(chla_na_interp = na.approx(chla_mean)) |> 
+  filter(Year == yoi)
+
+threshold <- median(data_to_plot$chla_na_interp, na.rm = TRUE) * 1.05
+
+ggplot(data_to_plot, aes(x = week, y = chla_na_interp)) + 
+  theme_bw() + 
+  geom_line() + 
+  geom_point(aes(color = is.na(chla_mean))) + 
+  scale_color_manual(values = c("FALSE" = "black", "TRUE" = "maroon3")) + 
+  geom_hline(yintercept = threshold) + 
+  labs(
+    x = "Week", 
+    y = "Mean chl-a (ug/L)", 
+    title = yoi, 
+    color = "Interpolated?"
+  )
+
+ggsave(
+  here("figs", "penncove", paste0(yoi, "_chla_threshold.png")),
+  height = 4,
+  width = 8,
+  dpi = 600
+)
+
+#### Figure: chl-a cumulative sum test ####
+data_to_plot <- combo_data |>
+  mutate(
+    chla = ifelse(
+      Chlorophyll_final_surface %in% 2:3,
+      NA,
+      Chlorophyll_surface
+    ), 
+    week = week(Date)
+  ) |> 
+  group_by(Year, week) |> 
+  summarize(chla_mean = mean(chla, na.rm = TRUE)) |> 
+  ungroup() |> 
+  filter_out(Year == 2023, week == 1) |> 
+  filter_out(Year == 2026, week == 5) |> 
+  mutate(chla_na_interp = na.approx(chla_mean)) |> 
+  filter(Year == yoi) |> 
+  mutate(
+    chla_screened = ifelse(
+      chla_na_interp > 3*sd(chla_na_interp) + median(chla_na_interp), 
+      max(chla_na_interp), 
+      chla_na_interp
+    ), 
+    chla_cumulative = cumsum(chla_na_interp), 
+    chla_shape = "no"
+  )
+
+threshold <- 0.15*max(data_to_plot$chla_cumulative)
+threshold_cross <- min(which(data_to_plot$chla_cumulative > threshold))
+data_to_plot$chla_shape[threshold_cross] <- "yes"
+
+ggplot(data_to_plot, aes(x = week)) +
+  theme_bw() +
+  geom_line(aes(y = chla_screened)) +
+  geom_point(aes(
+    y = chla_screened,
+    color = is.na(chla_mean),
+    shape = chla_shape
+  )) +
+  scale_color_manual(values = c("FALSE" = "black", "TRUE" = "maroon3")) +
+  scale_shape_manual(values = c("no" = 16, "yes" = 8)) + 
+  geom_line(aes(y = chla_cumulative / 20), linetype = "dashed") +
+  labs(
+    x = "Week",
+    y = "Mean chl-a (ug/L)",
+    title = yoi,
+    color = "Interpolated?", 
+    shape = "Bloom start?"
+  )
+
+ggsave(
+  here("figs", "penncove", paste0(yoi, "_chla_cumulative_threshold.png")),
+  height = 4,
+  width = 8,
+  dpi = 600
+)
 
 #### Hypoxic time ####
 library(DescTools)
