@@ -218,7 +218,7 @@ if (all_stations_fig) {
         labs(x = "", 
              y = "Depth (m)", 
              fill = expression(kg/m^3), 
-             title = bquote(sigma[Theta]~yoi))
+             title = bquote(sigma[Theta]~.(yoi)))
       ggsave(here("figs", "contour", "sigmat", 
                   paste0(paste(stations, collapse = "_"), 
                          "_sigmat_", 
@@ -324,7 +324,7 @@ if (all_stations_fig) {
           labs(x = "", 
                y = "Depth (m)", 
                fill = expression(kg/m^3), 
-               title = bquote(.(station)~sigma[Theta]~yoi))
+               title = bquote(.(station)~sigma[Theta]~.(yoi)))
         ggsave(here("figs", "contour", "sigmat", station, 
                     paste0(station, "_sigmat_", 
                            yoi, 
