@@ -234,7 +234,7 @@ yoi <- 2024
 
 data_to_plot <- data_ctd %>% 
   filter(Locator != "PENNCOVEPNN001", 
-         Year >= 2020) %>% 
+         between(Year, 2022, yoi)) %>% 
   group_by(Locator, Date) %>% 
   summarize(MinDO = min(DO)) %>% 
   mutate(FakeDate = Date)
