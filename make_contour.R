@@ -10,18 +10,24 @@ all_stations_fig <- as.logical(
   select.list(c("TRUE", "FALSE"), title = "All stations on one fig?")
 )
 all_stations_lims <- as.logical(
-  select.list(c("TRUE", "FALSE"), title = "Same limits for all stations (if not all on one fig)?")
+  select.list(
+    c("TRUE", "FALSE"), 
+    title = "Same limits for all stations (if not all on one fig)?"
+  )
 )
 all_years_fig <- as.logical(
   select.list(c("TRUE", "FALSE"), title = "All years on one fig?")
 )
 all_years_lims <- as.logical(
-  select.list(c("TRUE", "FALSE"), title = "Same limits for all years (if not all on one fig)?")
+  select.list(
+    c("TRUE", "FALSE"), 
+    title = "Same limits for all years (if not all on one fig)?"
+  )
 )
 min_year <- as.numeric(readline("Minimum year: "))
 max_year <- as.numeric(readline("Maximum year: "))
-years <- c(min_year, max_year)
-n <- length(unique(years))
+years_to_plot <- min_year:max_year
+n <- length(years_to_plot)
 
 # Mostly unchanging figure parameters
 # Do you want contour lines on your sigma-theta plots?
