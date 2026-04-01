@@ -304,8 +304,8 @@ p <- ggplot(data_to_plot,
 ggplotly(p)
 
 #### FIGURE - chlorophyll ####
-if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
-if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
+if (!exists("start_date")) {start_date <- as.Date(readline("Start date: "))}
+if (!exists("end_date")) {end_date <- as.Date(readline("End date: "))}
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
