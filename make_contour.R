@@ -65,8 +65,7 @@ data_ctd <- load_composite(bin_width,
 
 #### Calculate max_depth for each station ####
 max_depth <- data_ctd %>% 
-  filter(Year <= years[2], 
-         Year >= years[1]) %>% 
+  filter(Year %in% years_to_plot) %>% 
   group_by(Locator, Year, YearDay) %>% 
   summarize(MaxDepth = max(BinDepth, na.rm = TRUE)) %>% 
   ungroup() %>% 
@@ -79,7 +78,7 @@ data_remix <- data_ctd %>%
   mutate(FakeYearDay = YearDay)
 
 for (station in stations) {
-  for (yoi in years[1]:years[2]) {
+  for (yoi in years_to_plot) {
     if (min(data_remix$Year) < yoi) {
       extra_data_before <- data_remix %>% 
         filter(Year == yoi - 1, 
@@ -103,7 +102,7 @@ for (station in stations) {
 }
 
 data_remix <- data_remix %>% 
-  filter(Year %in% years[1]:years[2]) %>% 
+  filter(Year %in% years_to_plot) %>% 
   left_join(max_depth)
 
 #### Sigma-t contour plot ####
@@ -129,7 +128,7 @@ data_to_plot <- data_remix %>%
 if (all_stations_fig) {
   if (all_years_fig) {
     ggplot(data = data_to_plot %>% 
-             filter(Year %in% years[1]:years[2])) + 
+             filter(Year %in% years_to_plot)) + 
       theme_classic() + 
       facet_grid(rows = vars(Locator), 
                  cols = vars(Year), 
@@ -173,13 +172,13 @@ if (all_stations_fig) {
     ggsave(here("figs", "contour", "sigmat", 
                 paste0(paste(stations, collapse = "_"), 
                        "_sigmat_", 
-                       years[1], "-", years[2], 
+                       years_to_plot[1], "-", years_to_plot[2], 
                        ".png")), 
            height = h*length(stations), 
            width = w*n, 
            dpi = 600)
   } else {
-    for (yoi in years[1]:years[2]) {
+    for (yoi in years_to_plot) {
       ggplot(data = data_to_plot %>% 
                filter(Year %in% yoi)) + 
         theme_classic() + 
@@ -236,10 +235,10 @@ if (all_stations_fig) {
   for (station in stations) {
     if (all_years_fig) {
       ggplot(data = data_to_plot %>% 
-               filter(Year %in% years[1]:years[2], 
+               filter(Year %in% years_to_plot, 
                       Locator == station)) + 
         theme_classic() + 
-        facet_wrap(~factor(Year, levels = years[1]:years[2]), 
+        facet_wrap(~factor(Year, levels = rev(years_to_plot)), 
                    ncol = 1, 
                    scales = "free_y") + 
         metR::geom_contour_fill(aes(x = FakeYearDay, 
@@ -280,13 +279,13 @@ if (all_stations_fig) {
              title = bquote(.(station)~sigma[Theta]))
       ggsave(here("figs", "contour", "sigmat", station, 
                   paste0(station, "_sigmat_", 
-                         years[1], "-", years[2], 
+                         years_to_plot[1], "-", years_to_plot[2], 
                          ".png")), 
              height = h*n, 
              width = w, 
              dpi = 600)
     } else {
-      for (yoi in years[1]:years[2]) {
+      for (yoi in years_to_plot) {
         ggplot(data = data_to_plot %>% 
                  filter(Year == yoi, 
                         Locator == station)) + 
