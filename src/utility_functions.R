@@ -6,6 +6,10 @@ library(hms)
 library(readxl)
 library(svDialogs)
 library(RSocrata)
+library(metR)
+library(cmocean)
+library(scales)
+library(paletteer)
 
 # Load CTD data - single or multiple sites
 # Outputs a single tibble containing one or more sites
