@@ -121,32 +121,43 @@ data_to_plot <- data_remix |>
   arrange(desc(Year))
 
 # All stations + years on one figure
-ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
-  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
-  add_sigmat_contour()
-ggsave(
+png(
   get_filename(plot_type, stations, years_to_plot), 
   height = h*length(stations), 
   width = w*n_years, 
-  dpi = 600
+  units = "in", 
+  res = 600
 )
+ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
+  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
+  add_sigmat_contour()
+dev.off()
 
 # All stations on one figure; one figure for each year
 for (yoi in years_to_plot) {
+  png(
+    get_filename(plot_type, stations, yoi), 
+    height = h*length(stations), 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_sigmat_contour()
-  ggsave(
-    get_filename(plot_type, stations, yoi), 
-    height = h*length(stations), 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # All years on one figure; one figure for each station
 for (station in stations) {
+  png(
+    get_filename(plot_type, station, years_to_plot), 
+    height = h*n_years, 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
@@ -158,17 +169,19 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_sigmat_contour()
-  ggsave(
-    get_filename(plot_type, station, years_to_plot), 
-    height = h*n_years, 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # One figure for each station + year
 for (station in stations) {
   for (yoi in years_to_plot) {
+    png(
+      get_filename(plot_type, station, yoi), 
+      height = h, 
+      width = w, 
+      units = "in", 
+      res = 600
+    )
     ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_sigmat_contour() + 
@@ -179,12 +192,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
-    ggsave(
-      get_filename(plot_type, station, yoi), 
-      height = h, 
-      width = w, 
-      dpi = 600
-    )
+    dev.off()
   }
 }
 
@@ -214,33 +222,44 @@ data_to_plot <- data_remix |>
   arrange(desc(Year))
 
 # All stations + years on one figure
+png(
+  get_filename(plot_type, stations, years_to_plot), 
+  height = h*length(stations), 
+  width = w*n_years, 
+  units = "in", 
+  res = 600
+)
 ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
   facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
   add_sigmat_contour() + 
   labs(title = paste0("Surface 0-", surface_depth, " m"))
-ggsave(
-  get_filename(plot_type, stations, years_to_plot), 
-  height = h*length(stations), 
-  width = w*n_years, 
-  dpi = 600
-)
+dev.off()
 
 # All stations on one figure; one figure for each year
 for (yoi in years_to_plot) {
+  png(
+    get_filename(plot_type, stations, yoi), 
+    height = h*length(stations), 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = paste(yoi, "surface 0-", surface_depth, " m")) + 
     add_sigmat_contour()
-  ggsave(
-    get_filename(plot_type, stations, yoi), 
-    height = h*length(stations), 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # All years on one figure; one figure for each station
 for (station in stations) {
+  png(
+    get_filename(plot_type, station, years_to_plot), 
+    height = h*n_years, 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
@@ -252,17 +271,19 @@ for (station in stations) {
     ) + 
     labs(title = paste(station, "surface 0-", surface_depth, " m")) + 
     add_sigmat_contour()
-  ggsave(
-    get_filename(plot_type, station, years_to_plot), 
-    height = h*n_years, 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # One figure for each station + year
 for (station in stations) {
   for (yoi in years_to_plot) {
+    png(
+      get_filename(plot_type, station, yoi), 
+      height = h, 
+      width = w, 
+      units = "in", 
+      res = 600
+    )
     ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi, "surface 0-", surface_depth, " m")) + 
       add_sigmat_contour() + 
@@ -273,12 +294,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
-    ggsave(
-      get_filename(plot_type, station, yoi), 
-      height = h, 
-      width = w, 
-      dpi = 600
-    )
+    dev.off()
   }
 }
 
@@ -315,20 +331,29 @@ dev.off()
 
 # All stations on one figure; one figure for each year
 for (yoi in years_to_plot) {
+  png(
+    get_filename(plot_type, stations, yoi), 
+    height = h*length(stations), 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_do_contour()
-  ggsave(
-    get_filename(plot_type, stations, yoi), 
-    height = h*length(stations), 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # All years on one figure; one figure for each station
 for (station in stations) {
+  png(
+    get_filename(plot_type, station, years_to_plot), 
+    height = h*n_years, 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
@@ -340,17 +365,19 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_do_contour()
-  ggsave(
-    get_filename(plot_type, station, years_to_plot), 
-    height = h*n_years, 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # One figure for each station + year
 for (station in stations) {
   for (yoi in years_to_plot) {
+    png(
+      get_filename(plot_type, station, yoi), 
+      height = h, 
+      width = w, 
+      units = "in", 
+      res = 600
+    )
     ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_do_contour() + 
@@ -361,12 +388,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
-    ggsave(
-      get_filename(plot_type, station, yoi), 
-      height = h, 
-      width = w, 
-      dpi = 600
-    )
+    dev.off()
   }
 }
 
@@ -389,32 +411,43 @@ mybreaks <- seq(lims[1], lims[2], by = acc_T)
 mylabels <- get_labels(mybreaks)
 
 # All stations + years on one figure
-ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
-  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
-  add_t_contour()
-ggsave(
+png(
   get_filename(plot_type, stations, years_to_plot), 
   height = h*length(stations), 
   width = w*n_years, 
-  dpi = 600
+  units = "in", 
+  res = 600
 )
+ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
+  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
+  add_t_contour()
+dev.off()
 
 # All stations on one figure; one figure for each year
 for (yoi in years_to_plot) {
+  png(
+    get_filename(plot_type, stations, yoi), 
+    height = h*length(stations), 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_t_contour()
-  ggsave(
-    get_filename(plot_type, stations, yoi), 
-    height = h*length(stations), 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # All years on one figure; one figure for each station
 for (station in stations) {
+  png(
+    get_filename(plot_type, station, years_to_plot), 
+    height = h*n_years, 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
@@ -426,17 +459,19 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_t_contour()
-  ggsave(
-    get_filename(plot_type, station, years_to_plot), 
-    height = h*n_years, 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # One figure for each station + year
 for (station in stations) {
   for (yoi in years_to_plot) {
+    png(
+      get_filename(plot_type, station, yoi), 
+      height = h, 
+      width = w, 
+      units = "in", 
+      res = 600
+    )
     ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_t_contour() + 
@@ -447,12 +482,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
-    ggsave(
-      get_filename(plot_type, station, yoi), 
-      height = h, 
-      width = w, 
-      dpi = 600
-    )
+    dev.off()
   }
 }
 
@@ -484,32 +514,43 @@ if (!is.na(min_lim)) {
 }
 
 # All stations + years on one figure
-ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
-  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
-  add_s_contour()
-ggsave(
+png(
   get_filename(plot_type, stations, years_to_plot), 
   height = h*length(stations), 
   width = w*n_years, 
-  dpi = 600
+  units = "in", 
+  res = 600
 )
+ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
+  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
+  add_s_contour()
+dev.off()
 
 # All stations on one figure; one figure for each year
 for (yoi in years_to_plot) {
+  png(
+    get_filename(plot_type, stations, yoi), 
+    height = h*length(stations), 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_s_contour()
-  ggsave(
-    get_filename(plot_type, stations, yoi), 
-    height = h*length(stations), 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # All years on one figure; one figure for each station
 for (station in stations) {
+  png(
+    get_filename(plot_type, station, years_to_plot), 
+    height = h*n_years, 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
@@ -521,17 +562,19 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_s_contour()
-  ggsave(
-    get_filename(plot_type, station, years_to_plot), 
-    height = h*n_years, 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # One figure for each station + year
 for (station in stations) {
   for (yoi in years_to_plot) {
+    png(
+      get_filename(plot_type, station, yoi), 
+      height = h*, 
+      width = w, 
+      units = "in", 
+      res = 600
+    )
     ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_s_contour() + 
@@ -542,12 +585,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
-    ggsave(
-      get_filename(plot_type, station, yoi), 
-      height = h, 
-      width = w, 
-      dpi = 600
-    )
+    dev.off()
   }
 }
 
@@ -580,32 +618,43 @@ if (!is.na(min_lim)) {
 }
 
 # All stations + years on one figure
-ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
-  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
-  add_s_contour()
-ggsave(
+png(
   get_filename(plot_type, stations, years_to_plot), 
   height = h*length(stations), 
   width = w*n_years, 
-  dpi = 600
+  units = "in", 
+  res = 600
 )
+ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
+  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
+  add_s_contour()
+dev.off()
 
 # All stations on one figure; one figure for each year
 for (yoi in years_to_plot) {
+  png(
+    get_filename(plot_type, stations, yoi), 
+    height = h*length(stations), 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_s_contour()
-  ggsave(
-    get_filename(plot_type, stations, yoi), 
-    height = h*length(stations), 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # All years on one figure; one figure for each station
 for (station in stations) {
+  png(
+    get_filename(plot_type, station, years_to_plot), 
+    height = h*n_years, 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
@@ -617,17 +666,19 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_s_contour()
-  ggsave(
-    get_filename(plot_type, station, years_to_plot), 
-    height = h*n_years, 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # One figure for each station + year
 for (station in stations) {
   for (yoi in years_to_plot) {
+    png(
+      get_filename(plot_type, station, yoi), 
+      height = h, 
+      width = w, 
+      units = "in", 
+      res = 600
+    )
     ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_s_contour() + 
@@ -638,12 +689,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
-    ggsave(
-      get_filename(plot_type, station, yoi), 
-      height = h, 
-      width = w, 
-      dpi = 600
-    )
+    dev.off()
   }
 }
 
@@ -666,32 +712,43 @@ mybreaks <- seq(lims[1], lims[2], by = acc_NO23)
 mylabels <- get_labels(mybreaks, round = FALSE)
 
 # All stations + years on one figure
-ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
-  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
-  add_no23_contour()
-ggsave(
+png(
   get_filename(plot_type, stations, years_to_plot), 
   height = h*length(stations), 
   width = w*n_years, 
-  dpi = 600
+  units = "in", 
+  res = 600
 )
+ggplot(data = data_to_plot |> filter(Year %in% years_to_plot)) + 
+  facet_grid(rows = vars(Locator), cols = vars(Year), scales = "free_y") + 
+  add_no23_contour()
+dev.off()
 
 # All stations on one figure; one figure for each year
 for (yoi in years_to_plot) {
+  png(
+    get_filename(plot_type, stations, yoi), 
+    height = h*length(stations), 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_s_contour()
-  ggsave(
-    get_filename(plot_type, stations, yoi), 
-    height = h*length(stations), 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # All years on one figure; one figure for each station
 for (station in stations) {
+  png(
+    get_filename(plot_type, station, years_to_plot), 
+    height = h*n_years, 
+    width = w, 
+    units = "in", 
+    res = 600
+  )
   ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
@@ -703,17 +760,19 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_s_contour()
-  ggsave(
-    get_filename(plot_type, station, years_to_plot), 
-    height = h*n_years, 
-    width = w, 
-    dpi = 600
-  )
+  dev.off()
 }
 
 # One figure for each station + year
 for (station in stations) {
   for (yoi in years_to_plot) {
+    png(
+      get_filename(plot_type, station, yoi), 
+      height = h, 
+      width = w, 
+      units = "in", 
+      res = 600
+    )
     ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_s_contour() + 
@@ -724,11 +783,6 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
-    ggsave(
-      get_filename(plot_type, station, yoi), 
-      height = h, 
-      width = w, 
-      dpi = 600
-    )
+    dev.off()
   }
 }
