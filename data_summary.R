@@ -530,6 +530,9 @@ ggsave(here("figs", paste0(yoi, "_50m_int_chl_deep_CvsW.png")),
        dpi = 600, height = 4, width = 6)
 
 #### Figure - integrated chl over time ####
+stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
+              "PSUSANKP", "PSUSANENT", "Poss DO-2")
+
 totalchl <- data_ctd %>% 
   full_join(data_central) %>% 
   filter(Depth >= 1, 
@@ -556,7 +559,6 @@ ggplot(data = totalchl %>%
   scale_color_viridis_d(end = 0.9, direction = -1) + 
   lims(y = c(0, NA)) +
   scale_x_date(date_breaks = "1 year",
-               date_minor_breaks = "3 months", 
                date_labels = "%Y") + 
   theme(legend.position = "none")
 ggsave(here("figs", "whidbey_int_chl.png"), 
