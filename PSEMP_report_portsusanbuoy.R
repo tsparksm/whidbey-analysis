@@ -245,14 +245,13 @@ p7 <- ggplot(
        title = "G. Surface salinity")
 
 #### DO mooring ####
-data_to_plot <- data_buoy %>% 
-  filter(Parameter == "Oxygen")
+data_to_plot <- data_buoy |> 
+  filter(Oxygen_final == 1)
 
-p8 <- ggplot(data = data_to_plot, 
-             aes(x = FakeDate, 
-                 y = Value, 
-                 color = YearGroup, 
-                 shape = Type)) + 
+p8 <- ggplot(
+  data = data_to_plot, 
+  aes(x = FakeDate, y = Oxygen, color = YearGroup)
+) + 
   theme_bw() + 
   theme(legend.position = "none", 
         text = element_text(size = font_size), 
