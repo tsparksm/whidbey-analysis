@@ -155,8 +155,16 @@ add_no23_contour <- function() {
     add_extra_contour_bits()
   )
 }
+
+add_chl_contour <- function() {
+  list(
+    metR::geom_contour_fill(
+      aes(x = FakeYearDay, y = BinDepth, z = Chlorophyll), 
+      na.fill = TRUE, 
+      breaks = mybreaks
+    ), 
     scale_fill_cmocean(
-      name = "thermal", 
+      name = "algae", 
       breaks = mybreaks, 
       limits = lims, 
       labels = mylabels, 
@@ -165,7 +173,7 @@ add_no23_contour <- function() {
     labs(
       x = "", 
       y = "Depth (m)", 
-      fill = "N (mg/L)"
+      fill = expression(Chlorophyll~(mu*g/L))
     ), 
     add_extra_contour_bits()
   )
