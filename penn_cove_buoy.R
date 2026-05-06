@@ -13,6 +13,16 @@ bottom_data <- load_qc_penncovebottom() %>%
   rename_with(~str_c(., "_bottom"), .cols = HCEP_id:OxygenSat_final)
 combo_data <- full_join(surf_data, bottom_data)
 
+#### Add tide data ####
+tide_data <- tide_height(
+  stations = "Seattle", 
+  minutes = 15, 
+  from = min(combo_data$Date) - 1, 
+  to = max(combo_data$Date) + 1, 
+  tz = "Etc/GMT-8"
+)
+combo_data <- left_join(combo_data, tide_data |> select(-Station))
+
 #### Load CTD and discrete data ####
 discrete_data <- load_whidbey_discrete()
 ctd_data <- load_CTD("PENNCOVEENT")
