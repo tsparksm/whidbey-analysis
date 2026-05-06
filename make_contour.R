@@ -306,6 +306,7 @@ for (station in stations) {
 
 #### DO contour plot ####
 plot_type <- "DO"
+lims <- c(0, 10)
 data_to_plot <- data_remix |> 
   filter(
     Locator %in% stations, 
@@ -315,12 +316,13 @@ data_to_plot <- data_remix |>
   group_by(Locator, Year, FakeYearDay, BinDepth) |> 
   summarize(DO = mean(DO, na.rm = TRUE)) |> 
   ungroup() |> 
-  arrange(desc(Year))
+  arrange(desc(Year)) |> 
+  mutate(DO = ifelse(DO > lims[2], lims[2] - 1e-4, DO))
 
 # Calculate whole dataset limits - will be overwritten as needed later
-lims <- get_limits(data_to_plot$DO, acc_DO)
+# lims <- get_limits(data_to_plot$DO, acc_DO)
 mybreaks <- seq(lims[1], lims[2], by = acc_DO)
-mylabels <- get_labels(mybreaks, even_only = TRUE)
+mylabels <- get_labels(mybreaks, max_lim = lims[2], even_only = TRUE)
 
 # All stations + years on one figure
 png(
