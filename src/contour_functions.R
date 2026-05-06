@@ -192,7 +192,6 @@ get_labels <- function(mybreaks,
   } else {
     mylabels[!(round(mylabels, 2) == round(round(mylabels, 1), 2))] <- ""
   }
-  if (even_only)
   if (!is.na(min_lim)) mylabels[1] <- paste0("<", min_lim)
   if (!is.na(max_lim)) mylabels[length(mylabels)] <- paste0(">", max_lim)
   return(mylabels)
