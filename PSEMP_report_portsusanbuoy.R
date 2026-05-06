@@ -151,60 +151,27 @@ p3 <- ggplot(data = data_to_plot) +
   )
 
 #### Chl contour ####
-data_to_plot <- data_ctd %>% 
-  filter(!is.na(Chlorophyll)) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
-  summarize(Chlorophyll = mean(Chlorophyll)) %>% 
-  ungroup()
+data_to_plot <- data_ctd |> 
+  filter(!is.na(Chlorophyll)) |> 
+  group_by(Locator, Year, YearDay, BinDepth) |> 
+  summarize(Chlorophyll = mean(Chlorophyll)) |> 
+  ungroup() |> 
+  rename(FakeYearDay = YearDay)
 
-min_lim <- round_any(min(data_to_plot$Chlorophyll), 
-                     accuracy = acc_chl, 
-                     f = floor)
-max_lim <- round_any(max(data_to_plot$Chlorophyll), 
-                     accuracy = acc_chl, 
-                     f = ceiling)
-mybreaks <- seq(min_lim, max_lim, by = acc_chl)
-mylabels <- mybreaks
-mylabels[round(mybreaks %% 4, 1) != 0] <- ""
+lims <- get_limits(data_to_plot$Chlorophyll, acc = acc_chl)
+mybreaks <- seq(lims[1], lims[2], by = acc_chl)
+mylabels <- get_labels(mybreaks, even_only = TRUE)
 
 p4 <- ggplot(data = data_to_plot) + 
-  theme_bw() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
-        text = element_text(size = font_size), 
-        axis.text.x = element_blank()) + 
-  metR::geom_contour_fill(aes(x = YearDay, 
-                              y = BinDepth, 
-                              z = Chlorophyll), 
-                          na.fill = TRUE, 
-                          breaks = mybreaks) + 
-  scale_fill_cmocean(name = "algae", 
-                     breaks = mybreaks, 
-                     limits = c(min_lim, max_lim), 
-                     labels = mylabels, 
-                     guide = guide_colorbar(show.limits = T, ticks = F)) + 
-  scale_y_reverse(expand = c(0, 0)) + 
-  coord_cartesian(xlim = c(0, 366)) + 
-  scale_x_continuous(expand = c(0, 0), 
-                     breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                yday(paste(yoi, "-02-01", sep = "")), 
-                                yday(paste(yoi, "-03-01", sep = "")), 
-                                yday(paste(yoi, "-04-01", sep = "")), 
-                                yday(paste(yoi, "-05-01", sep = "")), 
-                                yday(paste(yoi, "-06-01", sep = "")), 
-                                yday(paste(yoi, "-07-01", sep = "")), 
-                                yday(paste(yoi, "-08-01", sep = "")), 
-                                yday(paste(yoi, "-09-01", sep = "")), 
-                                yday(paste(yoi, "-10-01", sep = "")), 
-                                yday(paste(yoi, "-11-01", sep = "")), 
-                                yday(paste(yoi, "-12-01", sep = ""))), 
-                     labels = month.abb) + 
-  geom_vline(aes(xintercept = YearDay), 
-             alpha = 0.2) + 
-  labs(x = "", 
-       y = "", 
-       fill = expression(mu*g/L), 
-       title = "D. Chlorophyll fluorescence")
+  add_chl_contour() + 
+  theme(
+    text = element_text(size = font_size), 
+    axis.text.x = element_blank()
+  ) + 
+  labs(
+    fill = expression(mu*g/L), 
+    title = "D. Chlorophyll fluorescence"
+  )
 
 #### N contour ####
 data_to_plot <- data_ctd %>% 
