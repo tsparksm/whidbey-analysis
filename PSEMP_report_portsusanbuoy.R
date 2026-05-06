@@ -221,14 +221,13 @@ p6 <- ggplot(data = data_to_plot,
        title = "F. Surface temperature")
 
 #### S mooring ####
-data_to_plot <- data_buoy %>% 
-  filter(Parameter == "Salinity")
+data_to_plot <- data_buoy |> 
+  filter(Salinity_final == 1)
 
-p7 <- ggplot(data = data_to_plot, 
-             aes(x = FakeDate, 
-                 y = Value, 
-                 color = YearGroup, 
-                 shape = Type)) + 
+p7 <- ggplot(
+  data = data_to_plot, 
+  aes(x = FakeDate, y = Salinity, color = YearGroup)
+) + 
   theme_bw() + 
   theme(legend.position = "none", 
         text = element_text(size = font_size), 
