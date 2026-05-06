@@ -7,8 +7,27 @@ library(readxl)
 
 #### Load data ####
 # Remember to update file via Socrata download first!
-raw_data <- load_psusan() %>% 
-  relocate(WindDirection:SystemBattery, .after = AirPressure)
+old_data <- load_PS_buoy_old() |> 
+  mutate(
+    Type = "KC", 
+    Date = date(DateTime), 
+    Time = as_hms(DateTime), 
+    Month = month(Date), 
+    Year = year(Date)
+  )
+st_data <- load_PS_buoy_ST() |> 
+  mutate(
+    Type = "ST", 
+    Date = date(DateTime), 
+    Time = as_hms(DateTime), 
+    Month = month(Date), 
+    Year = year(Date)
+  )
+raw_data <- load_psusan() |> 
+  relocate(WindDirection:SystemBattery, .after = AirPressure) |> 
+  mutate(Type = "KC") |> 
+  full_join(old_data) |> 
+  full_join(st_data)
 
 # Remember to update discrete data first!
 # download_whidbey_discrete()
