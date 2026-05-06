@@ -139,6 +139,22 @@ add_no23_contour <- function() {
       na.fill = TRUE, 
       breaks = mybreaks
     ), 
+    scale_fill_paletteer_c(
+      palette = "grDevices::YlOrRd",
+      dir = 1,
+      breaks = mybreaks,
+      limits = lims,
+      labels = mylabels,
+      guide = guide_colorbar(ticks = FALSE, reverse = TRUE)
+    ), 
+    labs(
+      x = "", 
+      y = "Depth (m)", 
+      fill = "N (mg/L)"
+    ), 
+    add_extra_contour_bits()
+  )
+}
     scale_fill_cmocean(
       name = "thermal", 
       breaks = mybreaks, 
