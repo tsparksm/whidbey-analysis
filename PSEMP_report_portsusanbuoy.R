@@ -174,62 +174,27 @@ p4 <- ggplot(data = data_to_plot) +
   )
 
 #### N contour ####
-data_to_plot <- data_ctd %>% 
-  filter(!is.na(NO23)) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
-  summarize(NO23 = mean(NO23)) %>% 
-  ungroup()
+data_to_plot <- data_ctd |> 
+  filter(!is.na(NO23)) |> 
+  group_by(Locator, Year, YearDay, BinDepth) |> 
+  summarize(NO23 = mean(NO23)) |> 
+  ungroup() |> 
+  rename(FakeYearDay = YearDay)
 
-min_lim <- round_any(min(data_to_plot$NO23), 
-                     accuracy = acc_N, 
-                     f = floor)
-max_lim <- round_any(max(data_to_plot$NO23), 
-                     accuracy = acc_N, 
-                     f = ceiling)
-mybreaks <- seq(min_lim, max_lim, by = acc_N)
-mylabels <- mybreaks
-mylabels[!(round(mylabels, 2) == round(round(mylabels, 1), 2))] <- ""
+lims <- get_limits(data_to_plot$NO23, acc = acc_N)
+mybreaks <- seq(lims[1], lims[2], by = acc_N)
+mylabels <- get_labels(mybreaks, even_only = TRUE)
 
 p5 <- ggplot(data = data_to_plot) + 
-  theme_bw() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
-        text = element_text(size = font_size), 
-        axis.text.x = element_text(size = font_size + 2, face = "bold")) + 
-  metR::geom_contour_fill(aes(x = YearDay, 
-                              y = BinDepth, 
-                              z = NO23), 
-                          na.fill = TRUE, 
-                          breaks = mybreaks) + 
-  scale_fill_craftfermenter(
-    breaks = mybreaks, 
-    palette = "YlOrRd", 
-    direction = 1, 
-    limits = c(min_lim, max_lim), 
-    labels = mylabels, 
-    guide = guide_colorbar(show.limits = T, ticks = F)) + 
-  scale_y_reverse(expand = c(0, 0)) + 
-  coord_cartesian(xlim = c(0, 366)) + 
-  scale_x_continuous(expand = c(0, 0), 
-                     breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                yday(paste(yoi, "-02-01", sep = "")), 
-                                yday(paste(yoi, "-03-01", sep = "")), 
-                                yday(paste(yoi, "-04-01", sep = "")), 
-                                yday(paste(yoi, "-05-01", sep = "")), 
-                                yday(paste(yoi, "-06-01", sep = "")), 
-                                yday(paste(yoi, "-07-01", sep = "")), 
-                                yday(paste(yoi, "-08-01", sep = "")), 
-                                yday(paste(yoi, "-09-01", sep = "")), 
-                                yday(paste(yoi, "-10-01", sep = "")), 
-                                yday(paste(yoi, "-11-01", sep = "")), 
-                                yday(paste(yoi, "-12-01", sep = ""))), 
-                     labels = month.abb) + 
-  geom_vline(aes(xintercept = YearDay), 
-             alpha = 0.2) + 
-  labs(x = "", 
-       y = "", 
-       fill = "mg N/L", 
-       title = "E. Nitrate + nitrite")
+  add_no23_contour() + 
+  theme(
+    text = element_text(size = font_size), 
+    axis.text.x = element_text(size = font_size + 2, face = "bold")
+  ) + 
+  labs(
+    fill = "mg N/L", 
+    title = "E. Nitrate + nitrite"
+  )
 
 #### T mooring ####
 data_to_plot <- data_buoy %>% 
