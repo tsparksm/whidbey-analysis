@@ -3,7 +3,7 @@ source(here::here("src", "utility_functions.R"))
 library(metR)
 library(cmocean)
 
-yoi <- 2023
+yoi <- 2025
 
 # Figure settings
 fig_dpi <- 600
@@ -31,45 +31,52 @@ data_discrete <- load_whidbey_discrete() %>%
          DateTime = CollectDateTime) %>% 
   filter(Locator == "PSUSANBUOY")
 
-data_buoy <- read_csv(here("data", "port_susan_buoy_qc.csv")) %>% 
-  mutate(DateTime = DateTime - 8*60*60, 
-         Year = year(DateTime)) %>% 
-  filter(Year <= yoi, 
-         !(Flag %in% 3:4)) %>% 
-  mutate(YearGroup = ifelse(year(DateTime) == yoi, 
-                            yoi, 
-                            paste(min(year(DateTime)), 
-                                  yoi-1, 
-                                  sep = "-")), 
-         FakeDate = DateTime) %>% 
+data_buoy <- load_qc_psusan() |>
+  filter(Year <= yoi) |> 
+  mutate(
+    YearGroup = ifelse(
+      year(DateTime) == yoi, 
+      yoi, 
+      paste(min(year(DateTime)), yoi - 1, sep = "-")), 
+    FakeDate = DateTime
+  ) |> 
   arrange(DateTime)
 year(data_buoy$FakeDate) <- yoi
 max_date <- max(data_buoy$FakeDate, na.rm = TRUE)
 min_date <- min(data_buoy$FakeDate, na.rm = TRUE)
 
 bin_width <- 0.5
-data_ctd <- load_composite(bin_width, 
-                           monthly = FALSE) %>% 
-  filter(Locator == "PSUSANBUOY") %>% 
-  mutate(YearDay = yday(Date), 
-         Year = year(Date))
+data_ctd <- load_composite(bin_width, monthly = FALSE) |> 
+  filter(Locator == "PSUSANBUOY") |> 
+  mutate(
+    YearDay = yday(Date), 
+    Year = year(Date)
+  )
 
 # Add extra CTD data before/after each year
-extra_data_before <- data_ctd %>% 
-  filter(Year == yoi - 1, 
-         Locator == "PSUSANBUOY") %>% 
-  filter(YearDay == max(YearDay)) %>% 
-  mutate(YearDay = YearDay - 365, 
-         Year = yoi)
+extra_data_before <- data_ctd |> 
+  filter(
+    Year == yoi - 1, 
+    Locator == "PSUSANBUOY"
+  ) |> 
+  filter(YearDay == max(YearDay)) |> 
+  mutate(
+    YearDay = YearDay - 365, 
+    Year = yoi
+  )
 data_ctd <- add_row(data_ctd, extra_data_before)
 
-extra_data_after <- data_ctd %>% 
-  filter(Year == yoi + 1, 
-         Locator == "PSUSANBUOY") %>% 
-  filter(YearDay == min(YearDay)) %>% 
-  mutate(YearDay = YearDay + 365, 
-         Year = yoi)
-data_ctd <- add_row(data_ctd, extra_data_after) %>% 
+extra_data_after <- data_ctd |> 
+  filter(
+    Year == yoi + 1, 
+    Locator == "PSUSANBUOY"
+  ) |>  
+  filter(YearDay == min(YearDay)) |> 
+  mutate(
+    YearDay = YearDay + 365, 
+    Year = yoi
+  )
+data_ctd <- add_row(data_ctd, extra_data_after) |> 
   filter(Year == yoi)
 
 #### T contour ####
