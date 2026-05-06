@@ -142,10 +142,11 @@ for (yoi in years_to_plot) {
     units = "in", 
     res = 600
   )
-  ggplot(data = data_to_plot |> filter(Year == yoi)) + 
+  p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_sigmat_contour()
+  print(p)
   dev.off()
 }
 
@@ -158,7 +159,7 @@ for (station in stations) {
     units = "in", 
     res = 600
   )
-  ggplot(
+  p <- ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
   ) + 
@@ -169,6 +170,7 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_sigmat_contour()
+  print(p)
   dev.off()
 }
 
@@ -182,7 +184,7 @@ for (station in stations) {
       units = "in", 
       res = 600
     )
-    ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
+    p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_sigmat_contour() + 
       theme(
@@ -192,6 +194,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
+    print(p)
     dev.off()
   }
 }
@@ -244,10 +247,11 @@ for (yoi in years_to_plot) {
     units = "in", 
     res = 600
   )
-  ggplot(data = data_to_plot |> filter(Year == yoi)) + 
+  p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = paste(yoi, "surface 0-", surface_depth, " m")) + 
     add_sigmat_contour()
+  print(p)
   dev.off()
 }
 
@@ -260,7 +264,7 @@ for (station in stations) {
     units = "in", 
     res = 600
   )
-  ggplot(
+  p <- ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
   ) + 
@@ -271,6 +275,7 @@ for (station in stations) {
     ) + 
     labs(title = paste(station, "surface 0-", surface_depth, " m")) + 
     add_sigmat_contour()
+  print(p)
   dev.off()
 }
 
@@ -284,7 +289,7 @@ for (station in stations) {
       units = "in", 
       res = 600
     )
-    ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
+    p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi, "surface 0-", surface_depth, " m")) + 
       add_sigmat_contour() + 
       theme(
@@ -294,6 +299,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
+    print(p)
     dev.off()
   }
 }
@@ -338,10 +344,11 @@ for (yoi in years_to_plot) {
     units = "in", 
     res = 600
   )
-  ggplot(data = data_to_plot |> filter(Year == yoi)) + 
+  p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_do_contour()
+  print(p)
   dev.off()
 }
 
@@ -354,7 +361,7 @@ for (station in stations) {
     units = "in", 
     res = 600
   )
-  ggplot(
+  p <- ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
   ) + 
@@ -365,6 +372,7 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_do_contour()
+  print(p)
   dev.off()
 }
 
@@ -378,7 +386,7 @@ for (station in stations) {
       units = "in", 
       res = 600
     )
-    ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
+    p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_do_contour() + 
       theme(
@@ -388,6 +396,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
+    print(p)
     dev.off()
   }
 }
@@ -432,10 +441,11 @@ for (yoi in years_to_plot) {
     units = "in", 
     res = 600
   )
-  ggplot(data = data_to_plot |> filter(Year == yoi)) + 
+  p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_t_contour()
+  print(p)
   dev.off()
 }
 
@@ -448,7 +458,7 @@ for (station in stations) {
     units = "in", 
     res = 600
   )
-  ggplot(
+  p <- ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
   ) + 
@@ -459,6 +469,7 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_t_contour()
+  print(p)
   dev.off()
 }
 
@@ -472,7 +483,7 @@ for (station in stations) {
       units = "in", 
       res = 600
     )
-    ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
+    p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_t_contour() + 
       theme(
@@ -482,6 +493,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
+    print(p)
     dev.off()
   }
 }
@@ -535,10 +547,11 @@ for (yoi in years_to_plot) {
     units = "in", 
     res = 600
   )
-  ggplot(data = data_to_plot |> filter(Year == yoi)) + 
+  p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_s_contour()
+  print(p)
   dev.off()
 }
 
@@ -551,7 +564,7 @@ for (station in stations) {
     units = "in", 
     res = 600
   )
-  ggplot(
+  p <- ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
   ) + 
@@ -562,6 +575,7 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_s_contour()
+  print(p)
   dev.off()
 }
 
@@ -570,12 +584,12 @@ for (station in stations) {
   for (yoi in years_to_plot) {
     png(
       get_filename(plot_type, station, yoi), 
-      height = h*, 
+      height = h, 
       width = w, 
       units = "in", 
       res = 600
     )
-    ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
+    p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_s_contour() + 
       theme(
@@ -585,6 +599,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
+    print(p)
     dev.off()
   }
 }
@@ -639,10 +654,11 @@ for (yoi in years_to_plot) {
     units = "in", 
     res = 600
   )
-  ggplot(data = data_to_plot |> filter(Year == yoi)) + 
+  p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_s_contour()
+  print(p)
   dev.off()
 }
 
@@ -655,7 +671,7 @@ for (station in stations) {
     units = "in", 
     res = 600
   )
-  ggplot(
+  p <- ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
   ) + 
@@ -666,6 +682,7 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_s_contour()
+  print(p)
   dev.off()
 }
 
@@ -679,7 +696,7 @@ for (station in stations) {
       units = "in", 
       res = 600
     )
-    ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
+    p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_s_contour() + 
       theme(
@@ -689,6 +706,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
+    print(p)
     dev.off()
   }
 }
@@ -733,10 +751,11 @@ for (yoi in years_to_plot) {
     units = "in", 
     res = 600
   )
-  ggplot(data = data_to_plot |> filter(Year == yoi)) + 
+  p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
     add_s_contour()
+  print(p)
   dev.off()
 }
 
@@ -749,7 +768,7 @@ for (station in stations) {
     units = "in", 
     res = 600
   )
-  ggplot(
+  p <- ggplot(
     data = data_to_plot |> 
       filter(Year %in% years_to_plot, Locator == station)
   ) + 
@@ -760,6 +779,7 @@ for (station in stations) {
     ) + 
     labs(title = station) + 
     add_s_contour()
+  print(p)
   dev.off()
 }
 
@@ -773,7 +793,7 @@ for (station in stations) {
       units = "in", 
       res = 600
     )
-    ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
+    p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
       add_s_contour() + 
       theme(
@@ -783,6 +803,7 @@ for (station in stations) {
           linewidth = 0.5
         )
       )
+    print(p)
     dev.off()
   }
 }
