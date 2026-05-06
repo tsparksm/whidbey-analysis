@@ -23,7 +23,7 @@ raw_data <- load_penncovebottom() %>%
          Turbidity = Turbidity_NTU, 
          Salinity = Salinity_PSU, 
          NO23 = NO3_mgNL) %>% 
-  mutate(Date = as.Date(DateTime))
+  mutate(Date = as.Date(substr(DateTime, 1, 10)))
 
 # Remember to update discrete data first!
 # download_whidbey_discrete()

@@ -4,9 +4,7 @@ library(rtide)
 library(DescTools)
 library(zoo)
 
-if (!exists("yoi") | is.na(yoi)) {
-  yoi <- as.numeric(readline("Year of interest: "))
-}
+if (!exists("yoi")) {yoi <- as.numeric(dlg_input("Year of interest? YYYY")$res)}
 
 #### Load QC'd data and combine ####
 surf_data <- load_qc_penncovesurf() %>% 
