@@ -197,14 +197,13 @@ p5 <- ggplot(data = data_to_plot) +
   )
 
 #### T mooring ####
-data_to_plot <- data_buoy %>% 
-  filter(Parameter == "Temperature")
+data_to_plot <- data_buoy |>  
+  filter(Temperature_final == 1)
 
 p6 <- ggplot(data = data_to_plot, 
        aes(x = FakeDate, 
-           y = Value, 
-           color = YearGroup, 
-           shape = Type)) + 
+           y = Temperature, 
+           color = YearGroup)) + 
   theme_bw() + 
   theme(legend.position = "none", 
         text = element_text(size = font_size), 
