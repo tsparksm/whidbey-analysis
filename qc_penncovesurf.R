@@ -250,8 +250,8 @@ p <- ggplot(data_to_plot) +
 ggplotly(p) %>% layout(legend = list(orientation = "h"))
 
 #### FIGURE - oxygen ####
-if (!exists(start_date)) {start_date <- as.Date(readline("Start date: "))}
-if (!exists(end_date)) {end_date <- as.Date(readline("End date: "))}
+start_date <- as.Date(dlg_input("Start date (YYYY-MM-DD)")$res)
+end_date <- as.Date(dlg_input("End date (YYYY-MM-DD)")$res)
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
@@ -304,8 +304,8 @@ p <- ggplot(data_to_plot,
 ggplotly(p)
 
 #### FIGURE - chlorophyll ####
-if (!exists("start_date")) {start_date <- as.Date(readline("Start date: "))}
-if (!exists("end_date")) {end_date <- as.Date(readline("End date: "))}
+start_date <- as.Date(dlg_input("Start date (YYYY-MM-DD)")$res)
+end_date <- as.Date(dlg_input("End date (YYYY-MM-DD)")$res)
 
 data_to_plot <- qc_final %>% 
   filter(between(Date, start_date, end_date)) %>% 
