@@ -104,62 +104,28 @@ p1 <- ggplot(data = data_to_plot) +
   )
 
 #### S contour ####
-data_to_plot <- data_ctd %>% 
-  filter(!is.na(Salinity)) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
-  summarize(Salinity = mean(Salinity)) %>% 
-  ungroup()
+data_to_plot <- data_ctd |> 
+  filter(!is.na(Salinity)) |> 
+  group_by(Locator, Year, YearDay, BinDepth) |> 
+  summarize(Salinity = mean(Salinity)) |> 
+  ungroup() |> 
+  rename(FakeYearDay = YearDay)
 
-min_lim <- round_any(min(data_to_plot$Salinity), 
-                     accuracy = acc_S, 
-                     f = floor)
-max_lim <- round_any(max(data_to_plot$Salinity), 
-                     accuracy = acc_S, 
-                     f = ceiling)
-mybreaks <- seq(min_lim, max_lim, by = acc_S)
+lims <- get_limits(data_to_plot$Salinity, acc = acc_S)
+mybreaks <- seq(lims[1], lims[2], by = acc_S)
 mylabels <- mybreaks
 mylabels[round(mylabels %% 5, 1) != 0] <- ""
 
 p2 <- ggplot(data = data_to_plot) + 
-  theme_bw() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
-        text = element_text(size = font_size), 
-        axis.text.x = element_blank()) + 
-  metR::geom_contour_fill(aes(x = YearDay, 
-                              y = BinDepth, 
-                              z = Salinity), 
-                          na.fill = TRUE, 
-                          breaks = mybreaks) + 
-  scale_fill_cmocean(name = "haline", 
-                     breaks = mybreaks, 
-                     limits = c(min_lim, max_lim), 
-                     labels = mylabels, 
-                     guide = guide_colorbar(show.limits = T, 
-                                            ticks = F, 
-                                            reverse = T)) + 
-  scale_y_reverse(expand = c(0, 0)) + 
-  coord_cartesian(xlim = c(0, 366)) + 
-  scale_x_continuous(expand = c(0, 0), 
-                     breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                yday(paste(yoi, "-02-01", sep = "")), 
-                                yday(paste(yoi, "-03-01", sep = "")), 
-                                yday(paste(yoi, "-04-01", sep = "")), 
-                                yday(paste(yoi, "-05-01", sep = "")), 
-                                yday(paste(yoi, "-06-01", sep = "")), 
-                                yday(paste(yoi, "-07-01", sep = "")), 
-                                yday(paste(yoi, "-08-01", sep = "")), 
-                                yday(paste(yoi, "-09-01", sep = "")), 
-                                yday(paste(yoi, "-10-01", sep = "")), 
-                                yday(paste(yoi, "-11-01", sep = "")), 
-                                yday(paste(yoi, "-12-01", sep = ""))), 
-                     labels = month.abb) + 
-  geom_vline(aes(xintercept = YearDay), 
-             alpha = 0.2) + 
-  labs(x = "", 
-       y = "", 
-       fill = "PSU", 
-       title = "B. Salinity")
+  add_s_contour() + 
+  theme(
+    text = element_text(size = font_size), 
+    axis.text.x = element_blank()
+  ) + 
+  labs(
+    title = "B. Salinity", 
+    fill = "PSU"
+  )
 
 #### DO contour ####
 data_to_plot <- data_ctd %>% 
