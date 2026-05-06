@@ -122,11 +122,11 @@ qc_final <- qc_data %>%
     across(
       Temperature:NO23, 
       ~ case_when(
-        get(paste0(cur_column(), "_auto")) == "g" ~ 3, 
-        get(paste0(cur_column(), "_manual")) == "b" ~ 3,
-        get(paste0(cur_column(), "_auto")) == "r" ~ 2,
-        get(paste0(cur_column(), "_manual")) == "f" ~ 2,
-        get(paste0(cur_column(), "_manual")) == "s" ~ 2,
+        str_detect(get(paste0(cur_column(), "_auto")), "g") ~ 3, 
+        str_detect(get(paste0(cur_column(), "_manual")), "b") ~ 3,
+        str_detect(get(paste0(cur_column(), "_auto")), "r") ~ 2,
+        str_detect(get(paste0(cur_column(), "_manual")),"f") ~ 2,
+        str_detect(get(paste0(cur_column(), "_manual")), "s") ~ 2,
         TRUE ~ 1
       ), 
       .names = "{.col}_final"
