@@ -49,7 +49,7 @@ add_sigmat_contour <- function() {
   )
 }
 
-add_do_contour <- function() {
+add_do_contour <- function(hypoxia_color = TRUE) {
   list(
     metR::geom_contour_fill(
       aes(x = FakeYearDay, y = BinDepth, z = DO),
@@ -57,13 +57,24 @@ add_do_contour <- function() {
       breaks = mybreaks, 
       size = 0
     ),
-    scale_fill_paletteer_c(
-      palette = "grDevices::Purple-Blue",
-      breaks = mybreaks,
-      limits = lims,
-      labels = mylabels,
-      guide = guide_colorbar(ticks = FALSE, reverse = TRUE)
-    ),
+    if (hypoxia_color) {
+      scale_fill_cmocean(
+        name = "oxy", 
+        breaks = mybreaks, 
+        limits = lims, 
+        labels = mylabels, 
+        guide = guide_colorbar(ticks = FALSE, reverse = TRUE)
+      )
+    } else {
+      scale_fill_paletteer_c(
+        palette = "grDevices::Purple-Yellow",
+        dir = 1,
+        breaks = mybreaks,
+        limits = lims,
+        labels = mylabels,
+        guide = guide_colorbar(ticks = FALSE, reverse = TRUE)
+      )
+    }, 
     labs(
       x = "", 
       y = "Depth (m)", 
