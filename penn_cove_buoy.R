@@ -166,7 +166,6 @@ ggsave(
   width = 6
 )
 
-#### Figure: short period DO ####
 #### Figure: year of chl (top), all data ####
 data_to_plot <- combo_data |>
   filter(
@@ -213,6 +212,19 @@ ggsave(
   width = 6
 )
 
+#### Figure: short period DO + tide ####
+start_date <- as.Date(dlg_input("Start date (YYYY-MM-DD)")$res)
+end_date <- as.Date(dlg_input("End date (YYYY-MM-DD")$res)
+
+data_to_plot <- combo_data |> 
+  filter(between(Date, start_date, end_date))
+
+ggplot(
+  data_to_plot, 
+  aes(x = DateTime)
+) + 
+  geom_line(aes(y = TideHeight)) + 
+  geom_point(aes(y = Oxygen_surface))
 
 #### Figure: wind arrows - 1 year ####
 data_to_plot <- surf_data |>
