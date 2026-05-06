@@ -23,8 +23,8 @@ point_size <- 5
 acc_T <- 0.2
 acc_S <- 0.1
 acc_DO <- 0.2
-acc_chl <- 0.5
-acc_N <- 0.05
+acc_chl <- 0.2
+acc_N <- 0.01
 
 #### Load data ####
 data_discrete <- load_whidbey_discrete() %>% 
