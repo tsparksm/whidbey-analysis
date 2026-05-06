@@ -3,13 +3,9 @@ source(here::here("src", "utility_functions.R"))
 source(here::here("src", "contour_functions.R"))
 
 #### Load composite data ####
-data_ctd <- load_composite(bin_width, monthly = FALSE) |> 
-  mutate(
-    YearDay = yday(Date),
-    Locator = factor(Locator, levels = station_order)
-  )
+# How wide do you want your depth bins (0.5, 1, 2, 5 probably best)
+bin_width <- 0.5
 
-#### SETUP ####
 station_order <- c(
   "SARATOGARP",
   "SARATOGAOP",
@@ -23,6 +19,13 @@ station_order <- c(
   "Poss DO-2"
 )
 
+data_ctd <- load_composite(bin_width, monthly = FALSE) |> 
+  mutate(
+    YearDay = yday(Date),
+    Locator = factor(Locator, levels = station_order)
+  )
+
+#### SETUP ####
 # Select stations, years; figure settings
 stations <- dlg_list(station_order, multiple = TRUE)$res
 
@@ -34,9 +37,6 @@ n_years <- length(years_to_plot)
 # Mostly unchanging figure parameters
 # Do you want contour lines on your sigma-theta plots?
 sigmat_contour_alpha <- 0.1  # if you want contour lines, use 0.1; else use 0
-
-# How wide do you want your depth bins (0.5, 1, 2, 5 probably best)
-bin_width <- 0.5
 
 # How narrowly spaced do you want the color bins in each of these plots?
 # Original values are in comments following semi-colon
