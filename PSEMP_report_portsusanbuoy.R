@@ -269,14 +269,17 @@ p8 <- ggplot(
        title = "H. Surface dissolved oxygen")
 
 #### Chl mooring ####
-data_to_plot <- data_buoy %>% 
-  filter(Parameter == "Chlorophyll")
+data_to_plot <- data_buoy |> 
+  filter(
+    Chlorophyll_final == 1, 
+    Chlorophyll < 100, 
+    Year == yoi
+  )
 
-p9 <- ggplot(data = data_to_plot, 
-             aes(x = FakeDate, 
-                 y = Value, 
-                 color = YearGroup, 
-                 shape = Type)) + 
+p9 <- ggplot(
+  data = data_to_plot, 
+  aes(x = FakeDate, y = Chlorophyll)
+) + 
   theme_bw() + 
   theme(legend.position = "none", 
         text = element_text(size = font_size), 
@@ -284,8 +287,6 @@ p9 <- ggplot(data = data_to_plot,
         panel.grid.minor = element_blank(), 
         axis.text.x = element_blank()) + 
   geom_point() + 
-  scale_color_manual(values = palette_mooring) + 
-  scale_shape_manual(values = shapes_mooring) + 
   scale_x_datetime(date_breaks = "1 month", 
                    limits = c(min_date, max_date), 
                    expand = c(0, 0)) + 
