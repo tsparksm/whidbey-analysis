@@ -2,7 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(rtide)
 
-if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
+if (!exists("yoi")) {yoi <- as.numeric(dlg_input("Year of interest? YYYY")$res)}
 
 #### Load data ####
 # Remember to update file via Socrata download first!
