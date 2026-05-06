@@ -341,7 +341,8 @@ if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 for (station in unique(data_discrete$Locator)) {
   ggplot(data = data_discrete %>% 
            filter(Locator == station,  
-                  ParmId == 21), 
+                  ParmId == 21) |> 
+           arrange(Year == yoi), 
          aes(x = FakeDate, 
              y = Value, 
              shape = Detect, 
@@ -349,7 +350,7 @@ for (station in unique(data_discrete$Locator)) {
     theme_bw() + 
     facet_wrap(~ DepthBin, 
                ncol = 1) + 
-    geom_point(size = 3) + 
+    geom_point(size = 5) + 
     scale_color_manual(values = c("TRUE" = "black", 
                                   "FALSE" = "gray"), 
                        labels = c("TRUE" = yoi, 
