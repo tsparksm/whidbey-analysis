@@ -23,7 +23,7 @@ qc_data <- raw_data %>%
   mutate(
     Temperature_auto = case_when(
       !between(Temperature, -5, 45) ~ "g", 
-      !between(Temperature, 0, 23) ~ "r", 
+      !between(Temperature, 0, 23.5) ~ "r", 
       TRUE ~ NA
     ), 
     Pressure_auto = case_when(
