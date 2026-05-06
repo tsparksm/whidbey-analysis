@@ -346,8 +346,13 @@ p_lab <-
 pp <- (p_lab | (((p1 / p2 / p3 / p4 / p5) | (p6 / p7 / p8 / p9 / p10)) + 
                   plot_layout(tag_level = "new"))) + 
   plot_layout(widths = c(0.05, 1))
-ggsave(here("figs", paste0("PSEMP_portsusanbuoy_", yoi, ".png")), 
-       pp, 
-       dpi = fig_dpi, 
-       height = fig_height, 
-       width = fig_width)
+
+png(
+  here("figs", paste0("PSEMP_portsusanbuoy_", yoi, ".png")), 
+  height = fig_height, 
+  width = fig_width, 
+  units = "in", 
+  res = fig_dpi
+)
+print(pp)
+dev.off()
