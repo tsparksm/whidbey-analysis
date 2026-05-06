@@ -294,16 +294,16 @@ p9 <- ggplot(
        y = expression((mu*g/L)), 
        title = "I. Surface chlorophyll fluorescence")
 
-#### N bottle ####
-data_to_plot <- data_discrete %>% 
+#### N mooring + bottle ####
+data_to_plot_d <- data_discrete %>% 
   filter(ParmId == 14, 
          DepthBin == "surface", 
          year(DateTime) == yoi)
 
-p10 <- ggplot(data = data_to_plot, 
-              aes(x = CollectDateTime, 
-                  y = Value, 
-                  shape = grepl("MDL", QfrCode))) + 
+data_to_plot_c <- data_buoy |> 
+  filter(NO23_final == 1)
+
+p10 <- ggplot() + 
   theme_bw() + 
   theme(legend.position = "none", 
         text = element_text(size = font_size), 
@@ -311,7 +311,18 @@ p10 <- ggplot(data = data_to_plot,
         panel.grid.minor = element_blank(), 
         axis.text.x = element_text(size = font_size + 2, 
                                    face = "bold")) + 
-  geom_point(size = point_size) + 
+  geom_point(data = data_to_plot_c, 
+             aes(x = FakeDate, 
+                 y = NO23, 
+                 color = YearGroup)
+  ) + 
+  scale_color_manual(values = palette_mooring) + 
+  geom_point(data = data_to_plot_d, 
+             aes(x = CollectDateTime, 
+                 y = Value, 
+                 shape = grepl("MDL", QfrCode)), 
+             size = point_size, 
+             color = "cyan4") + 
   scale_shape_manual(values = shapes_mdl) + 
   scale_x_datetime(date_breaks = "1 month", 
                    date_labels = "%b", 
