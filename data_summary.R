@@ -604,25 +604,29 @@ yoi <- if (!exists("yoi")) {yoi <- as.numeric(readline("Year of interest: "))}
 
 data_to_plot <- data_ctd %>% 
   filter(Locator != "PENNCOVEPNN001", 
-         Year >= 2020) %>% 
+         between(year(Date), 2020, yoi)) %>% 
   group_by(Locator, Date) %>% 
   summarize(MinDO = min(DO)) %>% 
-  mutate(FakeDate = Date)
+  mutate(FakeDate = Date, 
+         HiLite = ifelse(
+           year(Date) == yoi, 
+           yoi, 
+           paste0("2022-", yoi - 1)
+         ))
 year(data_to_plot$FakeDate) <- 2020 
 
 ggplot(data = data_to_plot, 
        aes(x = FakeDate, 
            y = MinDO, 
-           color = year(Date) == yoi)) + 
+           color = HiLite)) + 
   theme_bw() + 
-  theme(legend.position = "none") + 
+  # theme(legend.position = "none") + 
   geom_point(size = 3) + 
   facet_wrap(~ Locator, 
              ncol = 5) + 
   labs(x = "", 
        y = "Minimum DO (mg/L)", 
-       color = "", 
-       title = yoi) + 
+       color = "") + 
   scale_x_date(date_breaks = "2 month", 
                date_labels = "%b") + 
   scale_color_manual(values = c("gray", "black")) + 
