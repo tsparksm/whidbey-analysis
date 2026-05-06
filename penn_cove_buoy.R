@@ -167,6 +167,51 @@ ggsave(
 )
 
 #### Figure: short period DO ####
+#### Figure: year of chl (top), all data ####
+data_to_plot <- combo_data |>
+  filter(
+    Year <= yoi, 
+    !(Chlorophyll_final_surface %in% 2:3)
+  ) |>
+  mutate(
+    YearGroup = ifelse(
+      Year == yoi, 
+      yoi, 
+      paste(min(year(DateTime)), yoi - 1, sep = "-")
+    ), 
+    FakeDate = DateTime) %>% 
+  arrange(YearGroup)
+year(data_to_plot$FakeDate) <- yoi
+
+ggplot(
+  data_to_plot, 
+  aes(
+    x = FakeDate, 
+    y = Chlorophyll_surface, 
+    color = YearGroup
+  )
+) + 
+  theme_bw() + 
+  labs(
+    x = "", 
+    y = expression(Chlorophyll~(mu*g/L)), 
+    color = "", 
+    title = "Penn Cove buoy"
+  ) + 
+  geom_point() + 
+  scale_x_datetime(
+    date_minor_breaks = "1 month", 
+    date_labels = "%b"
+  ) + 
+  scale_color_manual(values = c("gray", "black")) + 
+  scale_y_continuous(limits = c(0, NA))
+
+ggsave(
+  here("figs", "penncove", paste0(yoi, "_chl_comparison.png")), 
+  dpi = 600, 
+  height = 4, 
+  width = 6
+)
 
 
 #### Figure: wind arrows - 1 year ####
