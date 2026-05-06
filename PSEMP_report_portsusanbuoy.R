@@ -1,5 +1,6 @@
 #### SETUP ####
 source(here::here("src", "utility_functions.R"))
+source(here("src", "contour_functions.R"))
 library(metR)
 library(cmocean)
 
@@ -80,60 +81,27 @@ data_ctd <- add_row(data_ctd, extra_data_after) |>
   filter(Year == yoi)
 
 #### T contour ####
-data_to_plot <- data_ctd %>% 
-  filter(!is.na(Temperature)) %>% 
-  group_by(Locator, Year, YearDay, BinDepth) %>% 
-  summarize(Temperature = mean(Temperature)) %>% 
-  ungroup()
+data_to_plot <- data_ctd |> 
+  filter(!is.na(Temperature)) |> 
+  group_by(Locator, Year, YearDay, BinDepth) |> 
+  summarize(Temperature = mean(Temperature)) |> 
+  ungroup() |> 
+  rename(FakeYearDay = YearDay)
 
-min_lim <- round_any(min(data_to_plot$Temperature), 
-                     accuracy = acc_T, 
-                     f = floor)
-max_lim <- round_any(max(data_to_plot$Temperature), 
-                     accuracy = acc_T, 
-                     f = ceiling)
-mybreaks <- seq(min_lim, max_lim, by = acc_T)
-mylabels <- mybreaks
-mylabels[mylabels %% 5 != 0] <- ""
+lims <- get_limits(data_to_plot$Temperature, acc_T)
+mybreaks <- seq(lims[1], lims[2], by = acc_T)
+mylabels <- get_labels(mybreaks, even_only = TRUE)
 
 p1 <- ggplot(data = data_to_plot) + 
-  theme_bw() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
-        text = element_text(size = font_size), 
-        axis.text.x = element_blank()) + 
-  metR::geom_contour_fill(aes(x = YearDay, 
-                              y = BinDepth, 
-                              z = Temperature), 
-                          na.fill = TRUE, 
-                          breaks = mybreaks) + 
-  scale_fill_cmocean(name = "thermal", 
-                     breaks = mybreaks, 
-                     limits = c(min_lim, max_lim), 
-                     labels = mylabels, 
-                     guide = guide_colorbar(show.limits = T, ticks = F)) + 
-  scale_y_reverse(expand = c(0, 0)) + 
-  coord_cartesian(xlim = c(0, 366)) + 
-  scale_x_continuous(expand = c(0, 0), 
-                     breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                yday(paste(yoi, "-02-01", sep = "")), 
-                                yday(paste(yoi, "-03-01", sep = "")), 
-                                yday(paste(yoi, "-04-01", sep = "")), 
-                                yday(paste(yoi, "-05-01", sep = "")), 
-                                yday(paste(yoi, "-06-01", sep = "")), 
-                                yday(paste(yoi, "-07-01", sep = "")), 
-                                yday(paste(yoi, "-08-01", sep = "")), 
-                                yday(paste(yoi, "-09-01", sep = "")), 
-                                yday(paste(yoi, "-10-01", sep = "")), 
-                                yday(paste(yoi, "-11-01", sep = "")), 
-                                yday(paste(yoi, "-12-01", sep = ""))), 
-                     labels = month.abb) + 
-  geom_vline(aes(xintercept = YearDay), 
-             alpha = 0.2) + 
-  labs(x = "", 
-       y = "", 
-       fill = "\u00B0C", 
-       title = "A. Temperature")
+  add_t_contour() + 
+  labs(
+    title = "A. Temperature", 
+    fill = expression(degree*C)
+  ) + 
+  theme(
+    text = element_text(size = font_size), 
+    axis.text.x = element_blank()
+  )
 
 #### S contour ####
 data_to_plot <- data_ctd %>% 
