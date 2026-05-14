@@ -1,12 +1,14 @@
 #### SETUP ####
 source(here::here("src", "utility_functions.R"))
+source(here::here("src", "contour_functions.R"))
 library(metR)
 library(cmocean)
 library(pracma)
 library(RColorBrewer)
 library(patchwork)
+library(ggnewscale)
 
-yoi <- 2023
+yoi <- 2025
 
 # Figure settings
 fig_dpi <- 600
@@ -24,7 +26,7 @@ point_size <- 5
 sigmat_contour_alpha <- 0.1  # if you want contour lines, use 0.1; else use 0
 
 # Contour plot settings
-# acc_T <- 0.2
+acc_T <- 0.2
 acc_sigmaT <- 0.2
 # acc_S <- 0.1
 # acc_DO <- 0.2
@@ -38,21 +40,21 @@ data_discrete <- load_whidbey_discrete() %>%
   rename(Date = CollectDate)
 
 bin_width <- 0.5
-data_ctd <- load_composite(bin_width, 
+data_ctd_init <- load_composite(bin_width, 
                            monthly = FALSE) %>% 
   mutate(YearDay = yday(Date), 
          Year = year(Date))
 
 # Add extra CTD data before/after each year
-extra_data_before <- data_ctd %>% 
+extra_data_before <- data_ctd_init %>% 
   filter(Year == yoi - 1, 
          Locator == "SARATOGACH") %>% 
   filter(YearDay == max(YearDay)) %>% 
   mutate(YearDay = YearDay - 365, 
          Year = yoi)
-data_ctd <- add_row(data_ctd, extra_data_before)
+data_ctd <- add_row(data_ctd_init, extra_data_before)
 
-extra_data_after <- data_ctd %>% 
+extra_data_after <- data_ctd_init %>% 
   filter(Year == yoi + 1, 
          Locator == "SARATOGACH") %>% 
   filter(YearDay == min(YearDay)) %>% 
