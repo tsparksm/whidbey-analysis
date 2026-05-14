@@ -224,37 +224,53 @@ p3 <- ggplot(data = data_to_plot, aes(x = FakeDate, y = MinDO)) +
        color = "", 
        title = "C. Minimum dissolved oxygen - deep stations")
 
-#### Integrated chl ####
+
+#### Integrated chl multiple years ####
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2")
 
-totalchl <- data_ctd %>% 
+totalchl <- data_ctd_init %>% 
   filter(Depth >= 1, 
          Depth <= 50, 
-         Year == yoi, 
-         Locator %in% stations) %>% 
-  group_by(Locator, Date) %>% 
-  summarize(Int_chl = trapz(Depth, Chlorophyll))
+         Locator %in% stations, 
+         Year >= 2022) %>% 
+  group_by(Locator, Year, Date) %>% 
+  summarize(Int_chl = trapz(Depth, Chlorophyll)) |> 
+  mutate(FakeDate = Date)
+year(totalchl$FakeDate) <- yoi
 
 p4 <- ggplot(data = totalchl, 
-             aes(x = Date, 
-                 y = Int_chl, 
-                 color = Locator)) + 
+             aes(x = FakeDate, 
+                 y = Int_chl)) + 
   theme_bw() + 
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         text = element_text(size = font_size), 
+        axis.title.y = element_text(size = font_size + 1), 
+        axis.text.y = element_text(size = font_size + 1), 
         axis.text.x = element_text(size = font_size + 2, face = "bold"), 
         legend.position = "none") + 
-  geom_point(size = fig_point_size) + 
+  geom_smooth(
+    aes(color = Year == yoi, 
+        group = Year), 
+    se = FALSE
+  ) + 
+  scale_color_manual(values = c("TRUE" = "black", "FALSE" = "gray")) + 
+  new_scale_color() + 
+  geom_point(
+    aes(color = Locator, shape = Year == yoi), 
+    size = fig_point_size
+    ) + 
   scale_color_brewer(palette = "Paired") + 
+  scale_shape_manual(values = c("TRUE" = 16, "FALSE" = NA)) + 
   scale_x_date(limits = as.Date(c(paste0(yoi, "-01-01"), 
                                   paste0(yoi, "-12-31"))), 
                expand = c(0, 0), 
                date_breaks = "1 month", 
                date_labels = "%b") + 
+  scale_y_continuous(limits = c(0, 175)) + 
   labs(x = "", 
-       y = expression(Chl~a~(mg/m^2)), 
+       y = expression(Chl~a~fluorescence~(mg/m^2)), 
        color = "", 
        title = "D. 1-50 m integrated chlorophyll a - deep stations")
 
