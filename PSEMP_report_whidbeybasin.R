@@ -102,57 +102,31 @@ data_to_plot <- data_ctd %>%
 
 lims <- c(20, 23.6)
 mybreaks <- seq(lims[1], lims[2], by = acc_sigmaT)
-mylabels <- mybreaks
-mylabels[!(round(mylabels, 2) == round(round(mylabels, 2)))] <- ""
-mylabels[1] <- paste0("<", lims[1])
-mylabels[length(mylabels)] <- paste0(">", lims[2])
+mylabels <- get_labels(mybreaks, min_lim = lims[1], max_lim = lims[2])
 
 data_to_plot <- data_to_plot %>% 
-  mutate(SigmaTheta = ifelse(SigmaTheta >= lims[2], 
-                             23.6 - 1e-3, 
-                             SigmaTheta))
+  mutate(
+    SigmaTheta = case_when(
+      SigmaTheta >= lims[2] ~ lims[2] - 1e-3, 
+      SigmaTheta <= lims[1] ~ lims[1] + 1e-3, 
+      TRUE ~ SigmaTheta
+      )
+    ) |> 
+  rename(FakeYearDay = YearDay)
 
-p1 <- ggplot(data = data_to_plot) + 
-  theme_bw() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
-        text = element_text(size = font_size), 
-        axis.text.x = element_blank()) + 
-  metR::geom_contour_fill(aes(x = YearDay, 
-                              y = BinDepth, 
-                              z = SigmaTheta), 
-                          na.fill = TRUE, 
-                          breaks = mybreaks, 
-                          color = alpha("white", sigmat_contour_alpha)) + 
-  scale_fill_cmocean(name = "dense", 
-                     breaks = mybreaks, 
-                     limits = lims, 
-                     labels = mylabels, 
-                     guide = guide_colorbar(show.limits = TRUE, 
-                                            ticks = FALSE, 
-                                            reverse = TRUE)) +  
-  scale_y_reverse(expand = c(0, 0)) + 
-  coord_cartesian(xlim = c(0, 366)) + 
-  scale_x_continuous(expand = c(0, 0), 
-                     breaks = c(yday(paste(yoi, "-01-01", sep = "")), 
-                                yday(paste(yoi, "-02-01", sep = "")), 
-                                yday(paste(yoi, "-03-01", sep = "")), 
-                                yday(paste(yoi, "-04-01", sep = "")), 
-                                yday(paste(yoi, "-05-01", sep = "")), 
-                                yday(paste(yoi, "-06-01", sep = "")), 
-                                yday(paste(yoi, "-07-01", sep = "")), 
-                                yday(paste(yoi, "-08-01", sep = "")), 
-                                yday(paste(yoi, "-09-01", sep = "")), 
-                                yday(paste(yoi, "-10-01", sep = "")), 
-                                yday(paste(yoi, "-11-01", sep = "")), 
-                                yday(paste(yoi, "-12-01", sep = ""))), 
-                     labels = month.abb) + 
-  geom_vline(aes(xintercept = YearDay), 
-             alpha = 0.2) + 
-  labs(x = "", 
-       y = "Depth (m)", 
-       fill = expression(kg/m^3), 
-       title = expression(A.~Camano~Head~sigma [theta]~density))
+# p1 <- ggplot(data = data_to_plot) +
+#   add_sigmat_contour() +
+#   theme_bw() +
+#   theme(
+#     text = element_text(size = font_size),
+#     axis.title.y = element_text(size = font_size + 1),
+#     axis.text.y = element_text(size = font_size + 1), 
+#     axis.text.x = element_blank()
+#   ) +
+#   labs(
+#     fill = expression(kg/m^3),
+#     title = expression(A.~Camano~Head~sigma [theta]~density)
+#   )
 
 #### N bottle ####
 data_to_plot <- data_discrete %>% 
