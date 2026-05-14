@@ -129,34 +129,53 @@ data_to_plot <- data_to_plot %>%
 #   )
 
 #### N bottle ####
-data_to_plot <- data_discrete %>% 
-  filter(ParmId == 14, 
-         DepthBin == "surface", 
-         Year == yoi)
+data_to_plot <- data_discrete |> 
+  filter(ParmId == 14, DepthBin == "surface", Year <= yoi) |> 
+  mutate(
+    FakeDate = Date, 
+    PlotGroup = case_when(
+      Year == yoi & grepl("MDL", QfrCode) ~ "nondetect", 
+      Year == yoi ~ "yoi", 
+      TRUE ~ "other"
+    )
+  )
+year(data_to_plot$FakeDate) <- yoi
 
-p2 <- ggplot(data = data_to_plot, 
-             aes(x = as.Date(Date), 
-                 y = Value)) + 
+p2 <- ggplot(data = data_to_plot, aes(x = FakeDate, y = Value)) + 
   theme_bw() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
-        text = element_text(size = font_size), 
-        axis.text.x = element_blank(), 
-        legend.position = "right") + 
-  geom_point(aes(shape = grepl("MDL", QfrCode), 
-                 color = Locator), 
-             size = fig_point_size) + 
-  geom_smooth(color = "black", se = FALSE) + 
-  scale_x_date(limits = as.Date(c(paste0(yoi, "-01-01"), 
-                                  paste0(yoi, "-12-31"))), 
-               expand = c(0, 0), 
-               date_breaks = "1 month") + 
-  scale_shape_manual(values = shapes_mdl, 
-                     guide = "none") + 
+  theme(
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(), 
+    text = element_text(size = font_size), 
+    axis.title.y = element_text(size = font_size + 1), 
+    axis.text.y = element_text(size = font_size + 1), 
+    axis.text.x = element_blank(), 
+    legend.position = "right"
+  ) + 
+  geom_smooth(
+    aes(color = Year == yoi, group = Year), 
+    se = FALSE, 
+    show.legend = FALSE
+  ) + 
+  scale_color_manual(values = c("TRUE" = "black", "FALSE" = "gray")) + 
+  new_scale_color() + 
+  geom_point(
+    aes(shape = PlotGroup, color = Locator), 
+    size = fig_point_size
+  ) + 
+  scale_x_date(
+    limits = as.Date(c(paste0(yoi, "-01-01"), paste0(yoi, "-12-31"))), 
+    expand = c(0, 0), 
+    date_breaks = "1 month"
+  ) + 
+  scale_shape_manual(
+    values = c("nondetect" = 1, "yoi" = 16, "other" = NA), 
+    guide = "none"
+  ) + 
   scale_color_manual(values = brewer.pal(6, "YlGnBu")[2:6]) + 
   labs(x = "", 
        y = "Nitrate + nitrite N (mg/L)", 
-       title = "B. Surface nitrate concentration", 
+       title = "B. Surface nitrate + nitrite concentration", 
        color = "")
 
 #### Bottom DO ####
