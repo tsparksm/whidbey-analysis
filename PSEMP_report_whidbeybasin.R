@@ -182,30 +182,43 @@ p2 <- ggplot(data = data_to_plot, aes(x = FakeDate, y = Value)) +
 stations <- c("SARATOGARP", "SARATOGAOP", "SARATOGACH", 
               "PSUSANKP", "PSUSANENT", "Poss DO-2")
 
-data_to_plot <- data_ctd %>% 
-  filter(Year == yoi, 
-         Locator %in% stations) %>% 
-  group_by(Locator, Date) %>% 
-  summarize(MinDO = min(DO))
+data_to_plot <- data_ctd_init |>  
+  filter(between(Year, 2022, yoi), Locator %in% stations) |> 
+  group_by(Locator, Year, Date) |> 
+  summarize(MinDO = min(DO)) |> 
+  ungroup() |> 
+  mutate(FakeDate = Date)
+year(data_to_plot$FakeDate) <- yoi
 
-p3 <- ggplot(data = data_to_plot, 
-             aes(x = as.Date(Date), 
-                 y = MinDO)) + 
+p3 <- ggplot(data = data_to_plot, aes(x = FakeDate, y = MinDO)) + 
   theme_bw() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
-        text = element_text(size = font_size), 
-        axis.text.x = element_blank(), 
-        legend.position = "right") + 
-  geom_point(aes(color = Locator), 
-             size = fig_point_size) + 
-  geom_smooth(color = "black", se = FALSE) + 
-  scale_x_date(limits = as.Date(c(paste0(yoi, "-01-01"), 
-                                  paste0(yoi, "-12-31"))), 
-               expand = c(0, 0), 
-               date_breaks = "1 month") + 
-  scale_shape_manual(values = shapes_mdl) + 
+  theme(
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(), 
+    text = element_text(size = font_size), 
+    axis.title.y = element_text(size = font_size + 1), 
+    axis.text.y = element_text(size = font_size + 1), 
+    axis.text.x = element_blank(), 
+    legend.position = "right"
+  ) + 
+  geom_smooth(
+    aes(color = Year == yoi, group = Year), 
+    se = FALSE, 
+    show.legend = FALSE
+  ) + 
+  scale_color_manual(values = c("TRUE" = "black", "FALSE" = "gray")) + 
+  new_scale_color() + 
+  geom_point(
+    aes(color = Locator, shape = Year == yoi), 
+    size = fig_point_size
+  ) + 
+  scale_shape_manual(values = c("TRUE" = 16, "FALSE" = NA), guide = "none") + 
   scale_color_brewer(palette = "Paired") + 
+  scale_x_date(
+    limits = as.Date(c(paste0(yoi, "-01-01"), paste0(yoi, "-12-31"))), 
+    expand = c(0, 0), 
+    date_breaks = "1 month"
+  ) + 
   labs(x = "", 
        y = "DO (mg/L)", 
        color = "", 
