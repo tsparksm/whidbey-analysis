@@ -286,8 +286,12 @@ pp0 <- p1 /
 #   (p3 + theme(plot.margin = unit(c(0,30,0,0), "pt"))) / 
 #   p4 + 
 #   plot_layout(heights = c(1, 2, 2, 2))
-ggsave(here("figs", paste0("PSEMP_whidbey_", yoi, ".png")), 
-       pp0, 
-       dpi = fig_dpi, 
-       height = fig_height, 
-       width = fig_width)
+png(
+  filename = here("figs", paste0("PSEMP_whidbey_", yoi, ".png")), 
+  width = fig_width, 
+  height = fig_height, 
+  units = "in", 
+  res = fig_dpi
+)
+pp0
+dev.off()
