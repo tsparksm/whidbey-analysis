@@ -63,6 +63,35 @@ extra_data_after <- data_ctd_init %>%
 data_ctd <- add_row(data_ctd, extra_data_after) %>% 
   filter(Year == yoi)
 
+#### T contour ####
+data_to_plot <- data_ctd %>% 
+  filter(!is.na(Temperature), 
+         Locator == "SARATOGACH") %>% 
+  group_by(Locator, Year, YearDay, BinDepth) %>% 
+  summarize(Temperature = mean(Temperature)) %>% 
+  ungroup()
+
+lims <- get_limits(data_to_plot$Temperature, acc_T)
+mybreaks <- seq(lims[1], lims[2], by = acc_T)
+mylabels <- get_labels(mybreaks, even_only = TRUE)
+
+data_to_plot <- data_to_plot |> 
+  rename(FakeYearDay = YearDay)
+
+p1 <- ggplot(data = data_to_plot) + 
+  add_t_contour() + 
+  theme_bw() + 
+  theme(
+    text = element_text(size = font_size), 
+    axis.title.y = element_text(size = font_size + 1), 
+    axis.text.y = element_text(size = font_size + 1), 
+    axis.text.x = element_blank()
+  ) + 
+  labs(
+    fill = expression(degree*C), 
+    title = "A. Camano Head water temperature"
+  )
+
 #### Sigma-t contour ####
 data_to_plot <- data_ctd %>% 
   filter(!is.na(SigmaTheta), 
