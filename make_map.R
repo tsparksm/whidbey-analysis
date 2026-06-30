@@ -157,3 +157,87 @@ g <- ggmap(map_transparent) +
 ggsave(here("figs", "whidbey_station_map_KC_notext.png"), g, 
        dpi = 600, 
        height = 5, width = 4)
+
+#### Map - offshore SAP ####
+data_to_plot <- locators |> filter(Agency == "King County")
+
+g <- ggmap(map_transparent) + 
+  theme_bw() + 
+  theme(
+    panel.grid = element_blank(), 
+    panel.background = element_rect(fill = 'white'), 
+    axis.text = element_blank(), 
+    axis.ticks = element_blank(), 
+    legend.position = "none"
+  ) + 
+  geom_point(
+    data = data_to_plot, 
+    aes(x = Lon, y = Lat, shape = is.na(Last_Year)), 
+    size = 2
+  ) + 
+  geom_text_repel(
+    data = data_to_plot, 
+    aes(x = Lon, 
+        y = Lat, 
+        label = Name), 
+    bg.color = "white", 
+    bg.r = 0.1, 
+    box.padding = 0.3, 
+    xlim = c(NA, Inf), 
+    ylim = c(-Inf, Inf), 
+    min.segment.length = 0
+  ) + 
+  coord_cartesian(clip = "off") + 
+  labs(x = "", y = "") + 
+  annotate(
+    "text", x = -122.615, y = 48.318, 
+    label = "Whidbey Island", 
+    fontface = "italic", 
+    size = 3
+  ) + 
+  scale_shape_manual(values = c(8, 16))
+ggsave(
+  here("figs", "whidbey_station_map_offshore_sap.png"), 
+  g, dpi = 600, height = 5, width = 4
+)
+
+#### Map - mooring SAP ####
+data_to_plot <- locators |>
+  filter(
+    Name %in% c("PENNCOVEENT", "PENNCOVECW", "PSUSANBUOY")
+  )
+
+g <- ggmap(map_transparent) + 
+  theme_bw() + 
+  theme(
+    panel.grid = element_blank(), 
+    panel.background = element_rect(fill = 'white'), 
+    axis.text = element_blank(), 
+    axis.ticks = element_blank(), 
+    legend.position = "none"
+  ) + 
+  geom_point(data = data_to_plot, aes(x = Lon, y = Lat), size = 2) + 
+  geom_text_repel(
+    data = data_to_plot, 
+    aes(x = Lon, 
+        y = Lat, 
+        label = Name), 
+    bg.color = "white", 
+    bg.r = 0.1, 
+    box.padding = 0.3, 
+    xlim = c(NA, Inf), 
+    ylim = c(-Inf, Inf), 
+    min.segment.length = 0
+  ) + 
+  coord_cartesian(clip = "off") + 
+  labs(x = "", y = "") + 
+  annotate(
+    "text", x = -122.615, y = 48.318, 
+    label = "Whidbey Island", 
+    fontface = "italic", 
+    size = 3
+  )
+ggsave(
+  here("figs", "whidbey_station_map_moorings.png"), 
+  g, dpi = 600, height = 5, width = 4
+)
