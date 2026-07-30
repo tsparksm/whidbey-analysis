@@ -195,6 +195,13 @@ g <- ggmap(map_transparent) +
     fontface = "italic", 
     size = 3
   ) + 
+  annotate(
+    "text", x = -122.5, y = 48.2, 
+    label = "Camano\nIsland", 
+    lineheight = 0.8, 
+    fontface = "italic", 
+    size = 3
+  ) + 
   scale_shape_manual(values = c(8, 16))
 ggsave(
   here("figs", "whidbey_station_map_offshore_sap.png"), 
@@ -217,6 +224,19 @@ g <- ggmap(map_transparent) +
     legend.position = "none"
   ) + 
   geom_point(data = data_to_plot, aes(x = Lon, y = Lat), size = 2) + 
+  annotate(
+    "text", x = -122.615, y = 48.318, 
+    label = "Whidbey Island", 
+    fontface = "italic", 
+    size = 3
+  ) + 
+  annotate(
+    "text", x = -122.49, y = 48.225, 
+    label = "Camano\nIsland", 
+    lineheight = 0.8, 
+    fontface = "italic", 
+    size = 3
+  ) + 
   geom_text_repel(
     data = data_to_plot, 
     aes(x = Lon, 
