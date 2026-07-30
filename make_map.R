@@ -250,14 +250,74 @@ g <- ggmap(map_transparent) +
     min.segment.length = 0
   ) + 
   coord_cartesian(clip = "off") + 
-  labs(x = "", y = "") + 
-  annotate(
-    "text", x = -122.615, y = 48.318, 
-    label = "Whidbey Island", 
-    fontface = "italic", 
-    size = 3
-  )
+  labs(x = "", y = "")
+
 ggsave(
   here("figs", "whidbey_station_map_moorings.png"), 
   g, dpi = 600, height = 5, width = 4
 )
+
+# Map - phyto SAP ---------------------------------------------------------
+label_whidbey_x <- -122.615
+label_whidbey_y <- 48.318
+label_camano_x <- -122.5
+label_camano_y <- 48.2
+data_to_plot <- locators |>
+  filter(Agency == "King County", grepl("bottle", Data_Type)) |>
+  add_row(Name = "", Lat = label_whidbey_y, Lon = label_whidbey_x) |>
+  add_row(Name = "", Lat = label_camano_y, Lon = label_camano_x)
+g <- ggmap(map_transparent) + 
+  theme_bw() + 
+  theme(
+    panel.grid = element_blank(), 
+    panel.background = element_rect(fill = 'white'), 
+    axis.text = element_blank(), 
+    axis.ticks = element_blank(), 
+    legend.position = "bottom", 
+    legend.margin = margin(0, 0, 0, 0), 
+    legend.title = element_blank(), 
+    legend.spacing.x = unit(0, "mm"), 
+    legend.spacing.y = unit(0, "mm")
+  ) + 
+  geom_point(
+    data = data_to_plot, 
+    aes(x = Lon, y = Lat, shape = is.na(Last_Year), size = is.na(Agency)), 
+  ) + 
+  annotate(
+    "text", x = label_whidbey_x, y = label_whidbey_y, 
+    label = "Whidbey Island", 
+    fontface = "italic", 
+    size = 3
+  ) + 
+  annotate(
+    "text", x = label_camano_x, y = label_camano_y, 
+    label = "Camano\nIsland", 
+    lineheight = 0.8, 
+    fontface = "italic", 
+    size = 3
+  ) + 
+  geom_text_repel(
+    data = data_to_plot, 
+    aes(x = Lon, 
+        y = Lat, 
+        label = Name), 
+    bg.color = "white", 
+    bg.r = 0.1, 
+    box.padding = 0.3, 
+    force = 2, 
+    force_pull = 0, 
+    point.padding = 0.1, 
+    xlim = c(NA, Inf), 
+    ylim = c(-Inf, Inf), 
+    min.segment.length = 0
+  ) + 
+  coord_cartesian(clip = "off") + 
+  labs(x = "", y = "", shape = "") + 
+  scale_shape_manual(values = c(8, 16), labels = c("inactive", "active")) + 
+  scale_size_manual(values = c(2, 0)) + 
+  guides(size = "none")
+ggsave(
+  here("figs", "whidbey_station_map_phyto_sap.png"), 
+  g, dpi = 600, height = 5.5, width = 4
+)
+
