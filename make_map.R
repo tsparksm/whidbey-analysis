@@ -130,6 +130,50 @@ ggsave(here("figs", "whidbey_station_map_KC_y2tm.png"), g,
        dpi = 600, 
        height = 5, width = 4)
 
+
+# Map with KC stations (year 4 tech memo) ---------------------------------
+data_to_plot = locators %>% 
+  filter(Agency == "King County",
+         Name != "PENNCOVEPNN001") %>% 
+  mutate(Shape = case_when(
+    Data_Type == "CTD" ~ "CTD", 
+    TRUE ~ "CTD+bottle"))
+
+g <- ggmap(map_transparent) + 
+  theme_bw() + 
+  theme(panel.grid = element_blank(), 
+        panel.background = element_rect(fill = 'white'), 
+        axis.text = element_blank(), 
+        axis.ticks = element_blank(), 
+        legend.position = "none") + 
+  geom_point(data = data_to_plot, 
+             aes(x = Lon, 
+                 y = Lat, 
+                 shape = Shape, 
+                 color = Has_Mooring), 
+             size = 2) + 
+  geom_text_repel(data = data_to_plot, 
+                  aes(x = Lon, 
+                      y = Lat, 
+                      color = Has_Mooring, 
+                      label = Name), 
+                  box.padding = 0.3, 
+                  bg.color = "white", 
+                  bg.r = 0.1, 
+                  xlim = c(NA, Inf), 
+                  ylim = c(-Inf, Inf), 
+                  min.segment.length = 0) + 
+  coord_cartesian(clip = "off") + 
+  scale_shape_manual(values = c("CTD" = 17, 
+                                "CTD+bottle" = 16)) + 
+  scale_color_manual(values = c("TRUE" = "red", 
+                                "FALSE" = "black")) + 
+  labs(x = "", y = "", shape = "")
+ggsave(here("figs", "whidbey_station_map_KC_y4tm.png"), g, 
+       dpi = 600, 
+       height = 5, width = 4)
+
+
 #### Map with KC stations - no text ####
 data_to_plot = locators %>% 
   filter(Agency == "King County", 
