@@ -2,6 +2,7 @@
 source(here::here("src", "utility_functions.R"))
 library(ggmap)
 library(ggrepel)
+library(ggspatial)
 
 locators <- load_locator_all()  # use jitter version for best map
 
@@ -317,8 +318,9 @@ g <- ggmap(map_transparent) +
     panel.background = element_rect(fill = 'white'), 
     axis.text = element_blank(), 
     axis.ticks = element_blank(), 
-    legend.position = "bottom", 
-    legend.margin = margin(0, 0, 0, 0), 
+    legend.position = "inside", 
+    legend.position.inside = c(0.8, 0.9), 
+    legend.background = element_rect(color = "black"), 
     legend.title = element_blank(), 
     legend.spacing.x = unit(0, "mm"), 
     legend.spacing.y = unit(0, "mm")
@@ -359,7 +361,16 @@ g <- ggmap(map_transparent) +
   labs(x = "", y = "", shape = "") + 
   scale_shape_manual(values = c(8, 16), labels = c("inactive", "active")) + 
   scale_size_manual(values = c(2, 0)) + 
-  guides(size = "none")
+  guides(size = "none") + 
+  annotation_scale(location = "bl") + 
+  coord_sf(crs = 4326) + 
+  annotation_north_arrow(
+    location = "br",
+    which_north = "true",
+    pad_x = unit(0.1, "in"),
+    pad_y = unit(0.1, "in"),
+    style = north_arrow_nautical()
+  )
 ggsave(
   here("figs", "whidbey_station_map_phyto_sap.png"), 
   g, dpi = 600, height = 5.5, width = 4
