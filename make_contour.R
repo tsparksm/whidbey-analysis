@@ -178,7 +178,12 @@ for (station in stations) {
       scales = "free_y"
     ) + 
     labs(title = station) + 
-    add_sigmat_contour()
+    add_sigmat_contour() + 
+    geom_rect(
+      data = box_out, 
+      mapping = aes(xmin = Left, xmax = Right, ymin = Bottom, ymax = Top), 
+      fill = "gray"
+    )
   print(p)
   dev.off()
 }
@@ -484,7 +489,12 @@ for (station in stations) {
       scales = "free_y"
     ) + 
     labs(title = station) + 
-    add_t_contour()
+    add_t_contour() + 
+    geom_rect(
+      data = box_out, 
+      mapping = aes(xmin = Left, xmax = Right, ymin = Bottom, ymax = Top), 
+      fill = "gray"
+    )
   print(p)
   dev.off()
 }
