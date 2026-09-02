@@ -47,6 +47,19 @@ year(data_penncovesurf$FakeDateTime) <- ifelse(
   2024
 )
 
+data_penncovebottom <- load_qc_penncovebottom()
+
+# Calculation - Penn Cove hypoxia -----------------------------------------
+
+reduced_data <- data_penncovebottom |> 
+  filter(
+    FakeDateTime <= as.POSIXct("2024-10-15 12:00", tz = "Etc/GMT+8"), 
+    FakeDateTime >= as.POSIXct("2024-07-16 12:45", tz = "Etc/GMT+8"), 
+    Oxygen_final %in% 1:2
+    ) |> 
+  group_by(Year) |> 
+  summarize(Hypoxia = sum(Oxygen <= 2, na.rm = TRUE) / n())
+
 # Figure - Penn Cove nutrients --------------------------------------------
 
 data_discrete |>
