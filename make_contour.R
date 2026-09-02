@@ -96,6 +96,15 @@ data_remix <- data_remix %>%
   filter(Year %in% years_to_plot) %>% 
   left_join(max_depth)
 
+# Define gray boxes -------------------------------------------------------
+box_out <- data.frame(
+  Year = 2022:2026,
+  Bottom = c(0, 0, 0, 0, -Inf), 
+  Top = c(0, 0, 0, 0, Inf), 
+  Left = c(0, 0, 0, 0, yday("2026-03-01")), 
+  Right = c(0, 0, 0, 0, yday("2026-04-30"))
+)
+
 #### Sigma-t contour plot ####
 lims <- c(20, 23.6)  # min and max sigma-t values
 mybreaks <- seq(lims[1], lims[2], by = acc_sigmaT)
@@ -373,7 +382,12 @@ for (station in stations) {
       scales = "free_y"
     ) + 
     labs(title = station) + 
-    add_do_contour()
+    add_do_contour() + 
+    geom_rect(
+      data = box_out, 
+      mapping = aes(xmin = Left, xmax = Right, ymin = Bottom, ymax = Top), 
+      fill = "gray"
+    )
   print(p)
   dev.off()
 }
