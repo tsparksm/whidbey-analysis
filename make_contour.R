@@ -770,7 +770,7 @@ for (yoi in years_to_plot) {
   p <- ggplot(data = data_to_plot |> filter(Year == yoi)) + 
     facet_wrap(~ Locator, ncol = 1, scales = "free_y") + 
     labs(title = yoi) + 
-    add_s_contour()
+    add_no23_contour()
   print(p)
   dev.off()
 }
@@ -794,7 +794,12 @@ for (station in stations) {
       scales = "free_y"
     ) + 
     labs(title = station) + 
-    add_s_contour()
+    add_no23_contour() + 
+    geom_rect(
+      data = box_out, 
+      mapping = aes(xmin = Left, xmax = Right, ymin = Bottom, ymax = Top), 
+      fill = "gray"
+    )
   print(p)
   dev.off()
 }
@@ -811,7 +816,7 @@ for (station in stations) {
     )
     p <- ggplot(data = data_to_plot |> filter(Year == yoi, Locator == station)) + 
       labs(title = paste(station, yoi)) + 
-      add_s_contour() + 
+      add_no23_contour() + 
       theme(
         panel.border = element_rect(
           colour = "black", 
